@@ -1,12 +1,12 @@
-# nltk.download('punkt')
-# nltk.download('wordnet')
-# nltk.download('stopwords')
-
 import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
 from nltk.stem import PorterStemmer
+
+# nltk.download('punkt')
+# nltk.download('wordnet')
+# nltk.download('stopwords')
 
 
 # def preprocess_text(text):
@@ -26,20 +26,6 @@ from nltk.stem import PorterStemmer
 #             processed_tokens.append(stemmed_word)
 #
 #     return " ".join(processed_tokens)
-
-# def preprocess_text(text):
-#     # Tokenization
-#     tokens = word_tokenize(text.lower())
-#
-#     # Removing stopwords
-#     stop_words = set(stopwords.words('english'))
-#     filtered_tokens = [word for word in tokens if word not in stop_words]
-#
-#     # Lemmatization
-#     lemmatizer = WordNetLemmatizer()
-#     lemmatized_tokens = [lemmatizer.lemmatize(word) for word in filtered_tokens]
-#
-#     return " ".join(lemmatized_tokens)
 
 def preprocess_text(text):
     # Tokenization
