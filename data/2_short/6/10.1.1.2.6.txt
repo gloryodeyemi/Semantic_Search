@@ -1,0 +1,875 @@
+﻿Performance Evaluation of Efficient Shared Path
+Protection in Mesh WDM Networks
+Chadi Assi 1 , Ahmad Khalil 2 , Nasir Ghani 3 , Abdallah Shami 4 and Mohamed Ali 2
+1
+Concordia Institute for Information Systems Engineering, Concordia University
+assi@ciise.concordia.ca
+2
+Dept. of Electrical Engineering; Graduate School of The City University of New York,
+{khalilan, eeali}@ees1s0.engr.ccny.cuny.edu
+3
+Dept. ECE, Tennessee Tech. University
+nghani@tntech.edu
+4
+Dept. ECE, University of Western Ontario
+ashami@eng.uwo.ca
+Abstract: The efficient use of network capacity in shared restoration schemes strongly depends upon the path selection
+procedure. In this paper we propose and evaluate efficient shared path selection algorithms for restoration of
+connections in optical networks. Namely, two distributed path selection algorithms are proposed. The first approach
+maintains global information on network resource usage to determine link sharability and compute optimal shared
+paths. The second approach only relies upon local information maintained at each node. Subsequently, we present an
+analytical model to evaluate the performance of these path selection algorithms and show its accuracy through
+numerical examples. Results indicate that path selection algorithms that maximally exploit the use of reserved sharable
+channels do not necessarily result in fast restoration; rather these two optimality criteria can conflict most of the time.
+Additionally, algorithms that maximally exploit the sharability condition typically result in lower scalability and higher
+complexity.
+I- Introduction:
+Recently, wavelength Division Multiplexed (WDM) mesh networks have received much attention and
+emerged as a very promising transport solution for next-generation data networks. Given the scale of
+these architectures, where each fiber can potentially carry terabits of data, service survivability [1,2]
+becomes a critical requirement for network planning and management. Service survivability stipulates
+that upon the failure of any network element, all affected connections be rerouted within a short time
+interval using spare capacity reserved on alternate paths. Alternatively, if spare capacity is not reserved
+a-priori, the network must dynamically search/compute alternate routes and reserve resources to restore
+affected connections. However, since this latter approach exhibits longer restoration times and cannot
+guarantee complete service recovery, it may not be very feasible. Hence, the work herein only considers
+the case where spare capacity is already reserved during connection setup, referred to hereafter as path
+protection.
+A variety of optical path protection schemes have been proposed using concepts such as disjoint
+dedicated paths (1+1, 1:1), or shared backup paths [3]. In 1+1 protection, traffic is transmitted
+simultaneously on both working and protection paths, and in case of failure, the destination is required
+1
+to switch between working and protection paths, i.e., non-signaled switchover. Although such recovery
+is very fast, it is very inefficient due to the inherent resource redundancy. Meanwhile in 1:1 path
+protection, both working and protection paths are provisioned simultaneously, but data is only rerouted
+to the working path. As a result, protection paths can be used to transmit low priority pre-emptable
+traffic during non-failure conditions. As in 1+1 protection, recovery here is relatively fast, but efficiency
+is somewhat improved. Shared path protection builds upon this concept by further increasing resource
+efficiency. Here, backup resources can be shared amongst many lightpaths if they fail independently.
+Now since resources along the protection path are shared, switch nodes along the protection path are not
+configured at connection setup. Instead, upon a failure, source nodes (of failed paths) are notified and
+generate signaling messages to configure the switches along the protection path. In this paper we focus
+on shared path protection as it yields fast restoration/high efficiency for mesh WDM networks.
+A key issue pertaining to shared mesh protection addressed herein is the online path selection algorithm
+[2, 20]. First, we propose two distributed path selection algorithms to compute primary and backup
+paths. The first approach relies upon global knowledge of network resource utilization at each node to
+determine link sharability and compute optimum path pairs. It is assumed that such global information
+is disseminated throughout the network via extensions to existing routing protocols, such as OSFP and
+IS-IS [4,5]. Hence the source node computes a set of K primary shortest paths along with an optimum
+link disjoint backup path for each (which does not necessarily have to be the shortest link disjoint path).
+From this set, the path pair with the least cost is selected. Conversely, and to reduce the burden of
+network resource update, each node in the second approach only maintains local information and
+resource availability/sharability is determined in a distributed manner. Here all primary and secondary
+path pairs are selected from a set of pre-computed routes. Not surprisingly, these two path selection
+algorithms achieve different, often conflicting, objectives. Namely, while the former achieves better
+network resource utilization, the latter restricts the average hop count on the backup paths and yields
+faster service restoration times.
+Subsequently, we derive an analytical model to evaluate the performance of the proposed path selection
+schemes. Although extensive work has been done on WDM performance evaluation [7-13], to our
+knowledge these studies have not considered extensions for shared backup paths. Our model simplifies
+the analysis of WDM networks by using the multi-layer graph representation [19], where each layer
+corresponds to a virtual graph on a specific wavelength. Hence the routing and wavelength assignment
+(RWA) [10] problem is reduced to routing in circuit-switched networks [16], a well-studied problem for
+which it is relatively easy to approximate network blocking.
+The rest of the paper is organized as follows. Different distributed path selection algorithms are
+presented in section II and their respective complexities and scalabilities compared. Subsequently,
+2
+previous analytical work on WDM network performance evaluation is reviewed in Section III and a new
+analytical model for shared path protection proposed. Section IV compares the accuracy of the derived
+analytical models against detailed simulation results and also compares the different path selection
+schemes. Final conclusions are presented in Section V.
+II- Distributed shared path selection
+2.1- Background and Motivation:
+We consider the problem of online provisioning of mesh-restored optical connections, where distributed
+path selection is used to compute optimal pairs of primary and backup paths. In this scenario, where a
+source node has to make a routing decision without the knowledge of future requests, a common routing
+objective is to select potential diverse paths (primary and backup) while allocating the minimum number
+of resources, i.e., maximize the use of reserved sharable channels. Another objective is also to select
+backup paths that provide fast recovery for the affected connections in case of link failure. Now since
+resources on shared backup paths are only configured after failure occurrences, this requires the
+selection of shorter backup paths to ensure rapid service recovery. However, these two optimality
+criteria typically conflict most of the time, i.e., to maximally exploit the gain of wavelength sharability,
+one needs to allow longer backup paths, however shorter paths are required for fast service restorability.
+Also note that these sophisticated path selection algorithms require detailed knowledge of network state,
+as derived from extensions to existing link state routing protocols [4,5].
+Recent work on service survivability has focused on implementing capacity design algorithms for fast
+connection recovery in WDM networks. For example, in [1], the authors formulate the problem as a
+generalization of the maximum concurrent flow problem. Resources on backup paths are pre-configured
+to ensure fast service recovery, however restrictions on backup path sharing are imposed. On the other
+hand, the authors of [14] present a stochastic approach to compute shared mesh restorable connections
+to improve network scalability. Here, less information is deemed sufficient to determine the sharability
+of channels with remarkable accuracy. Meanwhile, a distributed path selection algorithm for a GMPLS-
+based shared mesh restoration scheme is presented in [2]. Here, a Full Information Restoration (FIR)
+algorithm is proposed, using signaling protocol extensions to distribute and collect additional link state
+information without relying upon centralized setups. On the other hand, [15] addresses the problem of
+efficient shared path protection under distributed control with only partial information knowledge.
+2.2- Path Selection Algorithms:
+2.2.1- Distributed Path selection with Global Information (DPGI):
+3
+As mentioned previously, the first approach is based upon global network state knowledge at each node.
+Here, upon arrival of a connection request, the source node computes a set of K shortest paths for the
+primary, P = p , p ,... p } . Then for each pn ∈ P , a link-disjoint secondary path and a
+{ 1 2
+K
+i
+wavelength, sn λ i
+, are selected simultaneously ( sn λ does not necessarily have to be the shortest link
+disjoint path). Consider the following notation, where a network is represented as a directed graph
+G ( N,
+J,
+W ) , with N being the set of nodes, J the set of links, and W the set of wavelengths. This graph
+can be also represented by a set of W virtual graphs, G ( N,
+J ) i = 1,..., W
+i λ , with each one
+corresponding to a specific wavelength. Then using the network state information available at the source
+node, the links weights on each graph are adjusted as follows:
+⎧0
+if λi
+on link jis
+sharable
+λ
+⎪
+i C ( j)
+= ⎨1
+if λ on link j is not used
+(1)
+i
+⎪
+⎩∞
+if j ∈ pn
+or λi
+is not sharable
+where C ( j)
+i λ
+λ i
+is the weight assigned to a link j on G . Note that the source node can determine the
+sharability (or non-sharability) of a link by checking its global information database. If the primary path
+of the connection in consideration is link-disjoint with the primary paths of all connections protected by
+this link, then a wavelength is said to be sharable. A regular shortest path algorithm (e.g. Dijskistra) is
+then used to compute the shortest path on each graph. This procedure is repeated for all virtual graphs,
+and hence up to W link disjoint paths (or less) with p n can be found. From this, the path with the
+minimal total cost is selected as a candidate disjoint path:
+( C
+Min
+i
+λi
+n
+λi
+) , where Cn
+= ∑
+j∈
+λ
+s i
+n
+C
+λi
+( j)
+(2)
+λ i
+After computing all pairs ( p , s ) n = 1,...
+K , the pair with the minimal combined cost is selected.
+n
+n
+Here the cost of the primary path is the number of hops along the path, while the cost of the secondary
+path is as defined in (2). Once pn is identified, a wavelength is assigned for the path. Note that any
+wavelength selection scheme can be used, but for simplicity, we use the First Fit approach. After
+selecting the primary/backup path pair and their corresponding wavelengths, the source node triggers its
+signaling protocol to simultaneously reserve resources along both paths. Subsequently, after receiving
+two positive acknowledgement (ACK) signaling messages, the source starts transmitting data on the
+primary path.
+4
+Note that besides the complexity associated with this algorithm, a large amount of information needs to
+be stored and frequently updated to reflect any network-wide changes. These updates can become a
+severe bottleneck if connections setup/takedown frequencies are high. Moreover, as network size
+increases, the scalability of this protocol becomes another concern.
+2.2.1- Distributed Path selection with Local Information (DPLI):
+We propose an alternative distributed protocol which exploits the sharability property of reserved
+channels yet only requires that local information be maintained at each node. This information is
+maintained in a local database to reflect the status of each wavelength on each outgoing link. Namely, if
+a wavelength on an outgoing link is reserved for protection, a list of all primary paths of connections
+protected by this wavelength is also stored. Each node also maintains up to K shortest-paths and their
+corresponding link-disjoint paths.
+Upon receiving a connection request, the source node selects a pair of disjoint paths from the arranged
+fixed set of routes. This path pair could be the first one in the list or the shortest pair. The source node
+sends a Probe message on each route toward the destination to collect available resources on each path.
+This message carries the set of free wavelengths along the first path(s) link to be established.
+Additionally, the Probe message sent along the backup path also has an additional field that contains the
+physical route of the working path of the connection (another one-bit flag is also attached to the
+message to indicate the type of the path to be setup). When an intermediate node receives this message,
+it determines the set of available wavelengths on its outgoing link (via the local database) and generates
+a new wavelength vector to be attached to the Probe message. This message is then forwarded to
+intermediate downstream nodes. These nodes determine the sharability of the wavelength by retrieving
+the route of the connection’s working path, say p, from the received Probe packet and checking to see if
+it is link-disjoint with the routes, p1, p2, etc., of the connections protected by this wavelength.
+Meanwhile, upon receiving a Probe message on the primary path, the destination node selects a
+wavelength from the attached set of available wavelengths using any wavelength selection scheme.
+This node then generates a Reserve message containing the selected wavelength and forwards it back
+upstream towards the source to configure intermediate switches. Each intermediate node checks to see
+if this wavelength is available and if so, reserves it by cross-connecting its switch and updating its local
+database. Otherwise, the intermediate node sends a negative acknowledgement (NACK) message to the
+source and a Release message back to the destination to indicate the setup failure. On the other hand,
+when receiving a Probe message on the secondary path, a wavelength is selected and a Reserve message
+is sent back to the source. Here, the Reserve message only updates the local information database at
+each intermediate node without cross-connecting the switch. Upon receiving both Reserve messages, the
+source deems the connection request successful and begins to transmit data on the primary path.
+5
+Otherwise, if at least one NACK message is received, the connection setup fails and any reserved
+resources must be released (for further details on this protocol, please refer to [18]). Unlike the previous
+protocol, the complexity of this algorithm is minimal since path computation is done off-line. This
+improves scalability with network size since only local information is maintained at each node.
+III- Analytical model for shared path protection:
+3.1- Background:
+Various analytical models have been proposed to study the performance of optical networks with fixed
+routing, fixed alternate routing, random and first fit wavelength assignment, and with/without
+wavelength conversion [7-13].
+In [12], the authors derive a model to compute approximate blocking probabilities with and without
+wavelength conversion. As they point out, however, this model is inappropriate for sparse networks
+because it uses the link independency blocking assumption without considering the dependence between
+the acquisitions of wavelengths on successive links. Meanwhile, the authors of [13] present an analysis
+that partially accounts for link load dependence. However, here it is assumed that a given wavelength
+on a link is used independently of other wavelengths. Hence this simplified model makes good
+qualitative predictions of network behavior, but is unable to predict the detailed behavior of simulations
+with numerical accuracy.
+Another model proposed in [7] uses a reduced load approximation approach with state dependent arrival
+rates. The model is shown to be good for smaller networks where multi-link traffic is not appreciable
+and is applicable to arbitrary topologies and traffic pattern. It is however computationally intensive, with
+the complexity growing exponentially with the number of hops. It also ignores the load correlation
+between links due to the wavelength continuity constraint. On the other hand, the authors of [8] propose
+a new model using combinatorics-based inclusion-exclusion principles for the analysis of optical
+networks with no wavelength conversion and random wavelength assignment. This model improves
+upon the approach proposed in [7] in that the complexity is independent of the hop length and scales
+only with the capacity of the link as opposed to exponentially. Here, the authors also propose another
+model that accounts for wavelength correlation and validate its accuracy even for sparse networks.
+Analytical models for FF assignment have been proposed in [9, 10, 11] and use versions of the overflow
+traffic model. Here, the analysis is simplified by using the multi-layer representation approach where
+each layer corresponds to a wavelength; thus the problem or routing and wavelength assignment is
+reduced into routing in a circuit switched networks [16]. The authors of [11] analyze fixed routing in
+optical networks with no wavelength conversion and FF assignment using the same technique
+mentioned earlier. Here, moment matching techniques are used to model overflow traffic. Similarly,
+6
+[10] studies fixed alternate routing with FF and assumes Poisson overflow modeling. Additionally,
+others have used various other overflow models to analyze network blocking, e.g., such as Binomial
+Poisson Pascal (BPP) in [9].
+3.2- Blocking Probability in Optical Networks with shared backup paths:
+In WDM network with path protection, a connection request is successful if two diversely routed paths
+can be found between a source-destination (s-d) pair and commensurate resources (wavelengths) can be
+allocated for them. Given the fact that both paths are diversely routed, blocking on one path is
+independent from the blocking on the second path. Hence the success probability of one connection is
+defined to be:
+S d s−
+=
+prob(
+sucesson
+primary and sucesson
+secondary)
+= prob(success on primary)*prob(success on secondary)
+= [1-prob(blocking on primary)]*[1-prob(blocking on secondary)].
+The blocking for a connection between an s-d pair is computed as follows:
+s d
+P − s d=1-
+S − = 1 ( 1−
+p1 )( 1−
+p2
+) = p1
++ p2
+− p1p
+2
+− (3)
+In other words, one needs to compute the blocking on both the primary (p1) and on the secondary (p2)
+for each connection so that overall blocking can be approximated. More detailed treatments for network
+traffic modeling and path blocking are now considered:
+A- Network and traffic assumptions:
+In this section we state the assumptions about network characteristics and traffic behaviors, which are
+used in our models for calculating path-blocking probability without wavelength converters. Let a
+network with N nodes and J links be represented by a directed graph G (N, J), with each link having the
+same number of wavelengths (W). Connection call requests arrive according to a Poisson process and
+the duration of each call is exponentially distributed with unit mean. Furthermore, let λ be the total
+traffic load offered to the network, ar be the offered load to the
+7
+th
+r s-d connection pair,
+E = { 1,
+2.......
+J}
+be the set of all links, and W = λ , λ ,......, λ } is the set of all wavelengths.
+{ 1 2
+W
+For analytical simplicity and tractability considerations, we pre-compute the possible set of primary and
+secondary routes between any s-d pair.
+( 1)
+( 1)
+( 1)
+( 1)
+Let R { r , r ....... r } be the set of all primary routes in the network, and
+= 1 2
+N(
+N−1)
+( 2)
+( 2)
+( 2)
+( 2)
+R { r , r ....... r } be the set of the secondary routes, link-disjoint with their corresponding
+= 1
+2
+N ( N−1)
+( 1)
+( 2)
+primary routes. Here, the pair ( r i , ri
+) is the pair of primary and secondary routes between the th
+i s-d
+pair.
+In our approach, the problem of computing path (primary, secondary) blocking on a particular
+wavelength is reduced to computing approximate blocking probability in a circuit switched network.
+Specifically, we extend the layered-graph approach [19], to develop an approximate analytical model
+for the path blocking. By using this layered approach, the RWA problem is reduced to only finding a
+wavelength on an end-to-end path between the s-d pair. The search for a wavelength on a path may be
+viewed as a search over a sequence of W logical paths, where a logical path is a combination of a
+predefined physical path and a particular wavelength. If the logical path under consideration is not
+available then the connection request overflows to the next logical path. When we find the two logical
+paths under consideration, the connection request is established. Otherwise, the connection is blocked.
+Here, we use moment matching techniques, specifically the Equivalent Random Method (ERM) [16] to
+model the overflow traffic between different wavelength layers.
+Further consider the following variable definitions:
+k ari λ 1)
+( 1)
+( : The arrival rate on primary route ri on wavelength layer λ k .
+k ari λ 2 )
+( 2)
+( : The arrival rate on secondary route ri on wavelength layer λ k .
+k Bj λ : The link blocking probability on link j on wavelength k
+λ .
+λk
+α j : The traffic load on link j on wavelength k
+L λ
+( : The primary path blocking probability on primary route
+k
+1)
+i
+r
+L λ
+k
+( 2)
+i
+r
+8
+λ .
+λ .
+( 1)
+ri on wavelength layer k
+( 2)
+: The secondary path blocking probability on secondary route ri on wavelength layer λ k .
+If we consider a network with F fibers per link, the number of idle circuits on link j on wavelength k λ
+can be viewed as a birth-and-death process given that the traffic arrival follows a Poisson distribution:
+P m = Prob {m circuits are used}=
+( )
+( ) −
+[ 1 + ∑
+]
+!
+!
+F
+λk
+m
+λk
+n
+α j
+α j
+m
+n
+n=
+1
+k B j
+λ = Prob {F circuits are used on link j on wavelength λ k } = P F . (5)
+1
+(4)
+B- End-to-end path blocking:
+The traffic load on link j on wavelength λ k is determined to be:
+λk
+α = α +
+j
+α
+λk
+, ( 1)
+λk
+, ( 2)
+j
+j
+( 6)
+9
+where
+λ k,(
+1)
+α is the traffic load
+λk
+, ( 2)
+on link j from the set of primary routes passing by link j, and α is the traffic load on link j from the
+secondary routes passing by link j.
+Note that the traffic load on link j from a connection routed on a path r (whether primary or secondary)
+can be approximated as follows [16]:
+∏( f∈r−{
+j}
+α = a × 1 − B )
+(7)
+j
+r
+where ar is the offered traffic on route r.
+λ k,(
+1)
+Obviously, one can estimate α :
+f
+j
+λk
+, ( 1)
+λk
+λk
+( 1)
+( 1)
+α j
+a ( 1 ) . ( 1 − Bm
+) ∀ r ∈ R
+(8)
+r
+r ( 1)
+: j∈r
+( 1)
+( 1)
+m∈r
+−{
+j}
+= ∑ ∏
+On the other hand, the traffic load on link j, due the set of secondary routes cannot be approximated by
+(8) if shared path protection is used. However, if dedicated path protection is being considered, similar
+to (8) one can compute:
+λk
+, ( 2)
+λk
+λk
+( 2)
+( 2)
+α j
+a ( 2)
+. ( 1 − Bm
+) ∀ r ∈ R
+(9)
+r
+r ( 2)
+: j∈r
+( 2 )
+m∈r
+( 2 ) −{
+j}
+= ∑ ∏
+In the case of shared path protection, we develop the following model to compute the link load.
+B.1- Property 1:
+Let s 1 and s 2 be two secondary paths passing through a link j and let p 1 , p 2 be their corresponding
+primary paths. Additionally, let j,
+1
+α and j,
+2
+j
+α be the corresponding traffic load on link j from both
+secondary paths independently (using Eq. 7). Then the aggregated link load can be computed as follows:
+Max , α )
+α
+α = if Φ =
+p I p
+(10)
+j
+( j,
+1 j,
+2
+1
+2
+j
+α + α
+if p I p ≠ Φ
+= j,
+1
+j,
+2
+1
+2
+Using this property one can generalize to the case where link j is shared by m secondary paths,
+j
+{ s 1 , s 2 , …, s m } where their corresponding set of primary paths is P = { p1,
+p2
+,..., pm}
+. However,
+the difficulty here stems from the fact that some of the corresponding primary paths of this set of
+secondary paths (passing through link j) might themselves be link disjoint amongst each other while
+10
+j
+S =
+others could overlap in at least one link. In other word, if p I p I ...... I p = Φ , then one can write
+j Max( j,
+1,
+j,
+2 ,...., α j,
+m )
+α
+α
+α = ; however, if Φ ≠
+p1 I p2
+I......
+I pm
+does not imply
+α = α + α + .... + α
+j j,
+1
+j,
+2
+j,
+m , rather, α j = f ( α j 1, , α j , 2 ,...., α j,
+m ) and needs to be determined.
+B.2- Computation of j α
+In this section we are interested in computing the aggregated load on link j from a set of m secondary
+paths passing by this link. We define F = E −{
+j}
+, the set of all links in the network except link j.
+We further define the array T[N(i)], where each element N(i) is:
+N k
+k
+( i)
+= { p / i ∈ p , k = 1.....
+m}
+∀ i∈ F
+T[N(i)] is an array of size |F|, where an element at index i represents the subset of all primary paths from
+the set , ,..., } p
+p p passing by link i.
+{ 1 2
+m
+Next we compute independently the traffic load on link j from each secondary route passing by link j,
+α , α ,...., α . From this we then compute:
+j , 1 j,
+2
+j,
+m
+| N ( i ) |
+∑
+k = 1
+β ( i ) = f { N ( i )} = α
+if |N(i)| ≠ 0 (11)
+j , k
+= 0 otherwise
+β (i)
+represents the traffic load on link j from the subset of the secondary paths in the set { s 1 , s 2 ,
+…, s m }where their respective subset of primary paths passes through link i.
+After computing β (i)
+, ∀ i ∈ F , one can compute the overall traffic load on link j:
+, ( 2)
+j
+i
+k α β
+λ
+= Max{
+( i)}
+(12)
+1
+2
+m
+Using both equations (8) and (12), one can compute the total traffic load on a link j using equation (6).
+Equations (5) and (6) can be solved iteratively to compute the exact values for the link blocking.
+On the other hand, given the link blocking on a given wavelength layer, one can compute the primary
+path and secondary path blocking between each s-d pair on this wavelength layer as:
+∏( 1)
+j∈ri
+λ k
+λk
+( 1)
+( 1)
+L = 1−
+( 1−
+B ) , ∀ ∈ R
+(13)
+( 1 )
+ri
+∏( 2 )
+j∈r
+i
+j
+r i
+λ k
+λk
+( 2)
+( 2)
+L = 1−
+( 1−
+B ) , ∀ ∈ R
+(14)
+( 2 )
+ri
+j
+Additionally, all traffic blocked on wavelength k
+a
+a
+λ
+r
+k + 1
+( 1)
+i
+λ
+r
+k + 1
+( 2 )
+i
+= a
+= a
+λ
+r
+k
+( 1 )
+i
+λ
+r
+k
+( 2 )
+i
+. L
+. L
+λ
+r
+k
+( 1)
+i
+λ
+r
+k
+( 2 )
+i
+r i
+λ overflows to wavelength k + 1
+Blocked traffic keeps overflowing until the last wavelength, where it is considered to be fully blocked.
+11
+λ :
+Hence the overall primary path blocking (respectively the secondary) is computed as:
+L
+( 1)
+i
+r
+=
+W
+∏
+k=
+1
+L
+λk
+(
+r
+1)
+i
+W
+, L ( 2)
+=
+r ∏ L
+i
+k = 1
+λ
+k
+( 2 )
+ri
+Namely, (17) computes the blocking on route ri by computing the product of the route blocking on each
+wavelength correspondingly.
+( 1)
+( 1)
+( 2)
+( 2)
+Having L ( 1)
+and L ( 2 ) ∀ r R
+ri
+r
+i ∈ , ∀ ri ∈ R , one can compute the connection blocking using
+i
+equation (3) and then the overall network blocking can be computed:
+∑ −
+s−d
+P
+s d
+P =
+N ( N −1)
+IV- Performance evaluation
+(15)
+(16)
+(17)
+(18)
+In this section we use simulations results to demonstrate the accuracy of our derived analytical model.
+We also compare the performance of the different path selection algorithms, in terms of blocking
+probability, sharability gain, and connection average hop count. Here, two network topologies are used:
+the 16-node NSF network and 21-node DARPA network. The number of wavelengths per fiber is set to
+4 and we consider only one fiber per link. Connection requests arrive at each node according to a
+Poisson process with arrival rate λ and the connection holding times have exponential distribution with
+unit mean.
+First, we show in figure 1 the comparison between the proposed analytical model and simulation results
+for dedicated and shared path protection. We solve the model proposed in section II to determine the
+end-to-end blocking probability (Eq. 18). First, the path blocking (primary and secondary) on each
+wavelength graph is computed using equations (13) and (14), where the link blocking is calculated by
+iteratively solving (5) and (6). The total path (primary and secondary) blocking is computed using (17),
+and the connection blocking is computed using (3). From this, the overall network blocking is computed
+using (18). We use the 16-node NSF network to evaluate the performance of this analytical model.
+Although larger networks can also be evaluated, related convergence times for the numerical solutions
+become prohibitive. As Figure 1 indicates, our methodology for estimating link loading in shared path
+protection is fairly accurate, and matches the simulation results closely.
+Next, we compare the performance of the path selection algorithms presented in section III. Overall, our
+results confirm that the path selection model has a signif icant impact on network performance. Here,
+three plots are shown on the figure (Fig. 2), with the first one representing DPGI and the other two plots
+representing DPLI. As mentioned earlier, when using DPLI, the source node maintains an ordered list of
+K shortest paths. In DPLI1 (Figure 2), the source node always selects the first pair of paths (which
+corresponds to the shortest primary and its shortest link-disjoint backup) in the ordered list. Meanwhile
+DPLI2 (Figure 2) selects the shortest pair. The results indicate that DPGI outperforms the other schemes
+since it can better exploit the sharability of reserved backup channels by favoring the selection of
+protection routes with more reserved sharable channels. However, the drawback of DPGI is the high
+complexity involved in the path selection procedure. Moreover, as connections setup/takedown
+frequencies increase, excessive updates are required to ensure up-to-date resource usage information.
+Clearly, this poses a notable scalability problem and mandates larger databases as network loadings
+increases. On the other hand, DPLI1 slightly outperforms DPLI2, which is due to the fact that the
+former scheme selects longer protection paths, thus allowing for more channel sharability.
+12
+Blocking Probability
+10 0
+10 -1
+10 -2
+10 -3
+NSF Network, W = 4 wavelengths
+10
+0 5 10 15 20 25 30 35 40
+-4
+Load (Erlangs)
+13
+Shared Protection, Simulation
+Dedicated Protection, Simulation
+Dedicated Protection, Analytical
+Shared Protection, Analytical
+Figure 1- Comparison of Analytical model and simulation
+Another key performance comparison is the sharability gain of the path selection algorithms (Figure 3).
+This value is defined as the improvement the algorithm yields over conventional dedicated path
+protection. As expected, DPGI exhibits better sharability gain, making it more favorable if the network
+utilization is the key criterion to be optimized. The figure shows that DPGI improves the sharabilty gain
+by 15-25% with respect to the other path selection schemes.
+Blocking Probability
+Sharability Gain
+10 0
+10 -1
+10 -2
+DPGI
+DPLI(1)
+DPLI(2)
+DARPA Network, W = 4 wavelengths
+10
+0 5 10 15 20 25
+-3
+Total Load (Erlangs)
+1.2
+1.1
+1
+0.9
+0.8
+0.7
+0.6
+0.5
+0.4
+0.3
+Figure 4- Comparison between different path selection algorithms
+DARPA Network, W = 4 wavelengths
+0.2
+0 2 4 6 8 10 12 14 16 18 20 22
+Load (Erlangs)
+Figure 5- Impact of path selection on sharability gain
+So far, our comparison has only focused on the merits of the DPGI scheme versus other path selection
+algorithms. However, although DPGI is more resource-efficient, i.e., since it favors longer backup paths
+14
+DPGI
+DPLI(1)
+DPLI(2)
+to maximally exploit sharability, it generally has slower recovery timescales. For example, Figure 6
+shows the average path (primary, secondary) hop counts for DPGI, DPLI1 and DPLI2. As expected,
+DPGI yields longer backup paths (approximately 8 hops), whereas DPLI2 yields shortest backup paths
+(approximately 5.5 hops). Meanwhile, DPLI1 performance is found to lie in between the above two
+schemes (approximately 7 hops).
+Average Path Hop Count
+10
+9
+8
+7
+6
+5
+4
+3
+2
+Primary Length, DPLI1
+Secondary Length DPLI1
+Primary Length DPLI2
+Secondary Length DPLI2
+Primary Length DPGI
+Secondary Length DPGI
+DARPA Network, W = 4 wavelengths
+1
+0 5 10 15 20 25
+Load (Erlangs)
+Figure 6- Impact of path selection on the average hop count
+These findings have a major impact on recovery time analysis. As mentioned in section IV, upon
+detecting any network element failure, the source (or destination) node of each affected connection is
+notified via signaling messages (FNM). Subsequently, the notified node initiates the backup path setup
+by sending a Failure Recovery Message (FRM) along the protection route to cross-connect the switches
+at intermediate nodes. Meanwhile, if source-based restoration is used, the source has to wait for an ACK
+from the destination before it can start transmitting data on the backup route. Therefore, at least one
+round trip delay on the backup path is incurred, in addition to the message processing time at each
+intermediate node and the time taken to configure each intermediate switch. On the other hand if
+destination-based restoration is used, the one-trip delay time is eliminated. Now clearly, recovery times
+also depend very much upon the length of the backup path, as well as message processing and switch
+configuration times. When the propagation time is a dominant factor (e.g., a 1000-mile fiber span
+15
+implies 5.36 ms propagation delay), the use of longer backup paths may not be feasible (e.g., a 5000
+miles cross-country path will incur 53.64 ms of only round trip propagation delay aside from per-node
+message processing time and cross connection times). Hence, short backup path selection is crucial
+when the restoration time is a key requirement. Overall, the use of DPGI is unfavorable herein, and
+instead schemes such as DPLI2 are more well-suited. For further details on recovery time analysis and
+the impact of related signaling procedures, interested readers are referred to [18].
+VI- CONCLUSION
+The paper addressed the path sele ction problem as a key requirement in the design of efficient mesh
+restorable networks. Two path selection algorithms were presented, namely the DPGI that relies on
+global information maintained at each node and DPLI, where only local information is necessary. We
+showed that path selection algorithms intended to optimize the resource utilization by maximally
+exploiting the sharability of reserved channels do not necessarily result in fast restoration. Rather, these
+two optimality criteria tend to be conflic ting. Analytical model for evaluating the performance of shared
+path protection is presented and its accuracy is validated through numerical comparison with simulation
+results.
+REFERENCES
+[1] O. Hause, M. Kudialam and T. V. Lakshman, “Capacity Design of Fast Path Restorable Optical Networks”
+IEEE INFOCOM 2002, NY.
+[2] G. Li, W. Wang, C. Kalmaneck, and R. Doverspike, “Efficient Distributed Path Selection for Shared
+Restoration Connections” IEEE INFOCOM 2002, NY.
+[3] B. Doshi, el Al “Optical Network Design and Restoration” Bell-labs Technical Journal Jan-Mar 1999.
+[4] K. Kompella et al. “OSPF extensions in support of Generalized MPLS” IETF Internet Draft, work in progress,
+Feb 2001.
+[5] K. Kompella et al. “IS-IS extensions in support of Generalized MPLS” IET F Internet Draft, work in progress,
+Feb 2001.
+[6] P. Ashwood-Smith et al. “”Generalized MPLS- Signaling Functional Description” IETF Internet Draft, work in
+progress, Nov 2001.
+[7] A. Birman, “Computing Approximate Blocking Probabilities for a Class of All-Optical Networks” IEEE J.
+Select. Areas Commun. Vol.14, pp. 852-857, June 1996.
+[8] A. Sridharan, K. Sivarajan, “Blocking in All-Optical Networks” IEEE INFOCOM 2000, March 2000.
+[9] H. Harai, M. Murata, and H. Miyahara, “Performance of All-Optical Networks with Limited-Range
+Wavelength Conversion” IEEE ICC, 1997.
+[10] A. Mokhtar, and M. Azizoglu, “Adaptive Wavelength Routing in All-Optical Networks” IEEE/ACM
+Transaction on Networking, vol.6, No. 2, pages 197-206, April 1998.
+16
+[11] E. Karasan, and E. Ayanoglu, “Effects of Wavelength Routing and Selection Algorithms on Wavelength
+Conversion Gain in WDM Optical Networks” IEEE/ACM Transaction on Networking, vol.6, No. 2, pages 186-
+196, April 1998.
+[12] M. Kovacevic and A. Acampora, “Benefits of Wavelength Translation in all-optical Clear Channel Networks”
+IEEE J. Select. Areas Commun. Vol.14, pp. 868-880, June 1996.
+[13] R. Barry, and P. Humblet, “Models of Blocking Probability in All-Optical Networks with and without
+wavelength changers” IEEE J. Select. Areas Commun. Vol.14, pp. 858-867, June 1996.
+[14] E. Bouillet, J. Labourdette, G. Ellinas, R. Ramamurthy, S Chaudhuri, “Stochastic Approaches to Compute
+Shared Path Mesh Restored Lightpaths in Optical Network Architecture” IEEE INFOCOM 2002, NY.
+[15] C. Qiao, and D. Xu, “Distributed Partial Information Management (DPIM) Schemes for Survivable
+Networks-Part I” IEEE INFOCOM 2002, NY.
+[16] A. Girard, Routing and Dimensioning in Circuit-Switched Networks, Addison Wesley, 1990.
+[17] S. Ramamurthy and B. Mukherjee, “Survivable WDM Mesh Networks, Part II - Restoration”, IEEE ICC
+1999.
+[18] C. Assi, et al. “A Hybrid Distributed Fault-Management Protocol for Combating Single-Fiber Failures in
+Mesh-based DWDM Optical Networks” IEEE GLOBECOM 2002.
+[19] C. Chen and S. Banerjee, “A New Model for Optimal Routing and Wavelength Assignment in WDM Optical
+Networks” IEEE INFOCOM 1996.
+[20] S. Sengupta and R. Ramamurthy “Capacity Efficient Distributed Routing of Mesh-Restored Lightpaths in
+Optical Networks” IEEE GLOBECOM 2001.
+17

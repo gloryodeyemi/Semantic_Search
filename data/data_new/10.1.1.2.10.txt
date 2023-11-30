@@ -1,0 +1,236 @@
+﻿406 IEEE COMMUNICATIONS LETTERS, VOL. 8, NO. 6, JUNE 2004
+Local Stability of a New Adaptive Queue
+Management (AQM) Scheme
+Li Zhu, Student Member, IEEE, and Nirwan Ansari, Senior Member, IEEE
+Abstract—In this letter, we propose a new Adaptive Queue Management
+scheme based on the virtual queue size and the aggregate
+flow rate. Our proposal is tailored for the widely deployed TCP
+Reno and does not require modifications to TCP end users. We
+prove that our scheme can guarantee local stability for a network
+with an arbitrary topology and heterogeneous round-trip times for
+TCP users.
+Index Terms—Adaptive Queue Management (AQM), stability,
+TCP, virtual queue.
+I. INTRODUCTION
+ACTIVE Queue Management (AQM) has been a very active
+research area in recent years. Many AQM mechanisms
+have been proposed, e.g., random early detection (RED)
+[1], random exponential marking (REM) [2], PI controller [3],
+adaptive virtual queue (AVQ) [4], and state feedback control
+(SFC) [5]. AQM schemes control the traffic rate and buffer occupancy
+by schematically dropping packets. If Explicit Congestion
+Control (ECN) is enabled, packets are marked instead of
+being dropped. Without loss of generality, we assume ECN is
+enabled in this letter. End TCP users adapt their transmission
+rates based on the marking feedback from AQM.
+RED is a queue length based AQM that marks packets with
+probability proportional to the current average queue length.
+AVQ is a typical rate based scheme. REM, PI, and SFC use the
+queue length and the aggregate flow rate to compute the marking
+probability.
+The TCP/AQM system has been modeled as a close loop control
+system. One of the major concerns about such a system is its
+stability property. [3]–[5] studied the local stability conditions
+for the network with PI, AVQ, and SFC, respectively. These
+works only considered a network of a single bottleneck link
+with homogeneous round-trip times, and neglected the backward
+propagation delays. [6] took the heterogeneous round-trip
+time and backward propagation delay into consideration, and
+provided the local stability condition for RED in a network with
+a single bottleneck link.
+In this letter, we propose a virtual queue and rate based AQM
+scheme (referred to as VQR), which uses the virtual queue size
+Manuscript received November 3, 2003. The associate editor cordinating the
+review of this letter and approving it for publication was Prof. D. Petr. This work
+has been supported in part by the New Jersey Commission on Higher Education
+under the NJI-TOWER project, and by the New Jersey Commission on Science
+and Technology under NJWINS.
+The authors are with the Advanced Networking Laboratory, Department of
+Electrical and Computer Engineering, New Jersey Institute of Technology,
+Newark, NJ07102 USA (e-mail: lz6@njit.edu; nirwan.ansari@njit.edu).
+Digital Object Identifier 10.1109/LCOMM.2004.831335
+1089-7798/04$20.00 © 2004 IEEE
+and the aggregate flow rate to compute the marking probability.
+We provide and prove the local stability condition of our scheme
+for a network with an arbitrary topology rather than a single
+bottleneck link, with heterogeneous rather than homogeneous
+round-trip times, and with the consideration of rather than negligence
+of the backward propagation delays.
+The remainder of this letter is organized as follows. Section II
+presents the framework of the TCP/AQM dynamic model.
+Section III presents our proposed VQR scheme and the corresponding
+local stability condition. Section IV presents the
+conclusions.
+II. TCP/AQM DYNAMICS
+In this section, we adopt the work in [6] to present the
+TCP/AQM dynamic model used in this letter. Consider a
+network with links, each with capacity .
+Assume there exist TCP sources, which share the links.
+The routing policy is expressed by an matrix with
+elements defined as
+if source uses link
+otherwise.
+(1)
+Each link marks packets with probability at time . Each
+TCP source is associated with a round-trip time
+where is the round-trip propagation delay for source and
+is the queue length of link at time . The round-trip time
+delay can also be expressed as
+where is the forward delay from source to link and
+is the backward delay from link back to source .
+The transmitting rate of source , , is modeled as
+where is the window size of . The aggregate transmission
+rate at link is
+With the assumption that is small, the end-to-end marking
+probability for source can be obtained by summing up
+the marking probability at each link traversed by
+(2)
+(3)
+(4)
+(5)
+(6)
+ZHU AND ANSARI: LOCAL STABILITY OF A NEW AQM SCHEME 407
+We adopt the fluid TCP model studied in [3] and [6], in which
+the TCP Reno window size evolves according to
+(7)
+The first term on the right side of (7) describes the additive
+window increment, and the second term stands for the multiplicative
+window decrement. The sending rate of TCP evolves
+according to
+The dynamics of the queue length at link can be expressed
+as
+Denote , , as the equilibrium values of , ,
+, respectively. At equilibrium, we have , and
+. Here, is the equilibrium
+round-trip time for source . It can be shown from (7) that
+(8)
+(9)
+(10)
+Let , ,
+. Linearizing (7), (8), and (5) around the equilibrium
+state with the first-order approximation, we have
+III. THE VQR ALGORITHM
+(11)
+(12)
+(13)
+VQR maintains a virtual queue , which is updated at
+each packet arrival according to
+(14)
+where is a positive number less than but close to 1 (e.g., 0.95).
+The marking probability is updated by
+(15)
+where is a reference virtual queue length, and and are
+positive numbers. If , it is set to zero; if ,it
+is set to one.
+At the equilibrium state, we have . Thus, the aggregate
+rate is , which is slightly smaller than the link capacity
+. Although this could lead to slight link under-utilization,
+there are some benefits of doing so. First, the queuing delay
+is zero at the equilibrium state. Second, since we only consider
+small perturbation around the equilibrium state, it can reasonably
+be assumed that is always less than the link capacity.
+As a result, the queue length is always zero, the round-trip
+time is reduced to , and is always zero under such
+an assumption. Thus, the second term on the right side of (12)
+is negligible. Together with (11), we can rewrite (12) as
+(16)
+Linearizing (14) and (15) around the equilibrium state, we
+have
+(17)
+(18)
+Following [6], we can express (13), and (16)–(18) in the Laplace
+domain in the matrix form:
+where , ,
+, , and
+if source uses link
+otherwise
+(19)
+(20)
+(21)
+(22)
+if source uses link
+(23)
+otherwise.
+Equations (19)–(21) form a closed-loop control system with the
+return ratio
+(24)
+According to [6] and [7], the above control system is stable if the
+eigenvalues of do not encircle in the complex
+plane. Define
+Using the relationship
+(25)
+(26)
+and following the similar argument in [7], the eigenvalues of
+are the same as those of:
+(27)
+Denote as the set of eigenvalues of . According to [7],
+we have
+(28)
+408 IEEE COMMUNICATIONS LETTERS, VOL. 8, NO. 6, JUNE 2004
+where denotes the convex hull of the
+set points . The spectral radius of
+satisfies [7]:
+(29)
+where is the maximum number of links a TCP source traverses
+in the network.
+Denote
+(30)
+If do not encircle in the complex
+plane, does not either [7]. Therefore, the system is stable.
+Next, we present a sufficient condition to guarantee the stability
+of such a system.
+Theorem 1: If
+and , the
+system is stable.
+Proof: From (30), we can rewrite as
+(31)
+With (10), it can be shown that the two conditions in Theorem 1
+are equivalent to
+Let
+where
+(32)
+(33)
+(34)
+If ,wehave
+and . Let be any frequencies at which
+cross the negative real axis, and we have
+Thus, from (34) and (35) we have
+From (35) and with the properties of and ,wehave
+If , from (36) we have
+(35)
+(36)
+(37)
+(38)
+In other words, only cross the real axis on the right side
+of point , and thus never encircle in the complex plane.
+Therefore, the system is stable.
+IV. CONCLUSIONS
+In this letter, we have proposed VQR, a new AQM scheme
+based on the virtual queue length and the aggregate flow rate.
+VQR can achieve high link utilization and near zero queuing
+delay. We have also presented and proved the local stability
+condition for a TCP/VQR based network with an arbitrary
+topology, heterogeneous round-trip times, and backward
+propagation delays.
+REFERENCES
+[1] S. Floyd and V. Jacobson, “Random early detection gateways for congestion
+avoidance,” IEEE/ACM Trans. Networking, vol. 1, no. 4, pp.
+397–413, Aug. 1993.
+[2] S. Athuraliya, S. H. Low, V. H. Li, and Q. Yin, “REM: Active queue management,”
+IEEE Network Magazine, vol. 15, no. 3, pp. 48–53, May/June
+2001.
+[3] C. Hollot, V. Misra, D. Towsley, and W. Gong, “On designing improved
+controllers for AQM routers supporting TCP flows,” in Proc. IEEE IN-
+FOCOM 2001, vol. 3, AK, Apr. 2001, pp. 1726–1734.
+[4] S. Kunniyur and R. Srikant, “Analysis and design of an active virtual
+queue (AVQ) algorithm for active queue management,” in Proc. ACM
+SIGCOMM 2001, San Diego, CA, Aug. 2001, pp. 123–134.
+[5] Y. Gao and J. C. Hou, “A state feedback control approach to stabilizing
+queues for ECN-enabled TCP connections,” in Proc. IEEE INFOCOM
+2003, vol. 3, San Diego, CA, Apr. 2003, pp. 2301–2311.
+[6] S. H. Low, F. Paganini, J. Wang, and J. C. Doyle, “Linear stability of
+TCP/RED and a scalable control,” Computer Networks J., vol. 43, no.
+5, pp. 633–647, Dec. 2003.
+[7] G. Vinnicombe, “On the scalability of end-to-end congestion control
+for the Internet,” Cambridge Univ., Cambridge, U.K., CUED/F-IN-
+FENG/TR.398, 2000.

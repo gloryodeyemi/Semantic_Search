@@ -1,0 +1,3542 @@
+Appears in Annals of Pure and Applied Logic, 107(1), pp 131--163, 2001
+Focussing and Proof construction
+
+Jean-Marc Andreoli
+Xerox Research Centre Europe, Grenoble, France
+Institut de Mathematiques de Luminy, Marseille, France
+Abstract
+
+This paper proposesa synthetic presentation of the Proof Construction paradigm, which underlies most of the research and
+development in the so-called "logic programming" area. Two essential aspects of this paradigm are discussed here: true nondeterminism
+et partial information. A new formulation of Focussing, the basic property used to deal with non-determinism
+in proof construction, is presented. This formulation is then used to introduce a general constraint-based technique capable
+of dealing with partial information in proof construction.
+One of the baselines of the paper is to avoid to rely on syntax to describe the key mechanisms of the paradigm. In fact, the
+bipolar decomposition of formulas captures their main structure, which can then be directly mapped into a sequent system
+that uses only atoms. This system thus completely "dissolves" the syntax of the formulas and retains only their behavioural
+content as far as proof construction is concerned. One step further is taken with so called "abstract" proofs, which dissolves
+in a similar way the specific tree-like syntax of the proofs themselves and retains only what is relevant to proof construction.
+
+keywords: Linear Logic, Proof Construction, Ludics, Focussing Proofs, Constraint Propagation, Tableau Methods
+1 Motivation
+
+1.1 The Never-Ending Quest for Programming Paradigms
+
+An important part of theoretical computer science is interested in providing a mathematical-logical foundation to programming
+"paradigms". The most successful attempt in this respect is based on the functional interpretation of proofs captured
+by the Curry-Howard isomorphism, which provides a steady foundation to the so called functional programming paradigm.
+However, a large --- and growing --- number of applications do not fit well in this paradigm. Indeed, one of its essential
+features is that it is concerned with programmes meant to end and return a result. The cut-elimination procedure (and the
+strong normalisation theorem) give a convenient abstraction of what is going on in the execution of such programmes. But
+many pieces of software do not fall in that category. What would be the "end" and "result" of the execution of an operating
+system (except for a crash, as users of a popular operating system may believe). Examples of this kind abound: take for
+instance an air-traffic control system which ensures that plane routes do not collide, or an electronic commerce broker, whose
+role is to mediate between a set of service and good providers, and a set of customers. Closer to everyone's daily practise is
+the case of a Web browser which organises the interaction between a client and a set of servers on the Internet.
+This kind of applications is gaining a huge momentum with the extraordinary development of the Internet. Their main
+characteristic is that instead of taking some input and returning a result, they are concerned with the coordination of entities
+(customers, providers, planes, etc.) which are external to them, and with which they have to continuously interact.
+The point here is not to say that the intuitions behind the functional programming paradigm are totally inadequate for the
+class of applications mentioned above. Obviously, an operating system or an electronic commerce broker will need, at some
+points in their execution, to launch a process to perform a functional computation that takes input, executes during some
+time as a black box and produces output. But the functional programming paradigm does not capture the overall picture of
+the behaviour of the application. It ignores a number of essential characteristics of these applications, in particular true nondeterminism,
+or the manipulation of partial information, not to mention a huge set of deeply woven issues such as security,
+robustness etc. Robustness, for instance, is not just a nice feature to have in an application such as an air-traffic control
+system; it is an absolute requirement, almost the "raison-d'etre" of the application, and any programming paradigm which
+would try to capture the computational essence of this application without taking into account this aspect is deemed to fail.
+Obviously, the quest for new programming paradigms will never end, since new abstract programming issues will always
+arise, calling for new foundations. Even trying to integrate in a single paradigm major issues that exist today (some of them
+have been mentioned above) is, to say the least, premature. In this paper, we are interested in the proof-theoretic foundation of
+1
+
+a programming paradigm, wrongly called the "logic programming paradigm", which has often been opposed to the functional
+programming paradigm. In proof-theoretic terms, the opposition functional/logic programming is better characterised by the
+opposition proof-reduction/proof-construction. Ludics [7] claims to provide a foundational framework that encompasses both
+approaches, and has strongly influenced the work presented here.
+1.2 A Historical Note
+
+Historically, the Proof-Construction paradigm was introduced by Prolog in the mid-seventies, although originally, the logical
+foundation of Prolog was not given in terms of proofs but rather of truth. Proofs (i.e. SLD-resolution proofs) were used as
+mere artifacts in order to achieve the primary notion of truth, as best illustrated by the (in)famous motto: "algorithm = logic
++ control" (in which "logic" refers to the bright and sunny world of truth, while "control" is the dark and heuristic-ridden
+under-world of proofs).
+The situation was reversed in the mid-eighties with a seminal paper on "uniform" proofs [11], which promoted proofs in the
+Intuitionistic sequent calculus as the basis for the Proof-Construction paradigm. It gave the Proof-Construction paradigm
+its "lettres de noblesse", but unfortunately did not succeed in raising enough interest within the proof-theoretic community.
+One reason may be that this paper, as well as many subsequent ones on the same subject, focussed their attention on various
+computational interpretations of fragments of logical systems, as if any logical system as a whole was intrinsically too
+powerful for the Proof-Construction paradigm to be meaningful. This is probably an unfortunate reminiscence of the Prolog
+origins of all these systems, when Horn clauses were presented as the "tractable" and computationally meaningful fragment
+of classical logic. But in the end, taking refuge in syntax (to define the so-called meaningful fragments) is just a way of hiding
+one's face in front of true problems, and, moreover, it has a tendency to create confusion about the goals of the whole research
+effort, whether it aims at defining a foundational paradigm or a programming language (two objectives that should clearly
+be kept separate): the definition of a programming language should obviously deal with issues of syntax; a foundational
+paradigm should on the contrary abstract away such issues.
+In this context, Focussing was introduced in [1] as an attempt to capture the notion of "tractability" in proof construction
+without relying on syntax. With respect to proof construction, Focussing was motivated by two essential remarks:
+
+ffl On the one hand, the Proof-Construction paradigm is truly non-deterministic. This is a central feature, that should be
+preserved in all circumstances, since it motivates the whole paradigm, as opposed to the Proof-Reduction paradigm
+where overall determinism and convergence are put forward.
+
+ffl However, not all non-determinism is meaningful. Choices may have to be made, but their relative or absolute timing
+may be irrelevant during a proof construction. We thus distinguish between asynchronous and synchronous nondeterminism,
+corresponding to irrelevant absolute and relative timing of choices.
+Making proof construction "tractable" will in fact consist in defining a policy for dealing with the different kinds of nondeterminism,
+and this, as explained before, should be done only by considering the nature of the objects being constructed
+(the proofs), and not their syntax.
+
+Structure of the Paper
+
+Section 2 recalls the foundation of the Proof-Construction paradigm, and its central feature: non determinism. Section 3 gives
+a new presentation of the Focussing system for Linear Logic [5]. Section 4 gives a new presentation of the "normal form"
+for Linear Logic, and in particular, introduces the notions of bipolarisation and Universal programme. Finally, Section 5
+presents a new, constraint based approach to the Proof-Construction paradigm, illustrating another of its essential features:
+the capacity to deal with partial information. All the proofs of the propositions and theorems stated in the paper are developed
+(or at least sketched) in Annex A.
+2 The Proof-Construction Paradigm
+
+The Proof-Reduction paradigm is based on the identification of types to formulas and of (well-typed) programmes to (correct)
+proofs. The Proof-Construction paradigm still lacks such an appealing and synthetic formulation. The attempt presented
+below is rather naive and does not pretend to achieve the level of maturity of the Proof-Reduction paradigm.
+Intuitively, the Proof-Construction paradigm identifies formulas to instructions and proofs to states. "Instruction" and "state"
+should be understood here as in imperative programming languages: state refers to the variable assignments of a programme;
+instruction means specification of a class of state transitions (with a "before" and an "after" state expressing a change in the
+variable assignment). For example, an instruction "x++" (in C) specifies the class of transitions from a state where variable
+
+x has a value v to the state where x has value v + 1.
+2
+
+The interpretation of an instruction is precisely the set of state transitions it specifies, which, in the case of imperative
+languages, is a mapping from states to states (the function v 7! v + 1 in our example). Since we are concerned with nondeterministic
+constructions, instructions in a proof construction specify transitions with one "before" state but zero, one or
+more "after" states. Therefore, the interpretation of an instruction (formula) will be a binary graph over states (proofs) rather
+than a full mapping.
+Note here that in the Proof-Construction paradigm, proofs are taken to be "incomplete" proofs (with proper axioms). In fact,
+the branches of a proof identify threads of execution (thus leading to an intrinsic notion of concurrency), and their open leaves
+(proper axioms) identify the state of the currently active threads of execution. The most straightforward kind of transition
+that can be performed on such incomplete proofs is "expansion", which is the process of grafting at a (leaf) node holding a
+proper axiom some new branches, which themselves may introduce new leaves with proper axioms. The number of branches
+added to the expanded node may be zero (meaning the selected computation thread is terminated), one or more (so that new
+computation threads can be created).
+The construction process mentioned above applies to any kind of tree, be it a proof or not. It is the role of a proof system
+(typically a sequent system) to define a correctness criterion for proof-trees, and we restrict to constructions that produce
+only correct proof-trees. The correctness criterion thus characterises a form of intrinsic coherence between the computation
+threads.
+
+A note on non local transitions
+
+Although, in the sequel, we are only interested in transitions of the expansion type, we mention here an other kind
+of transitions which was historically contained in the Prolog notion of unification, and was later given a proper
+proof-based status under the name "instantiation" in [3]. In that paper, a special formula constructor (known
+as the "tell marker" or "hat") was introduced to specify transitions which, given an input state (proof), would
+produce an output state (proof) obtained by adding the formula at all the nodes in the input proof (in the fragment
+considered in that paper, this would always preserve correctness of the proof; a slightly generalised operator
+could have been defined to lift this restriction). This was intended to capture asynchronous communication
+between computation threads.
+The interpretation (binary graphs on proofs) of the instructions (formulas) that we consider here has the following properties:
+
+ffl The interpretation of an instruction contains only expansion transitions, i.e. pairs of proofs h; 
+
+0
+
+i where 
+
+0
+
+is obtained
+from  by expansion of an open node (proper axiom).
+
+ffl The interpretation of an instruction is stable by embedding, i.e. if h; 
+
+0
+
+i is in the interpretation, so is hC[]; C[
+
+0
+
+]i
+
+where proof C[] embeds .
+
+Under these assumptions, the interpretation of a formula is always a set of inference figures of the form
+
+s 1 \Delta \Delta \Delta s n
+
+s
+
+where s; s 1 ; : : : ; s n are sequents. Such an inference figure represents all the expansion transitions from a proof  with proper
+axiom s to a proof obtained by expanding  at s with branches to new proper axioms s 1 ; : : : ; s n .
+Finally, an execution in the Proof-Construction paradigm is a sequence of contiguous transitions on proofs such that each
+transition belongs to the interpretation of an instruction (any formula). In fact, we do not differentiate between executions
+which differ only in the order in which they select the open node to expand at each step (as long as the same expansions
+are performed). Consequently, an execution is entirely defined by its last proof (the previous proofs in the execution can be
+inferred by considering the "prefix" proofs of the last one). In other words, proofs identify states that contain a trace of their
+own construction.
+Note that, although a proof construction is intrinsically non-deterministic, it may be guided by its initial state (proof). The
+knowledge about the content of the open nodes in this proof may enforce that only specific instructions may be used in the rest
+of the execution (thus defining a notion of programme/data). For example, if the starting proof is reduced to a single (open)
+node labeled by a single-formula sequent, the well known "sub-formula" property enforces that the instructions at each step
+in the proof construction will be sub-formulas of the initial one.
+3 Focussing
+
+3.1 Non-Determinism
+
+Given a sequent system, the interpretation of a formula is the set of instances of inference figures in which this formula has
+been selected as principal. Thus, for example, the interpretation of A\Omega B in the sequent system of Linear Logic will be the
+3
+
+set of inferences of the form
+
+\Gamma; A \Delta; B
+
+\Gamma; \Delta;
+
+A\Omega
+B
+
+The (logical) inference figures of the sequent system individually identify meaningful instructions. In the example of
+
+[\Omega
+], the
+transition creates two computation threads competing for their resources, and given, each, a sub-resource of the decomposed
+one. Such a computational phenomenon occurs, for example, with the fork instruction (in Unix), which creates two subprocesses
+competing on their IO streams and initiated with different process-id numbers (which can then be tested to select
+different continuations). But note that the Unix fork also clones the initial process memory, a behaviour rather captured by a
+
+[N] inference.
+As explained before, proof construction, although essentially non-deterministic and built from meaningful steps, introduces
+a lot of meaningless non-determinism. In Linear Logic, the two forms of non-determinism (asynchronous and synchronous)
+are introduced by connectives of different polarities. The negative connectives (?; O; ?; N; 8) introduce asynchronous nondeterminism,
+while the positive connectives
+(1;\Omega
+
+; 0; \Phi; 9) introduce synchronous non-determinism in proof construction.
+Interestingly, we can extend polarities to the case of atomic formulas by choosing an arbitrary partition of the latter such
+that duality reverses polarity also on atoms. We'll see below that this extension is crucial, as it extends in a very natural
+way the treatment of non-determinism, which is quite straightforward in the case of logical inferences, to the case of identity
+inferences.
+The Focussing sequent system for Linear Logic basically attempts to reduce these two forms of non-determinism by ensuring
+that, on the one hand, negative steps are performed as soon as possible and, on the other hand, sequences of positive steps
+which otherwise would differ in irrelevant relative timing are performed in one step. The Focussing system was presented
+in [1] by means of "triadic" sequents. We give here a simpler and hopefully more insightful presentation of this system. In
+fact, instead of giving inference rules, we directly define the Focussing interpretation of a formula (which is equivalent: recall
+that the interpretation of a formula is the set of instances of inference figures in which that formula is selected as principal).
+Notations
+
+ffl denotes the empty multiset, and hjx; y : : :ji denotes the multiset with enumerated occurrences x; y : : : . F
+
+denotes the set of formulas, A the set of negative atoms, S the set of sequents and P the set of inferences.
+Typically, an element of P is of the form
+
+\Delta \Delta \Delta [E] \Delta \Delta \Delta
+
+s
+
+which denotes the inference figure with premisses E ae S and conclusion s 2 S. The Focussing interpretation is
+a mapping from formulas to sets of inferences, i.e.:
+
+F 7! (P)
+F kFk
+
+3.2 Focussing in MALL
+
+Here, sequents are multisets of formulas (denoted by letters fl; \Gamma : : : ). Technically, to define the Focussing interpretation of
+a formula F , we proceed in two steps.
+
+ffl We first treat the case of the negative inferences of Linear Logic (responsible for asynchronous non-determinism).
+They should be applied as soon as possible, so that if they introduce new possible asynchronous inferences, these
+too should be immediately applied. In other words, all the negative connectives at the top of a formula should be
+decomposed in one step, whenever this formula is available for decomposition. We obtain inferences of the following
+form, reminiscent of the negative inferences of Ludics.
+
+\Gamma; fl 1 \Delta \Delta \Delta \Gamma; fl n
+
+\Gamma; F
+
+where \Gamma is any multiset and each fl i is a multiset of non-negative formulas that can be computed from F . More
+precisely, if kFk
+
+"
+
+2 (S) denotes the set of fl i , we have:
+
+8
+?
+?
+!
+? ?
+:
+
+k?k
+
+"
+
+=
+
+
+? kF 1 OF 2 k
+
+"
+
+= kF 1 k
+
+"  OkF 2 k
+
+"
+
+k?k
+
+"
+
+=
+
+
+? kF 1 NF 2 k
+
+"
+
+= kF 1 k
+
+"
+
+ NkF 2 k
+
+"
+kFk
+
+"
+
+= R
+
+"
+
+(F ) in all the other cases
+4
+
+where the symbols
+
+
+
+?;
+
+
+
+?;  O;  N and R
+
+"
+
+denote the following objects:
+
+
+
+?;
+
+
+
+? 2 (S)  O;  N : (S) \Theta (S) 7! (S) R
+
+"
+
+: F 7! (S)
+
+defined by
+
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+
+
+
+? = ffflg S 1
+
+ OS 2 = ffl 1 ; fl 2 where fl 1 2 S 1 and fl 2 2 S 2 g
+
+
+
+? = ; S 1  NS 2 = S 1 [ S 2
+R
+
+"
+
+(F ) = fhjF jig
+
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+
+ffl For the positive inferences of Linear Logic (responsible for synchronous non-determinism), once one has been performed,
+all the dependent ones for which the relative timing is irrelevant should be immediately applied. The dependent
+inferences are precisely the decompositions of the positive subformulas of the initial one. In other words, all the
+positive connectives at the top of a formula should be decomposed in one step, whenever this formula is selected for
+decomposition. We obtain inferences of the following form, reminiscent of the positive inferences of Ludics.
+
+\Gamma 1 ; F 1 \Delta \Delta \Delta \Gamma n ; Fn
+
+\Gamma 1 ; : : : ; \Gamma n ; F
+
+where the \Gamma i are any multisets and the F i are F 's innermost non-positive subformulas, to which the previous treatment
+applies. The set of inferences of the above form, in which the principal formula F is omitted, is written kFk
+
+#
+
+, and is
+defined by
+
+8
+?
+?
+?
+?
+!
+?
+?
+?
+?
+:
+
+k1k
+
+#
+
+=  1 kF
+
+1\Omega
+
+F 2 k
+
+#
+
+= kF 1 k
+
+#
+
+ \Omega\Gamma F 2 k
+
+#
+
+k0k
+
+#
+
+=  0 kF 1 \Phi F 2 k
+
+#
+
+= kF 1 k
+
+#  \PhikF 2 k
+
+#
+ka
+
+?
+
+k
+
+#
+
+= I(a) if a is a negative atom
+
+kFk
+
+#
+
+= R
+
+#
+
+(kFk
+
+"
+
+) in all the other cases
+where the symbols  1;  0;
+\Omega
+
+;  \Phi, R
+
+#
+
+and I denote the following objects:
+
+ 1;  0 2 (P)
+
+\Omega
+
+;  \Phi : (P) \Theta (P) 7! (P) R
+
+#
+
+: (S) 7! (P) I : A 7! (P)
+
+defined by
+
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+
+
+1 = f
+
+ffl
+
+g P 1
+
+\Omega
+
+P 2 = f
+\Delta \Delta \Delta [E 1 ] \Delta \Delta \Delta [E 2 ] \Delta \Delta \Delta
+
+\Gamma 1 ; \Gamma 2
+
+where
+
+\Delta \Delta \Delta [E 1 ] \Delta \Delta \Delta
+
+\Gamma 1
+
+2 P 1 and
+
+\Delta \Delta \Delta [E 2 ] \Delta \Delta \Delta
+
+\Gamma 2
+
+2 P 2 g
+
+ 0 = ; P 1  \PhiP 2 = P 1 [ P 2
+R
+
+#
+
+(S) = f
+
+(\Gamma; fl) fl2S
+
+\Gamma
+
+g \Gamma2S I(a) = f
+hjaji
+g
+
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+
+Note here the crucial role played by the positive atoms. Basically, it means that when decomposing in one step the
+topmost positive connectives of a formula, if a positive atom is reached, the identity axiom inference can also be
+included in that single step. It is thus a natural prolongation of the hereditary positive decomposition property to the
+atomic case.
+We can now define the Focussing interpretation of a formula as follows:
+
+Definition 1 Let F be a formula. Its Focussing interpretation kFk is given by
+kFk = f
+\Delta \Delta \Delta [E] \Delta \Delta \Delta
+
+\Gamma; F
+
+where
+
+\Delta \Delta \Delta [E] \Delta \Delta \Delta
+
+\Gamma
+
+2 kFk
+
+#
+
+g
+The Focussing sequent system consists of the inferences in the union of the Focussing interpretations of all the formulas
+which are not negative atoms (the interpretation of a negative atom is a set of dummy inferences that have the same premiss
+and conclusion, hence are ignored). It is in fact a simple reformulation of the "Triadic" sequent system of [1]: the operators
+
+R
+
+"
+
+and R
+
+#
+
+correspond exactly to the so-called "Reaction rules" in the Triadic system, and the operator I corresponds to the
+controlled form of Identity rule in the Triadic system. The Triadic system (and hence the Focussing system defined here) is
+equivalent to the Standard sequent system of Linear Logic, as proved in [1], not only in terms of provability, but also in terms
+of the proofs themselves, i.e. we have
+5
+
+ffl A mapping from Focussing proofs into Standard ones (it basically adds the intermediate transitions that are condensed
+in each single step of the Focussing proof).
+
+ffl A mapping from Standard proofs into Focussing ones (it basically re-orders the steps in the Standard proof so as to
+conform to the Focussing policy concerning non determinism, and then condenses the dependent steps into single
+steps).
+In the second mapping, there may be different ways of re-ordering the steps, still distinguishing between proofs which are
+inessentially different. This is a well known limitation of Focussing which has not been overcome yet.
+The first mapping above also straightforwardly applies to proof constructions (i.e. incomplete proofs). The second mapping
+obviously does not. Indeed, an incomplete proof limited to a single step in the Standard system may not have an equivalent
+in the Focussing system. However, if a proof construction can be successfully completed, then the resulting (complete) proof
+is amenable to focussing. In terms of the Proof-Construction paradigm, this expresses a form of behavioural equivalence
+between Standard and Focussing executions (so long as we only deal with potentially successful executions), so that, in the
+sequel, we will only consider the latter.
+
+3.3 An example
+
+Consider the formula F = a
+
+?\Omega
+
+b
+
+?\Omega ((cNd)Oe)\Omega
+
+f with a; b; c; d; e; f being negative atoms and let G be the subformula
+
+(cNd)Oe. To compute the Focussing interpretation of F , we must first compute kFk
+
+#
+
+. By application of the definitions
+(positive layer), we have:
+kFk
+
+#
+
+= I(a)
+
+\Omega
+
+I(b)
+
+\Omega
+
+R
+
+#
+
+(kGk
+
+"
+
+)
+\Omega
+
+R
+
+#
+
+(kfk
+
+"
+
+) = f
+f\Gamma; flg fl2kGk
+
+" f\Delta; ffi g ffi2kfk
+
+"
+
+\Gamma; \Delta; a; b
+
+g \Gamma;\Delta2S
+By application of the definitions (negative layer), we have
+
+kGk
+
+"
+
+= (R
+
+"
+
+(c) [ R
+
+"
+
+(d))  OR
+
+"
+
+(e) = fhjc; eji; hjd; ejig
+
+kfk
+
+"
+
+= R
+
+"
+
+(f) = fhjf jig
+
+Finally, the Focussing interpretation of F is the set of inferences of the form
+
+\Gamma; c; e \Gamma; d; e \Delta; f
+
+\Gamma; \Delta; a; b; F
+
+where \Gamma; \Delta range over multisets of formulas.
+Note that it is not needed to parenthesise precisely the formula F . Indeed, the operators  O;  N and
+
+\Omega
+
+;  \Phi are associative
+commutative and have the constants
+
+
+
+?;
+
+
+
+? and  1;  0 as respective neutral elements. Furthermore, it is easy to show that  O
+
+distributes over  N and
+
+\Omega
+
+over  \Phi. In fact, Focussing appears as a proof-theoretic formulation of the well known properties of
+associativity-commutativity-distributivity of the connectives of Linear Logic.
+
+3.4 Focussing with Exponentials
+
+Focussing also deals with the exponentials. The basic idea, introduced in [1], is to use "dyadic" sequents which are two-field
+sequents of the form \Theta : \Gamma which stands for the standard sequent ? \Theta; \Gamma in which the exponential nature of the formulas of
+the first field has been explicitly recognised. \Theta represents a set of delocalised formulas which can be used any number of
+times (including 0). The definitions given here slightly differ from [1] on the handling of the left-hand field of the dyadic
+sequents.
+
+ffl The definitions of the two sets of operators
+
+
+
+?,  O, R
+
+"
+
+and  1,
+\Omega
+
+, R
+
+#
+
+, I are straightforwardly adapted to account for the
+new structure of the sequents
+
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+
+
+
+? = fffl : fflg S 1
+
+ OS 2 = f` 1 ; ` 2 : fl 1 ; fl 2 where ` 1 : fl 1 2 S 1 and ` 2 : fl 2 2 S 2 g
+ 1 = f
+
+ffl : ffl
+
+g P 1
+
+\Omega
+
+P 2 = f
+\Delta \Delta \Delta [E 1 ] \Delta \Delta \Delta [E 2 ] \Delta \Delta \Delta
+
+\Theta 1 ; \Theta 2 : \Gamma 1 ; \Gamma 2
+
+where
+
+\Delta \Delta \Delta [E 1 ] \Delta \Delta \Delta
+
+\Theta 1 : \Gamma 1
+
+2 P 1 and
+
+\Delta \Delta \Delta [E 2 ] \Delta \Delta \Delta
+
+\Theta 2 : \Gamma 2
+
+2 P 2 g
+R
+
+"
+
+(F ) = fffl : hjF jig R
+
+#
+
+(S) = f
+
+(\Theta; ` : \Gamma; fl) `:fl2S
+
+\Theta : \Gamma
+
+g \Theta:\Gamma 2S I(a) = f
+
+ffl : hjaji
+
+;
+
+hjaji : ffl
+
+g
+
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+6
+
+ffl The definitions of mappings k:k
+
+"
+
+and k:k
+
+#
+
+are unchanged, except for two new clauses to handle the new connectives
+(exponentials):
+
+k ?Fk
+
+"
+
+=
+
+?R
+
+"
+
+(F ) k ! Fk
+
+#
+
+=
+
+!R
+
+#
+
+(kFk
+
+"
+
+)
+
+This introduces two new operators
+
+ ? : (S) 7! (S)  ! : (P) 7! (P)
+
+defined, for any sets S of sequents and P of inferences, by
+
+
+?(S) = f`; fl : ffl where ` : fl 2 Sg
+
+
+!(P ) = f
+\Delta \Delta \Delta [E] \Delta \Delta \Delta
+
+\Theta; \Gamma : ffl
+
+where
+
+\Delta \Delta \Delta [E] \Delta \Delta \Delta
+
+\Theta : \Gamma
+
+2 Pg
+Note that the clause for connective ? is not inductive (k ?Fk
+
+"
+
+is defined from R
+
+"
+
+(F ), not from kFk
+
+"
+
+), stressing the
+special status of ? in terms of polarity (in fact, as remarked in [6], ? consists of a truly negative pseudo-connective
+combined with a polarity inverter). Idem for connective !. Note that we have
+
+ !R
+
+#
+
+(S 1  NS 2 ) =  !R
+
+#
+
+(S 1 )
+\Omega
+ !R
+
+#
+
+(S 2 )
+
+ffl Finally, the definition of mapping k:k is adapted to capture Contraction and Weakening on the left-hand field of the
+sequents, as well as Dereliction:
+
+kFk = f
+\Delta \Delta \Delta [E] \Delta \Delta \Delta
+
+\Theta : \Gamma; F
+;
+
+\Delta \Delta \Delta [E] \Delta \Delta \Delta
+
+\Theta; F : \Gamma
+
+where
+
+\Delta \Delta \Delta [E] \Delta \Delta \Delta
+
+\Theta
+
+0
+
+: \Gamma
+
+2 kFk
+
+#
+
+and \Theta
+
+0
+
+ae \Theta g
+\Theta
+
+0
+
+ae \Theta denotes inclusion between sets (not multisets), and thus captures both Contraction and Weakening on the
+left-hand field of the sequents. Dereliction is captured by the fact that each inference in kFk
+
+#
+
+yields two inferences
+in kFk instead of one (the second one first performs a Dereliction on F ). Thus, as expected, the structural rules of
+Contraction, Weakening and Dereliction are always limited to the conclusion of Focussing inferences.
+
+3.5 Focussing with First-Order Quantification
+
+We assume given a fixed signature of function symbols and constants. The set of constants is assumed to be infinite, so
+that new constants can always be picked outside any finite subset. We want the Focussing interpretation k:k to produce
+only ground inferences. The mapping k:k
+
+"
+
+may produce non-ground sequents where the variables are implicitly universally
+quantified, and the operators that define it therefore work with non-ground sequents. On the other hand, the mapping k:k
+
+#
+
+produces only ground inferences, and so the operators defining it work only with ground sequents and inferences. This is
+achieved by the following definitions:
+
+ffl The definitions of mapping k:k
+
+"
+
+and k:k
+
+#
+
+are unchanged, except for two new clauses to handle the quantifiers.
+
+k8xFk
+
+"
+
+= kFk
+
+"
+
+k9xFk
+
+#
+
+=
+
+[
+
+t
+
+k[x=t]F k
+
+#
+In the second clause, t ranges over the set of all ground terms.
+
+ffl Furthermore, the definition of the operator R
+
+#
+
+is slightly modified as follows:
+
+R
+
+#
+
+(S) = f
+
+(\Theta; ae` : \Gamma; aefl) `:fl2S
+
+\Theta : \Gamma
+
+g \Theta:\Gamma 2S
+
+where S may contain variables, but \Theta; \Gamma are ground, and ae is any substitution of the variables in ` : fl by pairwise
+distinct new constants not occurring in \Theta; `; \Gamma; fl.
+
+ffl Finally, the definition of k:k is unchanged, but applies only to ground formulas in which the quantified variables are all
+renamed apart.
+4 Bipolarisation
+
+4.1 Monopoles, Bipoles
+
+The previous section shows that the Focussing interpretation of a formula depends essentially on its topmost layers of positive
+and negative connectives. In other words, two formulas which differ only below these two layers will have the same interpretation
+up to the produced subformulas wherever they differ. This indicates that it is sufficient to work only with formulas
+with two layers, called bipoles. The class of bipoles is defined as follows:
+7
+
+Formula F = (a
+
+?\Omega
+
+((: :
+:\Omega
+
+1 : : : )O((: : : \Phi 2 : : :
+
+)Nb)))\Omega
+(c
+
+?\Omega
+
+((: :
+:\Omega
+
+3 : : : )Od))
+a
+
+&
+
+c
+d
+
+^
+h
+h
+h
+
+Positive layer
+Negative layer
+
+&
+
+&
+1
+2
+3
+
+^
+Subformulas turned into atoms
+integrated to the negative layer
+b
+e
+f
+g
+Bipole (F ) = k
+
+?\Omega
+
+((a
+
+?\Omega (eO(fNb)))\Omega
+(c
+
+?\Omega
+
+(gOd)))
+
+assuming F
+
+j
+
+7! k (: :
+:\Omega
+
+1 : : : )
+
+j
+
+7! e (: : : \Phi 2 : : : )
+
+j
+
+7! f (: :
+:\Omega
+
+3 : : : )
+
+j
+
+7! g
+
+Figure 1: Mapping : bipolarisation of a formula
+ffl The monopoles are built from negative atoms with the negative connectives, with the restriction that ? should only have
+a (negative) atomic sub-formula.
+
+ffl The bipoles are built from monopoles and positive atoms with the positive connectives, with the restriction that ! should
+only have a monopolar subformula. Furthermore, bipoles must contain at least one positive connective or be reduced
+to a positive atom (so that they are always disjoint from monopoles).
+The "methods" introduced in [1] are exactly the bipoles (or rather their duals) syntactically presented "a la Prolog": the
+positive atoms are permuted by associativity-commutativity-distributivity in the positive layer of the bipole so as to be grouped
+together in what is called the "head" of the method. We recall here (with some slight variants) the normalisation procedure
+of [1], called here bipolarisation, which maps any formula into a bipole preserving the "same" behaviour in proof construction.
+4.2 Bipolarisation of Formulas
+
+We first consider the propositional case. Let A, A
+
+0
+
+be sets of negative atoms such that A ae A
+
+0
+
+.
+
+Definition 2 A "naming scheme" is a bijection j from A-formulas (i.e. formulas built from the atoms in A and their duals)
+to A
+
+0
+
+, such that j a = a for all a in A.
+
+Thus, a naming scheme gives a separate name (negative atom in A
+
+0
+
+) to each of the A-formulas. The bipolarisation procedure
+applies to A-formulas and is defined with respect to a given naming scheme j. We first define the following mappings from
+
+A-formulas to A
+
+0
+
+-formulas.
+
+ffl negative layer (mapping 
+
+"
+
+)
+
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+
+
+
+"
+
+(?) = ? 
+
+"
+
+(F 1 OF 2 ) = 
+
+"
+
+(F 1 )O
+
+"
+
+(F 2) 
+
+"
+
+( ?F ) = ? jF
+
+
+"
+
+(?) = ? 
+
+"
+
+(F 1 NF 2 ) = 
+
+"
+
+(F 1 )N
+
+"
+
+(F 2)
+
+
+"
+
+(F ) = jF in all the other cases
+
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+
+ffl positive-negative layer (mapping 
+
+#
+
+)
+
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+
+
+
+#
+
+(1) = 1 
+
+#
+
+(F
+
+1\Omega
+
+F 2 ) = 
+
+#
+
+(F 1
+
+)\Omega
+
+
+
+#
+
+(F 2) 
+
+#
+
+( ! F ) = ! 
+
+"
+
+(F )
+
+
+
+#
+
+(0) = 0 
+
+#
+
+(F 1 \Phi F 2 ) = 
+
+#
+
+(F 1 ) \Phi 
+
+#
+
+(F 2)
+
+
+#
+
+(a
+
+?
+
+) = a
+
+?
+
+if a is a negative atom
+
+
+
+#
+
+(F ) = 
+
+"
+
+(F ) in all the other cases
+
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+8
+
+Note the perfect analogy with the clauses defining the interpretation mappings k:k
+
+#
+
+and k:k
+
+"
+
+. We can now define the Bipolar
+normal form of a formula as follows (note the analogy with the definition of mapping k:k):
+
+Definition 3 Let F be an A-formula. Its Bipolar normal form (F ) is an A
+
+0
+
+-bipole given by
+
+(F ) = j
+
+?
+
+F\Omega
+
+
+
+#
+
+(F )
+
+Figure 1 gives an example of transformation of a formula into a bipole by . To show that (F ) is always a bipole, remark
+that 
+
+#
+
+(F ) substitutes at the border of the topmost positive-negative layer of F each subformula G which is not a negative
+atom by jG (which is a negative atom). Hence, 
+
+#
+
+(F ) has at most two layers. It may not be a bipole because the positive layer
+may be empty. However, prepending the positive atom j
+
+?
+
+F enforces that the resulting formula, (F ), is a proper A
+
+0
+
+-bipole.
+
+4.3 Bipolarisation of Executions
+
+In the sequel, we are concerned with executions (i.e. proof constructions) where the sequents have a simple form (called a
+
+normal form): they are of the form \Theta; \Psi : \Phi where \Psi; \Phi contain only negative atoms and \Theta only bipoles. An execution made
+of normal sequents is called a normal execution. There is strictly no deep connotation in this notion of normality, beyond a
+notational convenience which will simplify the study of executions (in the next section). We must only make sure that this
+restriction is harmless, i.e. does not change the nature of the Proof-Construction paradigm. For this, we first introduce the
+notion of "Universal programme" (by analogy with the Universal Turing Machine).
+
+Definition 4 Let j be a naming scheme on sets of negative atoms A ae A
+
+0
+
+. The Universal programme for j is the set of
+
+A
+
+0
+
+-formulas of the form (F ) where F is an A-formula not reduced to a negative atom. It is a subset of A
+
+0
+
+-bipoles.
+
+The following property ensures that the nature of the Proof-Construction paradigm is not altered by a restriction to normal
+executions.
+
+Proposition 1 Let j be a naming scheme on sets of negative atoms A ae A
+
+0
+
+and U be its Universal programme. When
+extended to a mapping on executions, j is a bijection from the executions based on A to the traces of the U-normal executions
+based on A
+
+0
+
+.
+
+An execution is said to be "based on" a set of negative atoms A if it involves only A-formulas. The "trace" of an execution is
+obtained by discarding from it all the formulas which are not negative atoms. A "U-normal" execution is a normal execution
+in which all the bipoles belong to U .
+In fact, by construction, j viewed as a mapping on executions is injective (since it is already injective on formulas). Proposition
+1 concerns its co-domain. The proposition is two-fold:
+1. The j-image of any execution based on A is the trace of a U-normal execution based on A
+
+0
+
+.
+2. The trace of any U-normal execution based on A
+
+0
+
+is the j-image of an execution based on A.
+
+4.4 The First-Order Case
+
+In the first-order case, atomic formulas are built from predicate symbols and terms. We assume that (i) predicates are
+polarised, (ii) each predicate has a dual of opposite polarity and the same arity, and (iii) the polarity of an atomic formula is
+given by that of its predicate. In other words, given a tuple
+
+~ t of terms matching the arity of a predicate p, we have:
+
+p( ~ t)
+
+?
+
+= p
+
+?
+
+( ~ t)
+
+We need the following technical artifact:
+
+Definition 5 A "proper" formula is a formula F possibly containing free variables and such that:
+
+ffl Each free variable in F occurs exactly once.
+
+ffl Any term occurring in an atomic subformula of F is either a variable or contains a variable that is bound at that
+occurrence.
+
+In particular, it is easy to see that a proper formula cannot contain constants nor, more generally, ground terms.
+
+Proposition 2 Any formula F is an instance of a proper formula which is unique modulo renaming of its free variables.
+9
+
+Thus, if F is the formula
+
+F = 8x (p(x)O(9y (q(x; y;
+f(z))\Omega
+r(y; g(x; z); g(z; h(z
+
+0
+
+))))))
+
+then F = !  F where
+
+ F is the proper formula and ! the substitution defined as follows:
+
+ae
+
+ F = 8x (p(x)O(9y (q(x; y; w 1
+
+)\Omega
+
+r(y; g(x; w 2 ); w 3 ))))
+
+! = f w 1 7! f(z) ; w 2 7! z ; w 3 7! g(z; h(z
+
+0
+
+)) g
+
+The first modification w.r.t. the propositional case concerns the naming schemes. Given sets P ae P
+
+0
+
+of predicates, a naming
+scheme is now a bijection j from proper P-formulas (modulo renaming of the free variables) into P
+
+0
+
+such that j(p(~x)) = p
+
+for any predicate p 2 P and matching tuple of pairwise distinct variables ~x. Given a naming scheme j, we define the mapping
+
+ j on P-formulas as follows. Let F be a P-formula. Let
+
+ F be the proper formula of which F is an instance, ! the substitution
+such that F = !  F and ~x the tuple of free variables in  F . Then
+
+ jF = j  F
+
+(!~x)
+
+Mapping  j is a bijection between P-formulas and negative P
+
+0
+
+-atoms. Mappings 
+
+#
+
+and 
+
+"
+
+now apply to P-formulas (possibly
+containing free variables). They are defined as in the propositional case, except for the following alterations:
+
+ffl There are new clauses for 
+
+"
+
+and 
+
+#
+
+to handle quantification:
+
+ae
+
+
+
+"
+
+(8xF ) = 8x 
+
+"
+
+(F )
+
+
+
+#
+
+(9xF ) = 9x 
+
+#
+
+(F )
+
+ffl The default clause for 
+
+"
+
+becomes: 
+
+"
+
+(F ) =  jF
+
+The bipolar normal form is now given by
+
+(F ) = 9~x  j
+
+?
+
+F\Omega
+
+
+
+#
+
+(F )
+
+where ~x is the tuple of free variables in F . The Universal programme for j is now the subset of P
+
+0
+
+-bipoles of the form (F )
+
+where F ranges over proper P-formulas other than negative atoms. By construction, the Universal programme U contains no
+constant. This is important because U is present at all the nodes of a U-normal proof and should not interfere with the side
+condition on the occurrence of constants in the universal quantification inference rule.
+Finally, the analogous of Proposition 1 holds, i.e.  j is a bijection between the executions based on P and the traces of the
+
+U-normal executions based on P
+
+0
+
+.
+5 Constraint Based Proof Construction
+
+To summarise the previous sections, we have defined the Proof-Construction paradigm as identifying a computation with
+a sequence of transitions which build a proof by application of inference figures of a logical system (the sequence need
+not end with a complete proof). We have shown that in Linear Logic, we can restrict to the case of Focussing inference
+figures using normalised sequents based exclusively on (negative) atoms and bipoles (delocalised in the left-hand field of
+each sequent). This restriction does not affect the paradigm, i.e. the proof constructions thus obtained are behaviourally
+equivalent to the original ones (without the restriction). The inference figures are defined by the elements of kFk where F is
+a bipole. Examples of (traces of) such inference figures, in the propositional case, are given by
+
+c; \Phi
+
+a; b; \Phi
+
+c; d; \Phi e; \Phi f; \Psi
+
+a; b; \Phi; \Psi
+
+(1)
+where \Phi; \Psi are multisets of (negative) atoms. The inferences above belong, respectively, to the interpretation of the bipoles
+
+a
+
+?
+
+\Omega
+
+b
+
+?\Omega
+
+c and a
+
+?\Omega
+
+b
+
+?\Omega ((cOd)Ne)\Omega
+
+f . Note that we use here a simplified notation omitting the two-sided structure of
+the sequents; the full notation could easily be recovered, although it would multiply the figures by trying all the possibilities
+as to which side of the conclusion sequent the triggers a and b are taken from. In the first case above, we would have:
+
+\Psi : c; \Phi
+\Psi : a; b; \Phi
+\Psi; a : c; \Phi
+\Psi; a : b; \Phi
+\Psi; b : c; \Phi
+\Psi; b : a; \Phi
+\Psi; a; b : c; \Phi
+\Psi; a; b : \Phi
+
+To simplify the presentation, in the sequel, we systematically ignore the connective ? and assume that the first field of each
+sequent contains no atom (i.e. contains only bipoles, omitted in the traces).
+10
+
+5.1 Dealing with Partial Information
+
+The first inference in (1) has the advantage that it can be performed with no knowledge whatsoever of the context \Phi. In that
+sense, it may capture computational phenomenons of execution with only partial information on the state of the computational
+world. The second case looks more delicate, since although the application of the inference may not know anything about the
+context, it needs to enforce some condition about that context, namely that it is split into two disjoint subcontexts.
+A form of management of partial information has already been proposed in [11]: in that paper, following the Prolog tradition,
+the first-order variables are used as place-holders for ground terms, which the existential quantification (right) rule gradually
+fills by unification. In other words, the first-order variables provide an abstract representation of the missing information in
+the partially known computational world (the proof). Knowledge about that world gets incrementally refined by unifications
+triggered by the quantification inferences. For example, let D
+
+0
+
+(x) be a clause with a free variable x and let p be a predicate
+and f a function symbol. Let D be the closed clause 8x(D
+
+0
+
+(x) oe p(x)) oe p(f(x)). Clause D enables the following
+inferences in the Uniform proofs of the Intuitionistic sequent calculus:
+
+D ; D ; D
+
+0
+
+(t) ` p(t)
+
+D ; D ` p(f(t))
+
+for any ground term t. In our terminology, we would say that the interpretation of D is the set of all the inferences above
+for all possible values of t. In an actual proof construction, the state to which such an inference is applied need not be fully
+known: it may be any state of the form D; D ` p(U ), where U is a place holder possibly partially filled by a substitution `.
+
+The output state of the transition is then D; D;D
+
+0
+
+(T ) ` p(T ), where T is a new place holder, together with the substitution
+obtained by unifying ` and U : f(T ) (when possible). Such transitions are possible even if ` is not fully ground, so that
+the new place holder T may again be only partially instantiated by the substitution. In other words, proof construction can
+proceed even if the knowledge of the state of the computational world is incomplete.
+In the next section, we generalise this approach to the Linear Logic Proof-Construction paradigm we have introduced so far,
+so as to deal with incompletely specified proofs (i.e. with partial information about the state of the computational world).
+This will be achieved by the use of constraint solving by propagation instead of unification: it has often been remarked that
+unification is but a special case of constraint solving. Place holders will be introduced not only for existentially quantified
+variables, but also for "state" variables which, during a proof construction, will be assigned sequents instead of terms. The
+constraints we use express that the state of the computation (i.e. proof) at each step of an execution, even if it is incompletely
+specified, is at least consistent, i.e. could be completed to obtain a correct proof.
+
+5.2 Abstract Executions
+
+We first recall some basic concepts of equational theories needed here. We assume given an infinite set of variables, called
+state variables, written X;X
+
+0
+
+; X 1 : : : , and distinct from the first-order variables, written x; y; x
+
+0
+
+: : : . An instantiation is a
+pair of mappings, one from first-order variables to ground terms and one from state variables to multisets of ground atoms. A
+linear equation is of the general form
+
+\Gamma + X 1 + : : : + Xn = \Delta + Y 1 + : : : + Ym
+
+where \Gamma; \Delta are two multisets of (non-necessarily ground) atoms and fX i g i=1:::n ; fY j g j=1:::m are pairwise distinct state
+variables (m; n  0). A solution of a system of equations consists of an instantiation of the variables (both first-order and
+state variables) which satisfies the equations, when the plus sign in the equations is interpreted as multiset union. One defines
+as usual the notions of a consistent system (which admits a solution) and equivalent systems on a given set of variables (which
+yield the same solutions restricted to these variables).
+We now introduce a notion of abstract proofs which captures partial information about the state of the computation. An
+abstract inference figure is of the form
+
+X 1 \Delta \Delta \Delta Xn
+X
+
+where X;X 1 ; : : : ; Xn are pairwise distinct state variables, together with a finite system of equations. For example, the
+abstract inference figure corresponding to the second example of (1) is:
+X 1 X 2 X 3
+
+X
+
+with
+
+8
+?
+?
+!
+?
+?
+:
+
+X = a; b +X
+
+0
+
++X
+
+00
+
+X 1 = c; d +X
+
+0
+
+X 2 = e + X
+
+0
+
+X 3 = f +X
+
+00
+
+(2)
+The definitions show that, at least in the propositional case,
+11
+
+Proposition 3 The focussing interpretation of a formula is the set of all the instantiations of a finite set of abstract inferences
+by the solutions of their attached equation systems, as in the example above.
+
+In fact, this is also true when existential quantification is used in the first-order case: the existentially quantified variables are
+simply considered as part of the equations, assuming they are renamed apart. Universal quantification requires yet another
+kind of equations, and will be treated separately in Section 5.6.
+An abstract proof is a tree labeled with (pairwise distinct) state variables, together with a (finite) system of equations. An
+abstract proof finitely represents the (possibly infinite) set of concrete proofs obtained by instantiation of its proof tree by
+solutions of its attached equation system. When the equation system has no solutions (i.e. no concrete proof can be obtained
+from the abstract one), we say that the abstract proof is inconsistent.
+An abstract transition is a pair of abstract proofs where the second one is obtained from the first one by application of an
+abstract inference figure i at an open node labeled with a variable X, as follows:
+
+ffl Rename the variables in i so as to be different from all those in the proof; then rename the conclusion variable of i to
+
+X .
+
+ffl Expand the proof-tree at node X with i
+
+ffl Add the equations of i to the system attached to the proof
+We consider the smallest equivalence relation on abstract proofs such that:
+
+ffl Two abstract proofs which can be obtained from each other by renaming of the variables are equivalent.
+
+ffl Two abstract proofs which have the same proof tree and equivalent equation systems on the state variables labeling the
+tree are equivalent.
+Equivalent abstract proofs represent the same set of concrete proofs. Furthermore, an abstract transition applied to equivalent
+abstract proofs yields equivalent abstract proofs. Therefore equivalent abstract proofs need not (and will not) be distinguished.
+By proposition 3, a concrete proof construction is always an instance of an abstract proof construction, but an abstract proof
+construction may have many corresponding concrete constructions, possibly none, if it runs into an inconsistent abstract
+proof, i.e. an abstract proof whose equation system has no solution. Generating the concrete instances of an abstract proof
+(or execution) thus amounts to generating the solutions of a finite system of equations in the free algebra of terms with
+an associative-commutative operator (with a unit element). This is a well known problem in ACU unification: the general
+solution relies on algorithms for the enumeration of Hilbert bases for diophantine equations. However, the kind of equation
+systems obtained by the proof constructions we have considered so far can be solved by a simpler procedure, as shown in the
+next section.
+
+5.3 A Classification of the Equations
+
+In the sequel, we will consider only equation systems that may occur in abstract executions starting from an abstract proof
+reduced to a single node with no equation (or, possibly, just an assignment: see below). Furthermore, we only consider
+inferences obtained from bipoles that do not contain universal quantification. We are interested in designing a procedure
+capable of generating the solutions of such equation systems (if any). In the discussion, we refer to the example of abstract
+inference given by (2).
+We first analyse the structure of the equation system of an abstract proof. It is obtained by union of the equation systems
+attached to each abstract inference figure used in the proof. Among the state variables, we distinguish between the "main"
+variables, which are those which label the nodes of the abstract proof tree and the "side" variables (all the others). We use
+the main variables to identify the nodes in the proof-tree, since there is a one-to-one correspondence between the two. Each
+abstract inference contributes two kinds of equations:
+
+ffl A "conclusion" equation, which concerns the conclusion of the inference; it is of the form
+
+X = \Gamma + X
+
+0
+
+1 + : : : + X
+
+0
+
+n
+
+where \Gamma is a multiset of atoms, X is the (main) variable labeling the conclusion of the inference, and X
+
+0
+
+1 ; : : : ; X
+
+0
+
+n are
+pairwise distinct side variables (n  0) local to the inference. The first-order variables occurring in \Gamma are also local to
+the inference. In Example (2), the conclusion equation is
+
+X = a; b +X
+
+0
+
++X
+
+00
+12
+
+ffl A set of "premiss" equations, which concern the premisses of the inference; each of them is of the form
+
+X = \Gamma +X
+
+0
+where \Gamma is a multiset of atoms, X is the (main) variable labeling the concerned premiss of the inference, and X
+
+0
+
+is one
+of the side variables local to the inference. In Example (2), there are three premiss equations:
+
+8
+!
+:
+
+X 1 = c; d + X
+
+0
+
+X 2 = e + X
+
+0
+
+X 3 = f +X
+
+00
+Each equation is attached to one node in the proof tree (viewed either as a conclusion or as a premiss), and each node is
+identified by the main variable labeling it. We write [X : E] to recall that equation E is attached to node X where X is a
+main variable. We introduce the following classification of the equations:
+
+Definition 6 We are interested in two main classes of equations.
+
+ffl An "assignment" is an equation of one of the following forms
+
+ae
+
+X = \Gamma +X
+
+0
+
+X = \Gamma
+
+where X is a main variable, X
+
+0
+
+a side variable and \Gamma is a multiset of atoms.
+
+ffl A "constraint" is an equation of one of the following forms
+
+ae
+
+\Gamma +X
+
+0
+
+= \Delta +X
+
+0
+
+1 + : : : +X
+
+0
+
+n
+
+\Gamma = \Delta +X
+
+0
+
+1 + : : : +X
+
+0
+
+n
+
+where X
+
+0
+
+; X
+
+0
+
+1 ; : : : ; X
+
+0
+
+n are side variables (n  0) and \Gamma; \Delta are multisets of atoms.
+
+ffl A "generator" is a constraint as above where \Delta = ffl and n  1.
+
+The equation system of an abstract proof therefore consists of:
+
+ffl The set of premiss equations, exactly one for each node of the tree except the root (since it not the premiss of any
+inference). The premiss equation at node X is an assignment of the form X = \Gamma +X
+
+0
+
+, where X
+
+0
+
+is a side variable, or
+
+X = \Gamma when connective ! is used in the inference. We can thus define the "assignment" of a main variable X (other
+than the root) as the term \Gamma + X
+
+0
+
+(or \Gamma). For the root variable, if there is no given initial assignment, we assume its
+assignment is an arbitrary side variable introduced for that purpose.
+
+ffl The set of conclusion equations, exactly one for each node of the tree except the open nodes (since they are not the
+conclusion of any inference). We immediately replace the main variable in each conclusion equation by its assignment,
+so that it becomes a constraint of the form
+
+\Gamma (+X
+
+0
+
+) = \Delta + X
+
+0
+
+1 + : : : + X
+
+0
+
+n
+
+where \Gamma; \Delta are multisets of atoms and X
+
+0
+
+; X
+
+0
+
+1 ; : : : ; X
+
+0
+
+n are pairwise distinct side variables (n  0).
+
+Definition 7 An equation system E is said to be regular if the following conditions are met:
+
+ffl E consists of assignments and constraints only and each of them is attached to one node of the proof tree.
+
+ffl Each side variable X
+
+0
+
+occurs exactly once in the right-hand side of a constraint.
+
+ffl X
+
+0
+
+may also occur in the left-hand side of zero, one or several constraints, but each of them (if any) is attached to an
+immediate descendant in the proof tree of the constraint where X
+
+0
+
+occurs in the right-hand side.
+
+The following property captures the way abstract proofs are constructed.
+
+Proposition 4 The equation system of an abstract proof is regular.
+
+As we will see, regularity as defined above is the essential property which ensures the soundness and finiteness of the resolution
+method for equation systems proposed below. Section 5.4 defines a procedure which transforms a regular equation
+system into an equivalent finite disjunction (on the main variables) of regular equation systems, so that all the constraints in
+each disjunct are generators. Section 5.5 uses this result to defines a procedure capable of generating all the concrete proofs
+that are instances of a given abstract proof.
+13
+
+5.4 Equation Solving: a Constraint-based Tableau Method
+
+We make use of two basic transformations on linear equations. Let E be a linear equation and X
+
+0
+
+be a side variable:
+
+ffl Let \Gamma be a multiset of atoms. Substituting \Gamma +X
+
+0
+
+to X
+
+0
+
+in E yields a new linear equation, written Inc X
+
+0
+
+:\Gamma (E), obtained
+by moving \Gamma by associativity/commutativity.
+
+ffl Substituting the empty multiset ffl to X
+
+0
+
+in E yields a new linear equation written Nil X
+
+0 (E), obtained by applying the
+neutrality of ffl.
+
+The following property ensures that the transformations above do not modify the nature of the equations at hand.
+
+Proposition 5 If E is an assignment (respectively, a constraint), then so are Inc X
+
+0
+
+:\Gamma (E) and Nil X
+
+0 (E).
+
+The equation solving algorithm presented here mixes constraint propagation techniques and tableau methods. We assume
+given an initial equation system, corresponding to the abstract proof obtained at some point in an abstract execution. Resolution
+will consist in building a "tableau", i.e. a tree whose root is labeled with the initial equation system and whose nodes are
+labeled with derived equation systems, in such a way that:
+
+ffl each node is either an "open" node or has a finite (possibly null) number of offsprings;
+
+ffl each closed node is equivalent (on the main variables) to the disjunction of its offsprings, i.e. the set of solutions (on
+the main variables) of a closed node is exactly equal to the union of the sets of solutions of its offsprings (or the empty
+set if there are no offsprings);
+
+ffl if a closed node is regular, so are its offsprings.
+The expansion of an open tableau node is given by the following tableau inference rules. Each rule leads from one equation
+system (and closes its node) to a finite set of equation systems.
+
+Definition 8 Tableau node expansion is defined by the following clauses:
+1. Let N be an open tableau node labeled by an equation system of the form
+
+[X : \Gamma +X
+
+0
+
+= \Delta +X
+
+0
+
+1 + : : : +X
+
+0
+
+n ] ; E
+
+(a) If \Delta is not empty, then node N can be expanded to the following set of nodes
+
+[X : oe\Gamma
+
+0
+
++X
+
+0
+
+= X
+
+0
+
+1 + : : : + X
+
+0
+
+n ] ; oeInc X
+
+0
+
+:\Delta
+
+0 (E)
+
+with one such node for each pair \Gamma
+
+0
+
+; \Delta
+
+0
+
+of multisets of atoms and substitution oe such that there exist multisets of
+atoms \Gamma
+
+00
+
+; \Delta
+
+00
+
+with \Gamma = \Gamma
+
+0
+
+; \Gamma
+
+00
+
+and \Delta = \Delta
+
+0
+
+; \Delta
+
+00
+
+and oe is the most general unifier of (some ordered versions of)
+
+\Gamma
+
+00
+
+and \Delta
+
+00
+
+. Note that there may only be a finite (possibly null) number of such nodes, bounded by the number of
+sub-lists of \Gamma; \Delta.
+
+(b) If \Delta is empty and n = 0, then node N can be expanded either to no node at all if \Gamma is not empty, or, if \Gamma is empty,
+to one new node labeled Nil X
+
+0 (E).
+
+2. Let N be an open tableau node labeled by an equation system of the form
+
+[X : \Gamma = \Delta +X
+
+0
+
+1 + : : : +X
+
+0
+
+n ] ; E
+
+(a) If \Delta is not empty, then node N can be expanded to the following set of nodes
+
+[X : oe\Gamma
+
+0
+
+= X
+
+0
+
+1 + : : : + X
+
+0
+
+n ] ; oeE
+
+with one such node for each multiset of atoms \Gamma
+
+0
+
+and substitution oe such that there exists a multiset of atoms \Gamma
+
+00
+
+and \Gamma = \Gamma
+
+0
+
+; \Gamma
+
+00
+
+and oe is the most general unifier of (some ordered versions of) \Gamma
+
+00
+
+and \Delta.
+
+(b) If \Delta is empty and n = 0, then node N can be expanded either to no node at all if \Gamma is not empty, or, if \Gamma is empty,
+to one new node labeled E .
+
+An example of tableau node expansion (case 1a) is given by Figure 2. Note that, if the equation system at some open tableau
+node is regular, then in case 1 above, X
+
+0
+
+may occur in E only (i) in the right-hand side of the assignment equation for X
+
+and (ii) possibly in the left-hand side of the constraint (and right-hand side of the assignment) at nodes which have the same
+parent node as X (except X itself). In other words, the substitutions Inc X
+
+0
+
+:\Delta
+
+0
+
+(in case 1a) and Nil X
+
+0
+
+(in case 1b) need not be
+applied to the whole system of equations E , but only to a localised neighbourhood (the siblings of X).
+
+The following theorems form the core of the equation resolution procedure.
+14
+
+X2
+X4=...,w+X2'
+X1
+X2
+X3
+X4
+X6
+X5
+X1
+r+X0'=u+X1'+X2'
+X3
+X4
+X6
+X5
+X1
+X2
+X3
+X4
+X6
+X5
+X1'=b+X1"
+X1=...,r+X0'
+X4=...,w+X2'
+X6=...,t+X4'
+X3=...,v,b+X1"
+X2=...,a(1),c,b+X1"
+X5=...,s(1)+X3'
+X1=...,r+X0'
+X4=...,w+X2'
+X6=...,t+X4'
+X3=...,v,a(x),b+X1"
+X2=...,a(1),c,a(x),b+X1"
+X5=...,s(x)+X3'
+a(1),c+X1"=X3'+X4'
+r+X0'=u,a(x),b+X1"+X2'
+c+X1"=X3'+X4'
+r+X0'=u,b+X1"+X2'
+s = {x/1}
+X1'=a(x),b+X1"
+X1=...,r+X0'
+X5=...,s(x)+X3'
+
+t X3=...,v+X1'
+X2=...,a(1),c+X1'
+2
+X6=...,t+X4'
+
+at X1: u ((a(1) c) v) w
+
+&
+
+&
+
+^
+Interpretation:
+Interpretation:
+
+at X2: x a(x) b s(x) t
+
+^ ^
+
+$
+G , s(x)
+
+1
+
+G ,
+
+a(x), b
+v w
+G , G ,
+
+1 2
+
+G , a(1),c G , G ,
+a(1),c+X1'=a(x),b+X3'+X4'
+
+u G , G ,
+
+1
+1 1
+2
+2
+Figure 2: An example of tableau node expansion
+Theorem 6 Let E be a regular equation system. If a closed tableau node is labeled by E and has n  0 offsprings labeled by
+
+E 1 ; : : : ; En , then
+
+ffl Each equation system E i (for i = 1 : : : n) is regular.
+
+ffl E is equivalent to
+
+W n
+i=1 E i on the main variables.
+
+Theorem 7 For a given regular equation system E , there is only a finite number of tableaux with E at their root.
+
+Definition 9 A solution tableau for an equation system E is a maximal tableau whose root is E .
+
+Theorem 7 ensures that any regular equation system E has a solution tableau. Theorem 6 ensures that E is equivalent (on the
+main variables) to the disjunction of the equation systems at the leaves of any given solution tableau for E . Furthermore, all
+the nodes of a solution tableau for E are labeled by regular equation systems. By construction, the open leaves of a solution
+tableau cannot be expanded. Hence, the constraints at any of these leaves are of one of the two forms
+
+\Gamma + X
+
+0
+
+= X
+
+0
+
+1
+
++ : : : +X
+
+0
+
+n where n  1
+\Gamma = X
+
+0
+
+1 + : : : +X
+
+0
+
+n where n  1
+
+i.e. they are generators according to Definition 6. Thus:
+
+Proposition 8 The constraints at the open leaves of a solution tableau are generators.
+15
+
+5.5 Generation of the Solutions
+
+Finally, consider an abstract execution in the Proof-Construction paradigm, starting from a proof reduced to a single node
+with no equation (or an initial assignment). Let P be its ending proof. Procedure SOLVE defined below is capable of deciding
+whether the abstract proof P corresponds to some concrete proof, and also to generate all the corresponding concrete proofs
+(if any).
+
+Procedure SOLVE(P: abstract proof)
+
+1 Compute a solution tableau for the equation system of P;
+
+2 Choose an open leaf of the solution tableau;
+
+3 Let E be the equation system at the selected leaf;
+
+4 Let N be the set of nodes in P;
+
+5 Order N so that any node comes before any of its descendents;
+
+6 While N is not empty:
+
+7 Remove the first node n from N ;
+
+8 Choose a solution to the constraint attached to n;
+
+9 Apply it to E ;
+
+10Choose a ground instantiation of the first-order variables at that leaf;
+
+11Apply it to E ;
+
+12Replace in P each main variable by its assignment in E ;
+
+13Return P;
+
+This procedure contains many choice points. Some of them can be treated deterministically, i.e. they can be made at random
+and committed. Others (introduced by the keyword Choose) are pure non-deterministic choices. A different choice at each
+of these points will yield a different solution (i.e. concrete instance of P) at line 13.
+
+ffl At line 1, a solution tableau is computed by maximal expansion starting from a single tableau node labeled with
+the equation system of P . This system is regular (by Proposition 4), and Theorem 7 ensures that tableau expansion
+terminates, and yields a solution tableau. It involves choices (which expansions to perform ? and when ?), but they can
+all be deterministically treated: in fact, it is conjectured that all the solution tableaux of a regular equation system have
+the same open leaves.
+
+ffl At line 2, the choice of an open node of the solution tableau is non-deterministic and may fail (if all the nodes of the
+tableau are closed). It is the only potential failure point in the procedure. Theorem 6 ensures that the initial equation
+system is equivalent (on the main variables) to the disjunction of the systems labeling the open leaves of the solution
+tableau. This ensures that the procedure generates all the possible concrete instances of the abstract proof P . The
+abstract proof P has no concrete instances if and only if the solution tableau has no open node (failure at line 2).
+
+ffl At line 3, the equation system E is necessarily regular. Indeed, Theorem 6 ensures that the equation systems at the
+leaves of the solution tableau are regular, since so is the initial system (being the equation system of an abstract proof).
+Furthermore, Proposition 8 ensures that the constraints of E are all generators. This is essential for the rest of the
+procedure.
+
+ffl At line 5, the choice of an ordering satisfying the stated condition is obviously always possible and can be treated
+deterministically. It does not impact the equation system obtained at the end of the While loop.
+
+ffl The choice at line 8 is non-deterministic, but it never fails. Indeed, E contains only generators, and it is easy to see that
+a generator always admits solutions:
+
+-- In the case of a generator of the form \Gamma = X 1 + : : : + Xn where n  1, a solution is obtained by taking each
+element of \Gamma in turn (in an arbitrary order) and choose an index i 2 f1; : : : ; ng to map it to. The solution is given
+by instantiating each X i to the multiset of elements mapped to i.
+
+-- In the case of a generator of the form \Gamma + X = X 1 + : : : +Xn where n  1, choose an arbitrary value for X
+
+first then proceed as before (this may only happen for the root node).
+
+ffl The step at line 9 preserves the essential property that E contains only generators, so that the previous reasoning about
+line 8 still applies for the subsequent occurrences of the loop. This is due to (i) the regularity of E and (ii) the condition
+on the ordering of the tree traversal stated at line 5. With this condition and regularity, the variables on the right-hand
+side of the constraints in the remaining nodes of N are not affected by the instantiation at line 9 (hence these constraints
+remain generators).
+
+ffl The choice at line 10 is obviously non-deterministic, but it also obviously never fails.
+
+ffl Finally, it is easy to see that at line 12, all the side variables have been instantiated, so that the assignments in E define
+a ground instantiation for the main variables, which completes the definition of the generated solution.
+16
+
+5.6 Dealing with Universal Quantification
+
+Universal quantification in the Proof-Construction paradigm has been investigated in [10], and used as a mechanism to model
+a form of dynamic modularity. In fact, the generation of new unique identifiers is a rather common operation in many systems,
+in particular to create new "addresses" for private communication with a computation thread or new "keys" in a table. We
+show here how we can easily adapt the constraint based tableau method described above to handle universal quantification.
+Abstract inferences using universal quantification introduce new constants in the sequents. The actual value of these constants
+is unimportant; what is important is that they do not occur in the context where they are introduced. Therefore, we will make
+use of a new kind of variables in the equation systems, sometimes called "eigen-variables" written w; w
+
+0
+
+; w 1 : : : and meant
+to be assigned constants.
+
+Definition 10 Given an eigen-variable w and an expression H built from the state variables, the first-order variables, the
+eigen-variables and the function symbols and constants of the signature, a "universal quantification" constraint is of the form
+
+w 6! H
+
+and expresses that w does not occur in H (read w "outside" H).
+
+Abstract inferences may introduce universal quantification constraints. For example, consider the following bipole:
+
+9x (p
+
+?
+
+(x)\Omega
+
+8y(q(x; y)Nr(x;
+y))\Omega
+
+8z s(x; z))
+
+The corresponding abstract inference consists of the usual system of equations:
+
+8
+?
+?
+!
+?
+?
+:
+
+X = p(x) + X
+
+0
+
++ X
+
+00
+
+X 1 = q(x; w
+
+0
+
+) +X
+
+0
+
+X 2 = r(x; w
+
+0
+
+) + X
+
+0
+
+X 3 = s(x; w
+
+00
+
+) +X
+
+00
+plus the following universal quantification constraints
+
+ae
+
+w
+
+0
+
+6! p(x) w
+
+0
+
+6! X
+
+0
+
+w
+
+00
+
+6! p(x) w
+
+00
+
+6! X
+
+00
+We assume that in an abstract execution, both the first-order variables and the eigen variables in each abstract inference are
+renamed apart. A universal quantification constraint w 6! H can be immediately reduced in the following cases:
+
+ffl If H contains an occurrence of w, the constraint immediately reduces to a contradiction.
+
+ffl Otherwise, if H is not reduced to a first-order or side variable, the constraint immediately reduces to the possibly empty
+set of constraints w 6! x and w 6! X
+
+0
+
+where x (resp. X
+
+0
+
+) ranges over the first-order variables (resp. side variables)
+occurring in H.
+
+Now, the tableau expansion rules of Definition 8 are modified as follows:
+
+ffl In the unification performed in cases 1a and 2a, the eigen variables must be treated as constants (i.e. they unify only
+with themselves).
+
+ffl The system of universal quantification constraints is immediately reduced at each output node of the expansion; moreover,
+the branches leading to a contradiction are immediately discarded.
+Finally, procedure SOLVE of Section 5.5, which generates the concrete instances of an abstract proof, should be altered to
+account for the universal quantification constraints: at step 10, after a ground instantiation has been chosen for the first-order
+variables, the eigen variables should be assigned pairwise distinct arbitrary constants outside all those used in the instantiation
+of the first-order variables. This ensures that the universal quantification constraints are satisfied. Of course, the solutions are
+generated modulo renaming of the constants.
+6 Summary and Discussion
+
+Procedure SOLVE of Section 5.5 is therefore capable of generating all the concrete proofs (hence executions) which are
+instances of an abstract one (if any). It does that in a non trivial way (as opposed to a generate and test method), in that
+it proceeds in two phases: the first phase (generation of a solution tableau and choice of an open node) only makes one
+non-deterministic choice (of an open node of the solution tableau) which is finite and may fail (solution tableau with no open
+17
+
+node); the second phase (enumeration of the solutions for the chosen open tableau node) makes non-deterministic choices
+which may be infinite but never fail.
+This completes the investigation of the Proof-Construction paradigm viewed as a mixture of two dual processes of abstract
+proof expansion on one hand and constraint propagation on the other hand. Of course, the presentation given here is intentionally
+generic, since it aims at investigating a foundational paradigm; different systems based on that paradigm may then
+choose different ways to implement and interleave these two processes.
+This constraint based approach to proof construction was initially introduced in the context of parsing [4]. In that paper,
+the linguistic resources are initially (i) the words of the sentence to parse, called triggers, and (ii) the syntactic category to
+reach (typically "s"), called the target. Then, each transition consumes a trigger and a target and produces new targets in
+different branches of the proof, which thus compete for the remaining triggers. Constraint propagation is used to organise
+this competition.
+However, it is remarkable that competition between processes can be represented within a single branch of a Focussing proof,
+so long as the transitions performed by each process do not produce resources that it is important to hide from the other
+processes. In the linguistic application, the targets produced by each transition could as well share the same branch of proof:
+they would compete just as well for triggers; the single-branch approach is precluded only because some transitions (e.g.
+triggered by a relative pronoun) generate not only new targets but also new triggers (e.g. a "gap" noun-phrase) which should
+be visible only by one of the targets (e.g. that for the relative clause) and not by the others.
+A form of constraint propagation for proof construction has also been considered in [9], with the so-called "input-output
+model" of resource consumption. In their approach, propagation is tightly coupled to some assumptions made on the way
+the expansion process works: the branches of the proof are expanded in a fixed (syntactic) order according to a depth-first
+strategy. Furthermore, the initial sequent (root of the proof) is completely specified, thus limiting the use of the paradigm to
+deal with partial information. In this Prolog-like setting, the constraint propagation mechanism can be sequentialised so as to
+view the propagations performed in a completed branch of proof as a mapping from an input set of available resources to an
+output set of remaining resources (those which have not been consumed) which is passed as input to the next branch.
+Constraint propagation for proof construction has also been studied in [8]. They consider the problem directly at the level of
+the sequent system of Linear Logic, which they decorate by annotating each formula with a Boolean expression (a kind of
+"presence" token) and solving Boolean constraints instead of multiset constraints. They propose various strategies to solve
+such systems. As in the previous case, this approach requires that the proof construction starts with a fully initialised sequent,
+since the Boolean annotations must be attached to formulas that are present in the annotated sequent, even if ultimately their
+annotation may be assigned the value false (stating that the formula is not present in the real sequent). Furthermore, they do
+not work with Focussing proofs, which would simplify the constraint systems they deal with.
+An expected outcome of the constraint based Proof-Construction paradigm presented here is in the application to the coordination
+of distributed objects, as in CLF [2]. A coordination in CLF is viewed as a proof construction, where the proof is
+stored across several distributed objects viewed as resource managers. The processes that perform the transitions (called the
+coordinators) do not know the proof beyond what they strictly need to perform each transition. Hence, it is essential in CLF
+to be able to deal with partial information about proofs. However, the restrictions on the kind of transitions allowed in CLF
+considerably simplifies the problem compared to what has been presented here. The approach presented here may help lift
+these restrictions and shed some new light on the meaning of Focussing in terms of distributed coordination and transaction
+mechanisms.
+Acknowledgement
+
+I am grateful to Jean-Yves Girard for having made this work possible, by welcoming me at the "Institut de Mathematique de
+Luminy" (IML) and by fruitful discussions on the topic of Ludics. I am also grateful to the members of the team "Logique
+de la programmation" at IML, esp. Paul Ruet and Claudia Faggian, for in-depth discussions on the possible applications of
+this work to Non-Commutative logic.
+References
+
+[1] J-M. Andreoli. Logic programming with focusing proofs in linear logic. Journal of Logic and Computation, 2(3), 1992.
+[2] J-M. Andreoli, D. Arregui, F. Pacull, M. Riviere, J-Y. Vion-Dury, and J. Willamowski. CLF/Mekano: a framework for
+building virtual-enterprise applications. In Proc. of EDOC'99, Manheim, Germany, 1999.
+[3] J-M. Andreoli, L. Leth, R. Pareschi, and B. Thomsen. True concurrency semantics for a linear logic programming
+language with broadcast communication. In Proc. of TAPSOFT'93, Orsay (France), 1993.
+[4] J-M. Andreoli and R. Pareschi. From lambek calculus to word-based parsing. Technical report, CIS, Ludwig Maximilian
+Universitat, Munich, Germany, 1991. Proc. of the Workshop on Substructural Logic and Categorial Grammar.
+18
+
+[5] J-Y. Girard. Linear logic. Theoretical Computer Science, 50:1--102, 1987.
+[6] J-Y. Girard. Light linear logic. Information and Computation, 143, 1998.
+[7] J-Y. Girard. Locus solus, 1999. Preprint.
+[8] J. Harland and D. Pym. Resource distribution via boolean constraints. In Proc. of the 14th Int'l Conference on Automated
+Deduction (CADE-14), Townsville, Australia, 1997.
+[9] J.S. Hodas and D. Miller. Logic programming in a fragment of intuitionistic linear logic. Journal of Information and
+Computation, 110(2):327--365, 1994.
+[10] D. Miller. Lexical scoping as universal quantification. In Proc. of the 6th International Conference on Logic Programming,
+Lisboa, Portugal, 1989.
+[11] D. Miller, G. Nadathur, F. Pfenning, and A. Scedrov. Uniform proofs as a foundation for logic programming. Annals of
+Pure and Applied Logic, 51:125--157, 1991.
+19
+
+A Demonstration of the Propositions and Theorems
+
+A.1 Propositions
+
+Soundness-Completeness of Bipolarisation Proposition 1 states that j is a bijection from the executions based on A to
+the traces of the U-normal executions based on A
+
+0
+
+. Let  denote the trace operator. We first show that:
+
+j(kFkA ) = k(F )k A
+
+0
+
+(3)
+where for any set P of inferences and set A of atoms, PA denotes the restriction of P to inferences containing only A-
+
+formulas. Equality (3) is a direct consequence of the definition of mapping k:k in terms of mapping k:k
+
+#
+
+together with the
+following equalities:
+
+j(kFk
+
+"
+
+) = k
+
+"
+
+(F )k
+
+"
+
+j(kFk
+
+#
+A ) = k
+
+#
+
+(F )k
+
+#
+A
+
+0
+This is shown by induction on F using the following straightforward properties, for any sets S 1 ; S 2 ; S of sequents and any
+sets P 1 ; P 2 ; P of inferences based on A:
+
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+
+j( 
+
+?) = 
+
+? j(S 1  OS 2 ) = j(S 1 )  Oj(S 2 ) j(  ?S) =  ?j(S)
+
+j( 
+
+?) = 
+
+? j(S 1  NS 2 ) = j(S 1 )  Nj(S 2 )
+
+j(R
+
+"
+
+(F )) = R
+
+"
+
+(j F )
+
+j(
+
+ 1) =  1 j(P 1
+
+\Omega
+
+P 2 ) = j(P 1 )
+\Omega
+
+j(P 2 ) j(
+
+ !P ) =  !j(P )
+
+j(  0) =  0 j(P 1  \PhiP 2 ) = j(P 1 )  \Phij(P 2 )
+
+j(I(a)) = I(a) j(R
+
+#
+A
+
+(S)) = R
+
+#
+A
+
+0 (j(S))
+
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+
+We also use the fact that the trace and restriction mappings are morphisms for the operators  1,
+\Omega
+
+,
+
+
+!,  0,  \Phi.
+
+Equality (3) states that j is a bijection from the inferences based on A to the traces of the U-normal inferences based on A
+
+0
+
+.
+It is not difficult to lift this result to the case of (incomplete) proofs (and hence of executions) rather than inferences. This is
+done by induction on the proofs. The induction hypothesis is applied to the subproofs at the premisses of the root inference.
+The induction makes use of the following result shown by induction:
+Let F be a formula, \Theta : \Gamma a sequent, [E] a set of sequents
+and\Omega
+a multiset of formulas.
+
+If
+
+\Delta \Delta \Delta [E] \Delta \Delta \Delta
+
+\Theta : \Gamma
+
+2 kFk then 9k  0 such that
+
+\Delta \Delta
+\Delta\Omega
+ [E] \Delta \Delta \Delta
+
+\Omega
+
+k
+
+ \Theta : \Gamma
+
+2 kFk
+
+where\Omega
+
+ is the operator
+appending\Omega
+to the left-hand field of sequents.
+
+Extraction of the proper formula Proposition 2 states that any formula is an instance of a unique (modulo renaming)
+proper formula. It plays an essential role in the proof of Proposition 1 in the first-order case. To prove Proposition 2, consider
+a formula F possibly containing free variables. Let u be the occurrence (in F ) of a term t occurring in an atomic subformula
+of F . Occurrence u is said to be free if t contains no variable which is bound at u in F . It is said to be proper if it is free and
+does not appear in the scope of another free occurrence.
+We build a substitution ! and a formula
+
+
+
+F by replacing in F each proper occurrence u by a new variable x (a new one each
+time, and not occurring in F ) and by mapping in ! variable x to the term at occurrence u. By construction,
+
+
+
+F is a proper
+formula and F = !
+
+
+
+F . By induction, we can show that any proper formula of which F is an instance is identical to
+
+
+
+F modulo
+renaming of the variables.
+
+Abstraction Proposition 3 and 4 are simple applications of the definitions.
+
+A.2 Theorems
+
+Theorems 6 and 7 basically express the soundness, completeness, termination and preservation of regularity of the equation
+solving procedure. Some of the proofs are just sketched.
+
+Completeness Let N be a closed tableau node. We may assume without loss of generality that we are in case 1a of
+Definition 8 (the other cases are treated similarly). Hence, N is labeled by an equation system E o of the form
+
+[X : \Gamma +X
+
+0
+
+= \Delta +X
+
+0
+
+1 + : : : +X
+
+0
+
+n ] ; E
+
+where \Delta is not empty. The offsprings of N in the tableau are labeled by equation systems of the form
+
+[X : oe\Gamma
+
+0
+
++ X
+
+0
+
+= X
+
+0
+
+1 + : : : +X
+
+0
+
+n ] ; oeInc X
+
+0
+
+:\Delta
+
+0 (E)
+20
+
+with one such offspring for each pair \Gamma
+
+0
+
+; \Delta
+
+0
+
+of multisets of atoms and substitution oe such that there exist multisets of atoms
+
+\Gamma
+
+00
+
+; \Delta
+
+00
+
+with \Gamma = \Gamma
+
+0
+
+; \Gamma
+
+00
+
+and \Delta = \Delta
+
+0
+
+; \Delta
+
+00
+
+and oe is the most general unifier of some ordered versions of \Gamma
+
+00
+
+and \Delta
+
+00
+
+.
+Let ! be a solution of E o at node N . Thus, ! maps first-order variables to ground terms and state variables to multisets of
+ground atoms. We have to show that the restriction of ! to the main variables is also the restriction to the main variables of a
+solution of one of the equation systems labeling the offsprings of N . Since ! is a solution of E o , we have
+
+!\Gamma; !(X
+
+0
+
+) = !\Delta; !(X
+
+0
+
+1 ); : : : ; !(X
+
+0
+
+n ) (4)
+Hence, !\Delta is a sub-multiset of !\Gamma; !(X
+
+0
+
+). Hence, it has one part in !\Gamma and one part in !(X
+
+0
+
+). Hence, there exist partitions
+
+\Gamma
+
+0
+
+; \Gamma
+
+00
+
+of \Gamma and \Delta
+
+0
+
+; \Delta
+
+00
+
+of \Delta such that
+
+!\Gamma
+
+00
+
+= !\Delta
+
+00
+
+(5)
+corresponds to the part of !\Delta which is in !\Gamma, and !\Delta
+
+0
+
+is a disjoint set of occurrences from !\Gamma
+
+0
+
+. By reporting in (4), we
+conclude that there exists a
+multiset\Omega
+such that
+
+!(X
+
+0
+
+) = !\Delta
+
+0
+
+;\Omega
+!\Gamma
+
+0
+
+;\Omega
+
+= !(X
+
+0
+
+1 ); : : : ; !(X
+
+0
+
+n )
+
+(6)
+From (5) we infer that there exists a substitution oe which is the most general unifier of some ordered version of \Gamma
+
+00
+
+and \Delta
+
+00
+
+such that ! = !
+
+0
+
+oe on the first-order variables for some instantiation !
+
+0
+
+of the first-order variables. !
+
+0
+
+is then extended to the
+state variables so as to be identical to ! on these variables, except !
+
+0
+
+(X
+
+0
+
+)
+=\Omega
+
+.
+
+ffl On the one hand, the second equality in (6) gives
+
+!
+
+0
+
+oe\Gamma
+
+0
+
+; !
+
+0
+
+(X
+
+0
+
+) = !\Gamma
+
+0
+
+;\Omega
+
+= !(X
+
+0
+
+1 ); : : : ; !(X
+
+0
+
+n
+
+) = !
+
+0
+
+(X
+
+0
+
+1 ); : : : ; !
+
+0
+
+(X
+
+0
+
+n
+
+)
+
+Hence, !
+
+0
+
+satisfies the equation
+
+oe\Gamma
+
+0
+
++ X
+
+0
+
+= X
+
+0
+
+1 + : : : +X
+
+0
+
+n
+ffl On the other hand, let E be an equation in E . Let's consider how its components are transformed by the mapping
+
+!
+
+0
+
+oeInc X
+
+0 :\Delta 0 .
+
+-- A first order variable x is unchanged by Inc X
+
+0
+
+:\Delta
+
+0 . It therefore becomes !
+
+0
+
+oe(x) which is equal to !(x).
+
+-- A state variable X
+
+00
+
+other than X
+
+0
+
+is unchanged by Inc X
+
+0 :\Delta 0 and by oe. It therefore becomes !
+
+0
+
+(X
+
+00
+
+), which is
+equal to !(X
+
+00
+
+) since X
+
+00
+
+is different from X
+
+0
+
+.
+
+-- Finally, state variable X
+
+0
+
+becomes X
+
+0
+
++ \Delta
+
+0
+
+by Inc X
+
+0
+
+:\Delta
+
+0
+
+, then X
+
+0
+
++ oe\Delta
+
+0
+
+by oe and !
+
+0
+
+(X
+
+0
+
+); !
+
+0
+
+oe\Delta
+
+0
+
+by !
+
+0
+
+. Now,
+using the first equality of (6), we have
+
+!
+
+0
+
+(X
+
+0
+
+); !
+
+0
+
+oe\Delta
+
+0
+
+=\Omega
+
+; !\Delta
+
+0
+
+= !(X
+
+0
+
+)
+
+Thus, overall, X
+
+0
+
+becomes !(X
+
+0
+
+).
+
+Therefore, we see that all the variables in E are mapped identically by !
+
+0
+
+oeInc X
+
+0
+
+:\Delta
+
+0 and by !, so that
+
+!
+
+0
+
+oeInc X
+
+0
+
+:\Delta
+
+0 E = !E
+
+Since ! is a solution of E and E is in E , we conclude that !
+
+0
+
+satisfies the equation system oeInc X
+
+0
+
+:\Delta
+
+0 E.
+
+Thus, we have shown that !
+
+0
+
+is a solution of the system
+
+[X : oe\Gamma
+
+0
+
++ X
+
+0
+
+= X
+
+0
+
+1 + : : : +X
+
+0
+
+n ] ; oeInc X
+
+0
+
+:\Delta
+
+0 (E)
+
+which is one of the offsprings of N . Furthermore, ! and !
+
+0
+
+differ only on the first-order variables and on the state variable
+
+X
+
+0
+
+, which is a side variable. Hence, ! and !
+
+0
+
+coincide on the main variables. This completes the proof.
+
+Soundness The soundness of the equation resolution procedure is shown by proving that, given a solution ! of the equation
+system labeling an offspring of a closed tableau node N , we can build a solution of the equation system labeling N which
+coincide with ! on the main variables. The proof is similar to that of completeness.
+
+Preservation of regularity This is shown simply by observing the structural changes occurring between the equation
+system at one tableau node and that at any of its offsprings, and by checking that each of the three regularity criterions (see
+Definition 7) is preserved. The first criterion is ensured by Proposition 5 which is straightforward.
+21
+
+Termination Given a regular equation system E , consider the set T of tableaux with E at their root. We reason by contradiction
+and assume that T is infinite. Each tableau in T is built from E , by a finite number of expansion steps listed in
+Definition 8. Each expansion step applies to an open tableau node and picks a constraint attached to a main variable at that
+node. Therefore, there is a finite number of ways to expand a tableau (bounded by the number of its open nodes multiplied
+by the number of main variables). Consequently, for T to be infinite, there must be an infinite sequence of expansion steps
+starting from E . We thus obtain an infinite tableau with E at its root, but since each node in a tableau has a finite number of
+offsprings, we conclude that the infinite tableau has an infinite branch. Hence, there exists an infinite sequence of rewriting
+steps of Definition 8 starting at E . We then proceed in two phases.
+1. First, we observe that the infinite sequence of rewriting steps must contain an infinite subsequence of steps of type 1a
+
+(see Definition 8). Indeed, all the other types of steps 1b; 2a; 2b strictly reduce the "size" of the equation system (the
+number of side variables in case 1b, the number of non-generators in case 2a, the number of constraints for 2b). In each
+case, one of these three dimensions is strictly reduced while the others are left unchanged (or reduced).
+2. Now, consider two consecutive applications of a step of type 1a to a constraint attached to the same main variable X .
+Before the first step, the constraint at X is of the form
+
+\Gamma +X
+
+0
+
+= \Delta +X
+
+0
+
+1 + : : : +X
+
+0
+
+n
+
+with \Delta non empty. After that step, the constraint at X becomes
+
+oe\Gamma
+
+0
+
++X
+
+0
+
+= X
+
+0
+
+1 + : : : + X
+
+0
+
+n
+
+Hence, step 1a cannot be immediately re-applied. The only way to change that is to have one of the side variables
+
+X
+
+0
+
+i substituted by a transformation Inc X
+
+0
+
+i :\Delta 0 performed by another step of type 1a on a constraint involving X
+
+0
+
+i on its
+left-hand side. The core of the argument is that, given that we deal only with regular equation systems, this is possible
+only by a step of type 1a at an immediate descendant of X . Hence, between two consecutive steps of type 1a on the
+same main variable, there is always a step of type 1a on an immediate descendant of that main variable. Now let ae(X)
+
+be the number of steps of type 1a at a main variable X which occurs in a given finite prefix of the infinite sequence of
+rewriting steps. We have shown that
+
+ae(X)  1 +
+
+X
+
+Y
+
+ae(Y ) (7)
+where Y ranges over the immediate descendants of X . By inductive application of (7), we conclude that ae(X) is
+bounded by the total number of main variables. Thus, no infinite subsequence of steps of type 1a on the same variable
+can exist, a contradiction.
+22
+

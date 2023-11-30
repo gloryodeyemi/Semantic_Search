@@ -1,0 +1,724 @@
+﻿ABSTRACT
+Collaborative Document Monitoring via a Recommender System
+Natalie Glance Damián Arregui Jean-Luc Meunier
+In this paper we take a second look at agents that help users
+monitor URLs. More specifically, we present a system which
+enables the collaborative evaluation of URL content changes via
+a recommender agent. The recommender agent on its own helps
+users share URLs of interest within a community. A document
+monitoring agent is coupled with the recommender agent to alert
+members of a community when documents they are monitoring
+have changed. The agent provides an automized evaluation of
+the nature of the change. Users, however, provide the subjective
+evaluation and one user’s effort is often enough to inform the
+whole community. Based on these subjective evaluations, the
+recommender agent can decide which changed URLs to report to
+each user based on their preferences. By coupling the monitoring
+agent and the recommender agent, the work of monitoring URLs
+can be shared among many, hopefully to the benefit of all.
+Keywords
+URL monitoring agent, recommender system
+1. INTRODUCTION
+The World Wide Web has been described as the next frontier, a
+new world to explore. But if the WWW is a new territory, then it
+is one whose boundaries are ever expanding, in which new cities
+are founded every day and where the construction of new
+highways can barely keep up with the traffic. That's the
+excitement of the Web. What makes the lives of we explorers
+even more challenging is that this virtual universe undergoes
+constant change. A city we visited yesterday may be gone today.
+Or perhaps the route we took to get there is torn up. Map-makers
+can't keep up with the Web's continual metamorphosis and the
+rest of us can't keep up with the map-makers' maps.
+Search engines help us find what we need; filtering systems help
+separate the gold from the dross; social recommendations help
+identify what's worth visiting. Which tools can help track the ebb
+and flow of the WWW?
+Earlier explorers of the Web have already constructed tools for
+monitoring the web. In this paper, we take a second look at a
+specific kind of tool: ways for monitoring URLs. Monitoring
+URLs allows us to identify URLs that are stale, multiple URLs
+that point to the same content, and, more generally, URLs which
+point to content which has changed. Researchers have built
+prototype systems to monitor URLs for changed content [5][6]
+and there exist today web sites where users can register URLs
+they wish to have monitored [15]. It's not a trivial task.
+Meaningful content changes represent only a small fraction of all
+detected changes. The larger proportion of changes are
+insignificant, such as a “last modified” date change, or a new ad
+Xerox Research Centre Europe
+6 chemin de Maupertuis
+38240 Meylan, France
+{firstname.lastname}@xrce.xerox.com
+banner, or perhaps a change in font size. The results returned by
+a URL monitoring agent risk having a small signal to noise ratio.
+Furthermore, what defines a change as meaningful is subjective.
+Two people, both monitoring an on-line computer catalog, may
+have very different evalutions of changes to the same page: one
+may be waiting for the price on a component to drop, the second
+may be waiting for another component to be marked “in stock.”
+This example also shows that it would be wrong to assume that a
+small change is necessarily unimportant.
+The problem is that many people are unable (or unwilling) to
+monitor all pages of interest to him/herself for all possible
+changes of interest. In fact, no one person should have to: any
+page of interest is likely to have thousands, if not millions, of
+readers. The solution we propose to harnass the collaborative
+nature of the Web so that a group of people can together monitor
+a set of URLs for significant changes.
+In this paper, we present a system which enables the collaborative
+evaluation of URL content changes via a recommender agent.
+The recommender agent on its own is used to recommend URLs
+of interest to a community. A document monitoring agent is
+coupled with the recommender agent to alert members of a
+community when documents they are monitoring have changed.
+The agent also provides an automized evaluation of the nature of
+the change. This automatic evaluation guides user evaluation; it
+indicates, for example, what percent of the content has changed,
+how many links have been added/removed, what percentage of
+the keywords have changed. Users, however, provide the
+subjective evalutation and one user's effort is often enough to
+inform the whole community: “It's time to buy - the price has
+dropped 20%!”; or “The authors have added a new section
+on…”; or “The only thing that's changed is the layout.” Based
+on these subjective evaluations, the recommender agent can
+decide which changed URLs to report to each user and which to
+set aside.
+In the next two sections we will describe in more detail how the
+recommender agent and the document monitoring agent
+individually operate. We will also report on related research.
+Then, in Section 4, we will describe the coupling of the two
+agents: one the hand, the overall system architecture, and on the
+other hand, the design issues that arose in deciding how to enable
+collaborative evaluation of content changes and the choices we
+made. In the final section, we will present the current status of
+the implementation and our future plans.
+2. WORKGROUP RECOMMENDER
+Early recommender systems, for example Firefly [19] and
+GroupLens [17] provided personalized recommendations of
+movies, restaurants, newsgroup articles and music to an Internet
+Paper submmission for Agents-2000 Workshop on Agent-based Recommender Systems.
+audience. These early systems generally used statistical
+algorithms to perform what is called in the literature automated
+collaborative filtering. Basically, the algorithms learn to identify
+groups of people with similar preferences within given domains
+of interest or genres. As a result, recommender systems are able
+to provide personalized recommendations, predicting how much
+an items is likely to appeal to a user based on how others
+evaluated the item. The more items a user evaluates, the better
+the system will be able to personalize its recommendations.
+Recommender systems based on collaborative filtering have since
+found a niche in electronic commerce. Many on-line merchants
+now provide personalized recommendations using such
+techniques (e.g., Amazon.com). A more extensive review of the
+literature can be found in [7][8].
+The potential of recommender systems for filtering Web pages
+has also been recognized. A number of research projects have
+addressed the collaborative evaluation of Web pages, opening up
+their systems to the Internet community (e.g., [16][4]). However,
+there is currently no large-scale filtering system for the Web; for
+example, no search engine has yet incorporated a recommender
+agent using statistical collaborative filtering algorithms. Sites
+like ThirdVoice (www.thirdvoice.com), which allow
+collaborative annotation of web pages, come close but do not yet
+offer personalized filtering.
+Another application of recommender systems with strong
+potential is for sharing knowledge in an organization [7][8].
+How knowledge differs from information is more of a
+philosophical discussion than a practical one, which we will set
+aside for the purposes of this paper. In order to test the potential
+of recommender systems to extend the ability of working
+2
+communities to share information/knowledge, two of the authors
+along with another colleague built a recommender system for the
+workplace. Many issues arose in its design, such as incentives
+for use, feedback mechanisms and how to overcome cold-start
+problems.
+The workplace recommender system we implemented, known as
+the Knowledge Pump, allows users to submit recommendations
+of URLs, local files (via upload), or text. A recommendation
+consists of a rating and, preferably, a comment, along with the
+user’s classification of the item into one or more communities.
+(We used the term “community” instead of simply domain of
+interest, because we wanted to underline the fact that a
+community is a set of domains of interest plus the people in the
+organization with that set of interests.) In turn, the Knowledge
+Pump calculates a personalized set of recommendations for a user
+for each community to which s/he belongs. A selection of
+recommendations offered via Knowledge Pump is shown in
+Figure 1.
+Each recommended item consists of a link to the item, the
+predicted score for the user, a list of the names of the users who
+reviewed it and links to their comments. These last components,
+reviewer names and comments, are what bring out the potential
+of a workplace recommender system. A system like Knowledge
+Pump allows users to track who is active and knowledgeable in
+their community as well as in turn providing them ways to build
+their own reputations. Furthermore, the comments around a
+recommended item enhance the value of that item (in a sense,
+turning information into knowledge). Lastly, the patterns of
+recommendations and contents of recommended items can be
+mined to establish focii of interest and discover who are the local
+Figure 1 Knowledge Management community recommendations via Knowledge Pump.
+authorities.
+Knowledge Pump also provides search facilities. Its search
+function allows users to retrieve bookmarks based on keywords
+in title, author, etc. It can also return, for example, all bookmarks
+classified into a particular community, making it easy to construct
+an up-to-date (and annotated) reference collection of bookmarks
+for a given domain. Users can also perform context-sensitive
+search; users can construct queries to answer questions such as:
+What did so-and-so submit to the Agents community recently?
+How have other people reacted to that article I recommended to
+the Information Retrieval community last month? What was that
+WWW page on Java libraries that so-and-so highly recommended
+a couple of months ago? The results page show the ratings and
+comments provided by users for each item.
+Finally, Knowledge Pump includes elements intended to incent
+user participation, in particular, activity gauges and a market for
+evaluations. Community gauges show the level of activity in a
+community (see Fig. 1). The top half of the dial (IN) indicates
+how many recommendations are flowing in per person per week
+for the community. The out arc shows the community average;
+the inner arc shows the individual inflow. The bottom part of the
+dial (OUT) indicates the number of visits being made to items in
+the community, on average. Once again, the community average
+is represented by the outer arc, the individual average by the
+inner one.
+To establish a market for evaluations, we put in place some
+simple economic rules: for each visit to a recommended item, the
+visitor pays one chit which is redistributed as royalties shared
+among the item’s reviewers. (New members receive one month
+of “free” recommendations). If the visitor later reviews the item,
+s/he is reimbursed in proportion to the item’s actual value to
+him/her, and, in return, is eligible to receive future royalties.
+Reviewers receive royalties whenever another user in turn visits
+an item they have reviewed. The amount of the royalty depends
+on the number of reviewers for that item. The history of account
+transactions also provides feedback to users. Members have
+commented that they look forward to seeing the red royalty
+increments in their account history graph (not distinguishable in
+the figure) which indicate that people are visiting their
+recommendations. Also, the account balance makes users aware
+that the recommendations are not free and that for each
+recommendation visited, they in some sense owe the system a
+review of their own.
+Knowledge Pump is currently in its second release. The first
+release was a research prototype; the second is a so-called
+“advanced” prototype with basically the same functionality as the
+original, but with a new interface, improved architecture and
+robust implementation. Knoweldge Pump has been used across
+Xerox (primarily at XRCE) for the last two years and at the time
+of writing has over 40 active users. There have been about 400
+documents recommended via Knowledge Pump, with on average
+2 reviews per document (ranging from 1 to over 10 reviews per
+item). Recently, two new Knowledge Pump installations have
+been set up, one within Xerox and a second at a national research
+center, in order to further validate the use of recommender
+systems for knowledge sharing.
+Our larger vision for Knowledge Pump, however, does not
+position it as a stand-alone tool or application, but as a
+component of a set of knowledge services. That is, we intend the
+3
+recommendation service to work alongside other services such as
+search, document management, digital libraries, and e-mail,
+among others. Thus, research at XRCE has explored the
+integration of search and recommendation to do collaborative
+search [9] and addressed novel user interfaces to recommender
+systems [10]. We have also made the recommendation services
+(submitting/reviewing and viewing ratings/comments) available
+from a digital library called Calliope [8].
+3. DOCUMENT MONITORING
+The idea of monitoring Web pages is not new per se. In the early
+1990s, URL-minder offered this service for free on the Internet,
+and within a few months already had thousands of users. It
+worked as follows: users registered their URL of interest on the
+URL-minder Web site. In turn, the server fetched the pages on a
+regular basis to detect changes and notified the user by e-mail.
+Current monitoring tools work similarly and can be categorized
+into server-based or client-based tools.
+URL-minder, now called Mind-it [15], belongs to the first
+category; the tool runs on a server machine supporting multiple
+users. Server-based tools have the advantage of accessing only
+once multiply registered URLs, e.g., popular Web pages. On the
+other hand, privacy becomes an issue: users may opt not to
+register certain URLs because they are reluctant to reveal their
+pages of interest to a third party. Pages with restricted access also
+cannot be handled server-side while maintaing user privacy; this
+is the case for pages requiring a login/password or cookie-based
+identification.
+Client-based tools run on the user’s own machine, and therefore
+preserve privacy and properly manage restricted-access pages, but
+globally consume more network resources. Network load could
+become an issue for organizations whose members do clientbased
+monitoring, especially if the sets of pages being monitored
+overlap significantly. Client-based tools can also pre-fetch
+modified pages and related resources (images, sounds, and
+related pages), allowing users to browse pages off-line and/or
+with lower latency. Examples of client-side tools include SurfBot
+[20] and Microsoft Internet Explorer.
+Recent research work [1][6][5] introduced novel architectures
+and features. First, WebTracker [6] allows users to share tracked
+URLs, while also allowing users to track private URLs. It uses
+the Unix diff tools to show differences to users. The Do-I-Care
+[1] agent employs relevance feedback. User feedback on their
+interest in the change detected by the agent is used to train the
+agent and improve its future performance. A Bayesian
+classification process is used to build a profile of the user interest
+and to score detected changes, which in turn are compared
+against a configurable threshold. Do-I-Care also proposes a novel
+architecture which allows agents to cascade among themselves
+the most relevant information, leveraging thus the work and
+judgement of other users. Collaboration among users is achieved
+via their agents and is possible only once users have trained their
+personal agents. The AT&T Internet Difference Engine [5]
+incorporated sophisticated methods for performing the difference
+analysis, using an adaptation of Hirschberg’s solution for finding
+the longest common subsequence [12] to HTML pages. Finally,
+Pluxy [3] proposes a novel architecture: Pluxy is a Web proxy
+that hosts a dynamically extensible set of services; the authors
+propose, among others, a Web monitoring service.
+Implementing a basic monitoring agent is fairly straightfoward.
+We decided to build our own, because we required certain
+features in order to integrate it with the recommender system and
+because we wanted to experiment with using linguistic tools to do
+more sophisticated characterizations of content changes.
+With respect to the coupling of the monitoring agent with the
+recommender system, we required that the agent:
+• Synchronize the monitoring of pages: reference versions are
+saved each day, the first of every week and the first of every
+month; as a result all users monitoring the same page with
+the same frequency (daily, weekly, monthly) see the same
+set of changes.
+Œ Handle broken links: the monitoring agent reports broken
+links and detects URLs that have moved. To account for
+possible transient network failure, a counter of failed
+download attempts is associated to each registered
+document. A configurable threshold determines when to
+alert the recommender system of a high probability that the
+document has disappeared. URLs that have moved (and that
+are reported as thus by the HTTP server) are dealt with in
+two different ways: for permanent moves, the recommender
+system is immediately notified, while temporarily moves are
+dealt with silently.
+• Handle duplicates: the monitoring agent actively searches
+for cases in which the same document is registered twice
+with different URLs. It notifies the recommender system
+when it detects duplicates.
+The handling of broken links and duplicates will allow the
+recommender system to keep current its store of pointers to
+recommended documents. How the broken links and duplicates
+are dealt with is discussed in the next section, as this involves the
+integration of the monitoring agent with the recommender
+system.
+Our second reason for implementing our own monitoring agent
+was to provide a set of user-customizable policies for detecting
+changes. In particular, we wanted to test how well linguistic
+analysis of content changes could perform. Users can request the
+agent to monitor any (or all) of the following types of content
+change:
+Œ Any text change: The monitoring agent compares documents
+at the byte level. This is the lowest level detection.
+Œ Content change: HTML tags are removed before doing the
+comparison. Typically, changes in the document layout and
+presentation are ignored.
+Œ Inverted index: This is a more elaborate method, which
+consists in analyzing changes to the most-used noun-phrases
+of the document. Tags are removed and noun-phrases are
+extracted by using Xelda [21], an integration platform
+giving access to a whole set of linguistic services (such as
+noun phrases extraction or language guesser) coming from
+the XRCE Lab. The number of occurrences of the most
+frequent noun-phrases in the two versions of the page is then
+compared using the following formula, whose results range
+from 0 (no difference) to 1 (completely different):
+2
+2
+∑ | n − n’
+|
+diff =
+,
+2
+( n + n’
+)
+∑
+4
+with n and n’ being respectively the old and new occurrence
+of a noun phrase. By setting a threshold, it is then possible
+to tune the agent’s sensitivity.
+Œ Link change, image change - the agent monitors changes to
+hypertext links and images for an HTML document.
+Currently, these change-detection policies have been
+implemented only for HTML documents.
+The user can also define the content of the change report
+established by the agent, by determining which of the above
+policies to be used to build the report. Requesting the agent to
+monitor both for any text change and for content change permits
+the user to be informed of all changes to a document while being
+able to evaluate immediately their importance.
+The agent keeps an internal representation of each registered
+document (e.g., size in bytes, checksum, inverted index) which is
+appropriate to the its associated detection policies (different
+policies may be selected by different users for the same
+document). In the future, we may simply cache the documents
+themselves to help the recommender system better manage
+broken links: the agent might then provide its last seen view of
+the document, even if degraded due to missing images, for
+instance.
+Finally, we use the venerable Unix diff tool to highlight visually
+changes on HTML documents. As diff compare lines of text, we
+transform the HTML by separating HTML tags from actual text
+on separate lines. By analyzing the diff output, the agent is able to
+insert special signs in the page that show what has been added,
+what has been updated, and what has been deleted. Modifications
+in the HTML header are detected and a warning is inserted on top
+of the document “HTML header updated.” This is the case, for
+example, when the document title is modified. Scripts embedded
+in HTML document are not currently handled. Figure 2 below
+shows the result of a difference analysis made by our agent.
+4. INTEGRATION
+The important novelty of our work is the integration of the
+document monitoring agent with a recommender agent. By
+coupling the two agents, users will be able to collaboratively
+Figure 2 Monitoring agent’s presentation of a change.
+evaluate not only documents but also changes to those documents
+within one system. The addition of a document monitoring agent
+allows the recommender system to handle the entire lifecycle of
+document recommendation, from initial recommendation, to
+collaborative evalution of changes to a document, to notification
+of changes to a document and of new reviews.
+In the integrated system, users can request that an item be
+monitored when reviewing the item (see Figure 3). 1 The user can
+request to be notified of all changes to that item that have been
+evaluated as at least: (one of) negligible, significant, or important.
+Notifications of document changes appear in the Updated folder
+of a community (see Figure 4). Users can view both the agent’s
+evaluation of the change and other users’ evaluations. Users can
+also in turn evaluate the importance of the change.
+At the time or writing of this paper, the monitoring agent and
+recommender system are operational and in use, but the
+integration of the two is still in progress. Below we describe the
+design and specification of the integration. We present the
+design issues that have arisen and some of the choices we have
+made. The figures in this section are mock-up screenshots.
+Finally, we will also present the specification of the system
+architecture.
+4.1 Design issues
+Design issues arose around the following dimensions, basically
+all stemming from the question, “What does it mean to monitor
+documents collaboratively?”:
+• How frequently should documents be monitored?
+• How should changes be reported to the user? In particular,
+how should user evaluations and agent evaluations be
+combined?
+• What kinds of changes should be reported (e.g., content
+changes, stale URLs, new reviews, changes in reviews)?
+• How are evaluations of changes handled in the market for
+evaluations?
+Monitoring frequency
+As stated previously, the document monitoring agent on its own
+allows users to choose the monitoring frequency: either daily,
+weekly or monthly. However, in order to collaboratively evaluate
+a change, all users must be reacting to the same change. Thus,
+we decided that the monitoring agent check a document with the
+same frequency for all users. This frequency is set by the first
+person to request that a document be monitored.
+Change report
+The are several ways in which the document can change: its
+content can change, users can add new reviews or even modify
+old reviews, the URL may disappear or move, or the site server
+may disappear. We decided that since these are all changes to the
+document (doc = location + content + reviews), they should all
+appear within one Knowledge Pump folder, which we entitled
+Updated. Different kinds of changes are to be clearly signified
+by using different icons to distinguish them. Users will have the
+1 Thus, it can be argued that the additional document monitoring
+functionality may in of itself incent users to review.
+5
+Figure 3 Request to monitor an item for changes.
+option to modify their preferences to include only certain kinds of
+changes in the Updated folder. Note that even among ourselves,
+we did not agree on which kinds of changes we would like to see.
+Figure 4 shows a mock-up of the contents of the Updated folder
+for a user. Two kinds of change notifications are illustrated:
+content changes evaluated by the monitoring agent only; and
+content changes evaluated by the community (as well as by the
+agent). The monitoring agent indicates the size of the change and
+provides indications of whether that change is significant: how
+much the size of the page has changed, how many
+links/images/keywords have changed. Community-evaluated
+changes display users’ evaluations in addition to the monitoring
+agent’s description. A user evaluation consists of a categorization
+of the importance of the change (negligible, significant or
+important) and (optionally) a comment on the change.
+When the user clicks on the image of the binoculars, the system
+opens up a window containing the new version of the document,
+highlighting regions that have changed or been updated. In
+addition, clicking on Evaluation of change opens a dynamically
+created page that reports the history of all content changes to the
+document. The history consists of dated sets of user and agent
+evaluations of all reported changes.
+The Updated folder shows all changes detected by the monitoring
+agent but not yet evaluated by a user (another option
+would have been to filter for changes of a certain size or kind).
+Why? Because even a small content change can represent a large
+semantic change (e.g., change in price, availability, negation of a
+result). The monitoring agent highlights where the change is and
+then a user can easily decide how significant the change is. Once
+there is at least one user evaluation, the system can decide who to
+notify of the change based on users’ settings (see Fig. 3 again).
+When there are multiple differing user evaluations of the change,
+the system takes a weighted average of the set of evaluations in
+order to decide who to notify. See, for example in Fig. 4 where
+three members of the community have each evaluated the change
+in the same item, but with different conclusions. For the
+moment, we have decided to bias the final evaluation, so that an
+evaluation of important has greater weight
+than significant and so on. This means that it
+will take many ratings of negligible to
+outweigh just one rating of important.
+In summary, newly detected changes to a
+document are presented to all users who have
+chosen to have that document monitored.
+However, once there is at least one user
+evaluation, the change is presented only to
+users whose change significance threshold is
+at least as great as the human evaluation of
+the change.
+In addition, the system puts a little flag next
+to the Updated tag of the folder whenever
+there is new community evaluated change
+which exceeds the users change threshold. As
+a result, users are alerted when there is a
+reason to check their Updated folder. Users
+are alerted in a similar way when there are
+other kinds of changes likely to interest them,
+for example, a new review of an item they
+submitted, or a broken link for an item they
+submitted.
+Change reports are also available via e-mail
+or via search. Users can change their
+preferences to request that the monitoring
+agent send them a change report containing a
+summary of all of their monitored items that have changed that
+day/week/month (same periodicity as chosen via the system).
+Likewise, the Knoweldge Pump search engine is extended to
+allow users to search for all items that have changed since a given
+date, and/or in a given community, and/or monitored by a given
+user, etc. The search results return pointers to the items, reviews
+of the items, and dated comments concerning the changes.
+There remains the question of how to handle stale URLs. Should
+fixing the problem be the administrator’s role or the
+community’s? On the one hand, giving the job to the
+administrator assures the security of the system; on the other,
+users may be better informed regarding the status of the URL and
+better able to update it. Within a work setting, it may make sense
+to distribute the work by permitting users to modify the URLs.
+Thus, our current decision is to allow any user monitoring the
+document to either modify the URL or request the system to
+retrieve the previous version from the document monitoring
+agent’s cache and save it locally. Future requests to the stale
+URL can then be redirected to locally saved version. Monitoring
+can be turned off if it is believed that the URL has disappeared.
+Pricing user evaluations of changes
+Providing evaluations of changes in a document content is a
+valuable service to communities of users. The provision of
+change evaluations, just like the provision of reviews, is a
+common good. Just like other common goods, like clean air and
+recycling, it is likely to be underprovided [11]. Everyone
+benefits from more of a common good, but the incentive for any
+given individual to contribute is very small.
+As stated earlier, we introduced market mechanisms into
+Knowledge Pump in order to provide some additional incentive
+to review items. Currently, people are rewarded with funny
+Figure 4 (Partial) contents of a user’s Updated folder.
+6
+money: chits. In a work setting, management could decide to
+translate chits into real money or into performance points or other
+kinds of rewards. Here we discuss how these market mechanisms
+can be extended to incent people to evaluate document changes.
+We believe people should be rewarded for taking the time to
+evaluate the nature of a change. Just as for reviewing, evaluators
+are paid a small advance whenever they evaluate a document
+change. Evaluated changes then appear in others’ Updated
+folder, if the change is evaluated as significant enough. There the
+users will be able to read the evaluations. In order to have access
+to the monitoring agent’s highlighting of changed regions, they
+must click on the binoculars icon. This will cost users one chit,
+to be divided among all evaluators of the change. “Royalites” on
+change evaluations thus also appear in people’s account history,
+but displayed using another color than for reviews.
+Note that users do not pay for accessing the monitor’s
+presentation of the changed document when no one has yet to
+evaluate the change (the monitoring agent works for free). Also,
+there is likely to be little reward for evaluating a change as
+negligible. However, in general, it takes more effort to rate and
+comment upon a significant or important change than for a
+negligible change.
+4.2 System architecture
+In this section we intend to briefly present and explain the
+architectural (see Figure 5) and technological choices we made
+for implementing the coupled system, as well as some of the
+inner workings of the monitoring agent. For a more detailed
+description of the Knowledge Pump itself please refer to [7][8].
+From the start, the monitoring agent was conceived as an
+autonomous entity, able to work independently from Knowledge
+Pump. It provides a full-fledged HTML user interface on its own.
+HTTP
+HTTP-based
+JDBC
+Custom over TCP
+Web site
+Web site
+When thinking of coupling both systems, one of our major
+concerns was to clearly define the APIs that should be exported
+by each of them in order to allow the suitable level of interaction.
+Once these were agreed upon and implemented over a network
+protocol, the monitoring mgent could be executed as a separate
+process (in the UNIX sense), allowing for more flexibility both
+when handling failures (no effect on Knowledge Pump’s
+availability) and when distributing workload among hosts. The
+agent itself relies on a two external services: a Xelda linguistic
+server and a MySQL database server. Xelda is extensively used
+by the agent when evaluating the magnitude and nature of the
+changes in the content of a text document (basically HTMLtagged
+text). A fast, scalable and reliable data storage was also
+needed, as the agent evaluates changes by comparing present
+document content fetched from the Web and a locally stored
+representation of past document content. The MySQL database
+engine [14] has already proved to satisfy all those criteria, being
+in addition to that free for non-commecial use.
+We used Java to implement the monitoring agent because it
+enforces good object-oriented practices, it provides nice
+interfacing facilities (particularly in our case, as explained
+below), it is fast enough for our purposes and most important of
+all we already had used it successfully.
+To get the components to communicate over the network we tried
+to leverage as much as possible the existing protocols and their
+implementations, in particular:
+• HTTP: the monitoring agent uses HTTP to fetch URL
+contents from Web servers. Moreover, Knowledge Pump
+being based on a Servlet-enhanced HTTP server (Apache
+[2]), this was the technology used to provide a remote API.
+For communication to the agent, a lightweight HTTP server
+was embedded on the Monitoring Agent so that it could
+remotely exports its API as well.
+• JDBC: the preferred way to talk to SQL databases from
+Java. We used the MM driver for MySQL [13].
+• Custom: the Xelda platform provides a Java implementation
+of its API using a custom protocol over TCP.
+5. DISCUSSION
+User workstation
+Xelda
+Figure 5 System architecture
+Knowledge
+Pump
+Monitoring
+Agent
+MySQL
+database
+In this paper, we have described how a URL monitoring agent
+and a recommender agent can be coupled together to permit
+7
+collaborative monitoring of URLs by users. We believe that such
+an integration will make it much more feasible for users to track
+Web documents, since the effort will be divided among many.
+By working with a monitoring agent, a recommender system like
+Knowledge Pump can effectively handle documents as the
+dynamic objects they are, instead of as static objects. To our
+knowledge, Knowledge Pump with a monitoring agent will be the
+first recommender system to effectively deal in recommendations
+of items which change over time.
+At the time of writing, the implementation of the integrated
+system is in progress: the monitoring agent and the recommender
+agent are both operational, and in fact, are being used extensively
+at our research site, and elsewhere. We are currently completing
+the implementation. We hope that our presentation of the design
+specification will usefully contribute to the discussion over how
+to best put in place community processes for tasks such as
+collaborative evaluation of document changes.
+Once the integration is complete, we will release it to one or more
+of our user sites, which will provide us with testbed(s) for
+validating its utility and yield valuable feedback. In the long run,
+we expect that users will require some of the more powerful
+document monitoring methods that are already available
+commercially: monitoring a site or page to a specified depth;
+capability to monitor pages in a variety of formats, such as PDF,
+Word, etc.
+Future research issues of interest include more intelligent
+notification and filtering of document changes. On the one hand,
+we hope to improve the ability of the monitoring agent to
+evaluate changes. On the other hand, we hope to develop more
+sophisticated algorithms for deciding when to notify users of
+changes in documents. For example, we could use relevance
+feedback to train the recommender agent, and correlation among
+users for deciding when to notify them.
+6. ACKNOWLEDGMENTS
+The authors thank Cédric Vieau and Nadège Vignol for
+implementing the monitoring agent and for debugging and
+elaborating its specification with us.
+7. REFERENCES
+[1] Ackerman, M., Starr, B., Pazzani, M., “The Do-I-Care
+Agent: Effective Social Discovery and Filtering on the
+Web”, Proceedings of RIAO’97, 17-31.
+[2] Apache Web server, The Apache Software Foundation,
+http://www.apache/org/.
+[3] Dedieu, Olivier. “Pluxy: un proxy Web dynamiquement
+extensible.” Proceedings of the 1998 NoTeRe colloquium,
+Oct. 1998, http://www-sor.inria.fr/publi/PPWDE_notere98.
+html.
+[4] Delgado, J., Ishii, N. and Ura, T., “Content-based
+collaborative information filtering: Actively learning to
+classify and recommend documents” in M. Klusch, G. Weiß
+(Eds.): (1998) Cooperative Information Agents II.
+Learning, Mobility and Electronic Commerce for
+Information Discovery on the Internet. Springer-Verlag,
+Lecture Notesin Artificial Intelligence Series No. 1435.
+http://www-ishii.ics.nitech.ac.jp/~jdelgado/raap-final.pdf;
+http://www.myLinx.com/.
+[5] Douglis, F., Ball, T., Chen, Y.F., Koutsofios, E., “The
+AT&T Internet Difference Engine: Tracking and Viewing
+Changes on the Web,” in World Wide Web, 1(1), 27-44,
+January 1998.
+[6] Fishkin, K., Bier, E., “WebTracker - a Web Service for
+tracking documents,” in Proceedings of World Wide Web 6,
+Santa Clara, California, 1997, http://www.parc.xerox.com/
+istl/members/fishkin/doc/webtracker.html.
+[7] Glance, N., Arregui, D. and Dardenne M., “Knowledge
+Pump: Supporting the Flow and Use of Knowledge,” in
+Information Technology for Knowledge Management. Eds.
+U. Borghoff and R. Pareschi, New York: Springer-Verlag,
+1998.
+[8] Glance, N., Arregui, D. and Dardenne M., “Making
+recommender systems work for organizations,” in
+Proceedings of PAAM99 (London, UK, April 1999), 1999a.
+[9] Glance, N., Grasso, A., Borghoff, U.M., Snowdon, D., and
+Willamowski, J., “Supporting collaborative information
+activities in networked communities,” in Proceedings
+HCI’99 (Munich, Germany, May 1999), 422-426, 1999b.
+[10] Grasso, A., Meunier, J.-L., Thompson, C., “Augmenting
+recommender systems by embedding interfaces into
+practices,” to appear in Proceedings HICSS-33 (Hawaii,
+USA, January 2000).
+[11] Hardin, G. “The tragedy of the commons.” Science 162
+(1968), 1243-1248.
+[12] Hirschberg, D. S., “Algorithms for the longest subsequence
+problem,” Journal of the ACM, 24(4), 664-675, Oct. 1977.
+[13] MM MySQL JDBC driver, http://www.worldserver.com/
+mm.mysql.
+[14] MySQL, T.c.X DataKonsultAB, http://www.tcx.se/.
+[15] NetMind, http://www.netmind.com/.
+[16] “Pharos: a cooperative recommendation system for Web
+documents.” http://webtools.dyade.fr/pharos/; http://pharos.
+inria.fr/WebTech/.
+[17] Resnick, P., Iacovou, N., Suchak, M., Bergstrom, P. and
+Riedl, J. “GroupLens: An open architecture for collaborative
+filtering of netnews,” in Proceedings of CSCW’94
+(Chapel Hill, NC, October 1994), ACM Press, 175-186.
+[18] RMI, Sun, http://java.sun.com/products/jdk/rmi/.
+[19] Shardanand, U. and Maes, P. “Social information filtering:
+Algorithms for automating word of mouth,” in Proceedings
+of CHI’95 (Denver CO, May 1995), ACM Press, 210-217.
+[20] SurfBot, Surflogic LLC., http://www.surflogic.com/.
+[21] Xelda, http://www.xrce.xerox.com/ats/ .
+8

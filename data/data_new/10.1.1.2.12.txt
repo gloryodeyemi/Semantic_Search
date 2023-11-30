@@ -1,0 +1,811 @@
+Design and Implementation of Storage Manager in Main Memory Database
+System ALT IBASE
+
+TM
+Kwang-Chul Jung
+Real-Time Tech. Lab.
+ALTIBASE Co. Seoul, KOREA
+jungkc@altibase.com
+Kyu-Woong Lee
+Dept. of Computer Science
+Sangji Univ. Wonju, KOREA
+leekw@mail.sangji.ac.kr
+Abstract
+
+Conventional database systems are optimized for the
+particular characteristics of disk storage environment.
+Main memory database systems use the different implementation
+techniques to structure and organize the user data
+and system catalogs. In this paper, we present the design
+and implementation considerations of our main memory
+database system ALT IBASE
+
+TM
+
+that is currently applied
+to the time-critical applicaitons. We focus on the design
+issues of storage manager in ALT IBASE
+
+TM
+
+. The major
+components are introduced, and features and characteristics
+of transaction management method are described.
+In order to evaluate our transaction performance, we show
+various experimental reports as measured by the TPS.
+1 Introduction
+
+There are a number of large applications, particularly in
+the call routing and switching in the telecommunication applications
+and other real-time industry, where high performance
+access to data with timing requirements is required.
+Such applications typically need to timeliness response together
+with very low latency for transaction, and enforce
+strict durability and availability.
+Most disk-based database systems are designed to maximize
+the overall transaction throughput, rather than provide
+fast and predictable response time per individual request
+of transactions. Traditional disk-based database systems,
+therefore, are incapable of achieving the latter goal due to
+the latency of accessing data that is disk-resident.
+An attractive approach to providing predictable response
+per each request is to load the whole data into main memory.
+It can be suggested by the increasing availability of large
+and relatively cheap memory. Most database servers with
+main memories of 8 gigabytes or more are already available
+and common. The disk-resident database system(DRDB)
+with a very large buffer, however, is basically different from
+pure main memory database systems(MMDB). The key difference
+is that there is no need to interact with a buffer
+manager for fetching or flushing buffer pages. The performance
+of MMDB can be improved further by dispensing
+with buffer manager, changing the storage hierarchy into
+the flat structure [5, 4]. For example, copies of data can
+reside in memory in the DRDB with enough large buffer.
+Although such a system will perform well, it cannot taking
+entire advantage of the MMDB. The physical disk address
+should be computed for every request for a given tuple,
+and the the buffer manager will be executed to check if
+its block is in memory. In contrast, in a MMDB, the whole
+database can be directly mapped into the virtual memory address
+space. MMDB features all the conventional elements
+of DRDB, such as data organization, concurrency control,
+transaction and index management. The implementation
+techniques and traditional method of DRDB, however, cannot
+be adopted into MMDB directly [3]. We, therefore,
+design and implement the main memory database called
+
+ALT IBASE
+
+TM
+
+, which is adequate to the application that
+requires the high performance.
+In this paper, we describe the design details and implementation
+techniques of a ALT IBASE
+
+TM
+
+, especially
+focus on the storage manager. The remainder of the paper
+is organized as follows. In section 2, we provide our
+
+ALT IBASE
+
+TM
+
+system architecture and the functionality
+of each component. The transaction management and recovery
+management are described in section 3, and the evaluation
+of transaction performance is illustrated in section 4.
+In section 5, we give our conclusions.
+2 System Architecture of ALT IBASE
+
+TM
+2.1 Key Features of ALT IBASE
+
+TM
+Transaction Management
+
+The further performance improvements and concurrency
+
+degree can be obtained for transaction management by
+employing the modified multi-version concurrency control
+method in ALT IBASE
+
+TM
+
+. Particularly, we can get more
+efficiency in applications in which transactions are primarily
+read-only and update rates are low. In our transaction
+management method, we eliminate the unpredictable waiting
+for a data item that is a main disadvantage of conventional
+locking mechanisms. Transaction manager of
+
+ALT IBASE
+
+TM
+
+allows the data resource to be of various
+sizes and defines a hierarchy of data granularities. The
+small granularity of data can be controlled by multi-version
+concurrency control while the large granularity of data is
+managed by the lock-based method. The higher concurrency
+degree can be gained by applying the separate control
+schmes on the different level of granularity hierarchy.
+To skillfully manage the main memory, our transaction
+manager can identify and destroy the unnecessary aged
+data that is generated by multi-version concurrency control
+method. ALT IBASE
+
+TM
+
+controls the number of
+transactions that are concurrently executed, and it provides
+several properties related with the transaction execution,
+such as commit property autocommit, isolation level property
+(read committed, repeatable read, no phantom read)
+and other attributes of transaction execution to achieve the
+higher performance.
+
+Recovery Management
+
+The basic discipline of recovery management is the
+
+WAL(Write-Ahead Log) method in ARIES [8, 7] system.
+
+ALT IBASE
+
+TM
+
+supports the on-line hot-backup and multiple
+log files. Our backup process can be performed not
+only at the off-line state but also at the on-line database service
+state. For the recovery of database, ALT IBASE
+
+TM
+
+generates the optimal log record and exploits the fuzzy and
+ping-pong check points. In this mechanism, two backup
+databases are manipulated and the current on-going transaction
+is not effected by the backup procedure. Our log
+flush thread has the responsibility of manipulating all kinds
+of log records and flushing the log record into the current
+log file on disk without any interference with execution of
+live transactions. Log records are written into multiple log
+files for efficiency of recovery.
+To keep the reliable database state, ALT IBASE
+
+TM
+
+provides the five transaction durability levels corresponding
+to the significance of data. Depending on the durability
+level, the recovery manager utilizes the memory buffer or
+
+memory mapped file as its log buffer, and different synchronization
+mechanisms. The recovery manager, furthermore,
+supports the three types of logging level based on the importance
+between transaction performance and consistency
+of data.
+
+Memory Management
+
+The memory, the key storage space of ALT IBASE
+
+TM
+
+consists of persistent space and temporary space. The persistent
+space contains the physical database table and meta
+data for system catalogs. This area is reflected into backup
+database. The temporary space, however, is not required to
+perform the backup procedure. The data that is not necessary
+to backup, such as index data, is located in temporary
+space.
+
+ALT IBASE
+
+TM
+
+constructs the index data when the
+data is loaded into memory from disk. In our multi-version
+concurrency control method, The aged data that never be accessed
+can be remained in memory. For the efficient memory
+management, garbage collection thread performs the
+revoking procedure for the old version data and then the acquired
+space is returned into the free memory space.
+The entire physical database is loaded into memory
+space after database started. The great part of memory
+data actually is not used for whole time of database service.
+ ALT IBASE
+
+TM
+
+hence provides the selective loading
+ facility to maximize the convenience and utilization of
+memory space.
+Main memory space sometimes is not sufficient to operate
+the given user database operation. In this situation,
+the needless user table should be out from the memory into
+disk and then the obtained available space can be returned
+to free memory space. ALT IBASE
+
+TM
+
+supports the functionality
+of database compaction. It is possible to perform
+the database compaction on the individual user table unit.
+
+Index Management
+
+The purpose of index mechanism in DRDB is to minimize
+the number of access to disk. Main goal of index manager in
+
+ALT IBASE
+
+TM
+
+is to minimize the computational time of
+CPU with the least memory space. The great part of CPU
+time is wasted for waiting the memory access due to the
+cache miss.
+To achieve the our goal, we develop the cache conscious
+concurrency control and physical versioning approaches for
+index management, in order to minimize the cache miss ratio.
+Our improved T-Tree provides the physical versioning
+
+technique to eliminate the latch operation for read operation
+on the index node. The insertion and deletion operations of
+conventional T-Tree should be modified in order to support
+the proposed read operation without the latch. The concurrency
+control for index node in traditional B
+
++
+
+-Tree provides
+the low scalability because a lot of cache miss caused
+by the latch and lock.
+The proposed read operation hence improves the overall
+cache hit ratio. ALT IBASE
+
+TM
+
+supports the various index
+structure, such as B
+
++
+
+-Tree, T-Tree, and R # -Tree with
+the higher scalability by physical versioning and cache conscious
+concurrency control techniques.
+2
+
+2.2 Architecture of ALT IBASE
+
+TM
+ALT IBASE
+
+TM
+
+consists of four major components,
+memory manager(SMM), transaction manager(SMX), recovery
+manager(SMR), and index manager(SMI) as depicted
+in Figure 1.
+000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000
+111111111111111111111111111111111111111111111
+111111111111111111111111111111111111111111111
+111111111111111111111111111111111111111111111
+111111111111111111111111111111111111111111111
+111111111111111111111111111111111111111111111 111111111111111111111111111111111111111111111
+Index Manager
+(SMI)
+Recovery Manager
+(SMR)
+Transaction Manager
+(SMX)
+TM
+
+ALTIBASE
+
+System DB
+User DB
+
+...
+
+Application Program
+Log Files and Checkpoints
+
+...
+
+Native Strored Procedure Lib.
+Shared Memory or
+JDBC
+Query Processor (NSP)
+User, Developer
+Memory Manager
+(SMM)
+ESQLC
+Process Memory
+iSQL DBadmin
+
+ALTIBASE Interfaces
+
+etc. SQLCLI ODBC
+Figure 1. ALT IBASE
+
+TM
+
+System Architecture
+
+The transaction manager(SMX) manages the transaction
+table that contains all of the information about executing
+transactions. When the transaction starts, a transaction table
+entry is allocated and then is used to save the transaction
+information until the transaction commits or aborts.
+
+ALT IBASE
+
+TM
+
+provides the multi-version concurrency
+control to acquire the higher degree of concurrency.
+The index manager(SMI) focuses on the performance of
+index management and the efficient usage of memory space.
+The operation of index management in SMI is performed efficiently
+by using the modified read operation on the index.
+The read operation on the index is executed without holding
+any lock and latch. To support the modified read operation,
+the management method of index tree is newly proposed as
+based on the traditional T-tree index.
+One of the important facilities of DBMS is recovery.
+All kinds of failure such as a transaction and power failure
+should be recovered even though the user and system data
+in memory is being used by user transactions [6, 10]. The
+recovery manager(SMR) provides the efficient concurrency
+control method for log structure and fuzzy and ping-pong
+checkpoint to minimize the cost and time for recovery.
+The entire database is loaded into memory after database
+started and then all data pages in memory are resourcefully
+managed. The memory manager(SMM) has the responsibility
+on these memory management.
+
+3 Design of Transaction and Recovery Manager
+
+
+Trsanction State
+
+The state of transaction in SMX is partitioned into begin,
+block, commit/rollback, and end state. Transaction starts
+when the user query request is sent to the transaction manager,
+and it is placed in begin state. After All operations
+of transactions are performed successfully, or are not
+completed due to a certain reason, its state is changed
+
+commit or rollback respectively. All the resources (table
+and record lock) occupied by the transaction are released
+at the commit/rollback state, and the transaction state is
+transformed into end state. The transaction that cannot acquire
+its requesting data resource is remained in the block
+
+state until the data resource will be available.
+
+Isolation Level
+
+The transaction manager SMX supports the three types of
+isolation level, consistent, repeatable, and no phantom.
+
+The no phantom level is the same as the serializability of
+conventional concurrency control [9]. Each transaction sees
+a common serial order of update transactions that is consistent
+with their commit order. In the second isolation level
+
+repeatable, each transaction sees a serial order of update
+transactions and it is not necessarily the same as other executing
+transactions. This isolation level supports the weak
+consistency. The consistent isolation level is the same
+as the update consistency at the multi-version concurrency
+control [2, 1]. All the data resources fetched by the current
+transaction are guaranteed that those are written by committed
+transaction completely in this isolation level. The data
+item written by uncommitted transaction cannot be fetched
+by any other transactions. The SMX provides the different
+type of lock on the user table as illustrated in Table 1.
+Table 1. Lock Types based on Isolation Level
+Isolation
+Operation
+
+Consistent Repeatable No Phantom
+Read IS S S
+Write IX IX X
+Transaction Savepoints
+
+The transaction manager SMX supports the partial rollback.
+3
+
+Two kinds of savepoints are provided to support the partial
+rollback. Explicit savepoint is set up as the user request. Implicit
+savepoint, on the other hand, is set up by transaction
+manager for the system purpose. The major differences between
+implicit and explicit savepoints are described in Table
+2.
+Table 2. Savepoints in ALT IBASE
+
+TM
+Explicit Savepoints Implicit Savepoints
+Savepoint Name Defined by User NULL
+Set/Rollback by User by System
+Num. of points Unlimited One per Transaction
+Log Log Created Without Log
+Transaction Durability
+
+As our logging mechanism, two kinds of log buffer are used
+by recovery manager SMR. The memory mapped file is basically
+used as a log buffer. In this situation, the memory
+mapped file that is placed in the disk device with very
+slow I/O incurs overall poor performance. The effect of
+operating system overload, moreover, is directly reflected
+into the transaction performance. While the basic operation
+of transaction can be efficiently performed since the
+entire data is located in memory, the logging operation is
+very slowly completed because log records for that transaction
+are written into memory mapped file which is used
+as log buffer. The overall performance, however, is significantly
+degraded due to the memory mapped log buffer. We
+provide the memory buffer as a log buffer for alternative solution.
+Two kinds of log buffer, memory buffer and memory
+mapped file, is supplied and user can determine which log
+buffer will be used based on the transaction durability.
+Therefore, ALT IBASE
+
+TM
+
+provides multiple level of
+transaction durability. There are five levels of transaction
+durability for transaction performance and reliability
+of database state. Based on the transaction durability levels,
+the memory buffer or memory mapped file can be used
+as a log buffer and the synchronization techniques of log
+records are differently exploited. In durability level 1, all
+log records are written into only the memory buffer, and any
+dirty page is not synchronized with the disk. If the database
+server should restart, any updates by the transaction execution
+cannot reflect into database state in this durability
+level. The memory buffer is also used in durability level 2,
+
+but the logs must be synchronized with the log file by sync
+thread. The durability of committed transaction cannot be
+guaranteed in the durability level 2 because the transaction
+is declared as commit state before its commit log record is
+synchronized with the log file. The memory mapped file as
+a log buffer is used in the durability level 3. Both the memory
+buffer and memory mapped file are used as a log buffer
+in durability level 4 and 5. In both levels, the log records
+are written into memory buffer and they should be synchronized
+with the memory mapped file by the sync thread. The
+durability of committed transaction is ensured in level 5, but
+not in level 4. Because the transaction is declared as commit
+state before the log records are ensured to be written
+into memory mapped file in durability level 4, we cannot
+assure the durability of transaction updates. In other hands,
+in durability level 5, the consistent log file at disk level is
+the necessary condition for commit operation.
+There is trade-off relationship between the transaction
+durability and performance. We hence provide the various
+durability levels of transaction as the system parameter
+which can be controlled by the database administrator.
+
+Log Management
+
+Log records should be managed and written into the corresponding
+log file in memory, as transaction executes their
+update operations, fail or commit operation.
+Multiple log files are supplied in our recovery manager
+
+SMR. If the first log file is encountered with the end of file,
+the other empty log file is loaded in memory. We provide
+the system parameter that can control the number of log files
+for the efficiency of recovery. All log files can be exhausted
+in the worst case. If those are used once, the first log file is
+applied again to archive the log records. It is not necessary
+for all log files to be loaded in memory. Only the log file that
+is used currently or necessary to recover should be located
+in memory. Other log files can be remained in disk and they
+are loaded only if the request of that log files is generated.
+In traditional DRDB, the requested log record block is
+fetched or flushed by the buffer manager supplied by the
+operating system through the log buffer. However, there is
+no need to use the log buffer at disk level since the entire
+records of a currently used log file is guaranteed to place in
+memory or memory mapped file in ALT IBASE
+
+TM
+
+. We
+can perform the I/O of log records directly into memory by
+using the memory pointer that points the log file in memory
+or memory mapped file.
+
+ALT IBASE
+
+TM
+
+supports and provides multiple levels
+of logging. There are three logging levels based on the importance
+between transaction performance and consistency
+of data. Diffrent logging strategies are provided for each
+logging level. For only the purpose of fast response, transactions
+can be executed without leaving any log record in
+the logging level 0. The log records for DML(update, insert,
+delete statement) is managed in the logging level 1.
+
+The effect of committed transaction after checkpoint is not
+guaranteed to be completely reflected into database file in
+4
+
+the logging level 1. All kinds of log records are manipulated
+and the recovery of every failure is ensured in the logging
+level 2.
+
+Checkpoints
+
+To minimize the cost of recovery, the checkpoint is maintained
+during the transaction execution time. The checkpoint
+that starting and ending checkpoint log is completely
+written into the log file is defined as complete checkpoint.
+
+Otherwise it is named as incomplete checkpoint. Upon the
+
+incomplete checkpoint, recovery procedure is performed by
+using dirty page list and transaction list that were executed
+at the failure point. ALT IBASE
+
+TM
+
+provides the pingpong
+checkpoint for the database file. Hence, the database
+status is guaranteed to be in correct state at the disk level
+until the previous checkpoint. Checkpoints are performed
+when the database starts, and checkpoint thread also perform
+the checkpoints periodically. These checkpoints are
+classified into implicit checkpoint. The explicit checkpoint,
+
+in other hand, is performed by the user request. Furthermore,
+the functionality auto remove archive enables us to
+wipe out the unnecessary log files.
+
+Recovery
+
+Recovery procedure consists of analysis phase, redo phase
+and undo phase in ARIES system [7, 8]. Dirty page list
+and incompleted transaction list are generated at the analysis
+phase, the data value of all the committed transactions
+is restored at the redo phase, and finally the partial work by
+uncommitted transaction is invalidated at the undo phase.
+In the ALT IBASE
+
+TM
+
+, the recovery procedure is divided
+into redo and undo phase to perform the efficient restart. For
+the efficiency of recovery, the analysis phase is integrated
+into the redo phase. Dirty page list and uncommitted transaction
+list, hence, should be generated at redo phase. Dirty
+page list can be easily constructed from the memory manager.
+ SMM always manages the list of free space and dirty
+pages to maximize the utilization of memory space until the
+end of database service time.
+
+4 Experiments
+
+This section illustrates our experimental results for transaction
+execution of our ALT IBASE
+
+TM
+
+. We focus on the
+number of TPS(transactions per second) based on the various
+number of records and concurrent users. All experiments
+were performed on Sun Enterprise 3500 platform
+with 4 CPUs and 4G bytes of memory. Our environment of
+experiments is described in Table 3.
+All experimental transactions use the native stored procedure
+ interface of ALT IBASE
+
+TM
+
+. The SQL statement
+processing requests from the native stored procedure is sent
+to the query processor for generating the optimized execu-
+
+Table 3. Environment for Experiments
+Platform Sun Enterprise 3500
+Operating System Sun Solaris 2.5.8
+# of CPU 4(Sparc Chip 400MHz)
+Memory Size 4G Bytes
+# of Records 10,000
+
+-
+
+500,000
+# of Concurrent Users 1
+
+-
+
+50
+tion plan. Our experimental results are not interferenced
+with any kinds of network delay. select, insert, update, and
+delete transaction were evaluated for the measurement of
+TPS under the strict condition of transaction durability level
+4 and logging level 2. The target table consists of total 20
+attributes of various data types, such as number, real, char
+
+and varchar. Update transaction updates the 17 attributes
+values into a tuple, insert transaction performs the insertion
+of complete tuples into the table with 20 attributes. All attributes
+values are fetched for the target tuple in our select
+transaction. The delete transaction performs the deletion
+for one tuple with the search condition on the indexed key
+attribute.
+The representative result is in Table 4. It shows the
+TPS of single user environment. The higher TPS was measured
+in the experiment in which transactions are completely
+ read-only(select transaction). The better performance
+is evaluated in the delete transaction experiment
+over other DML transaction experiments because delete operations
+can be completed if we finished up to change only
+the value of data structure in memory manger. This result
+shows the TPS measured by our experiment is comparatively
+higher than other commercial products of MMDB.
+Table 4. TPS of Single User Environment
+Insert Update Select Delete
+6,134.97 4,405.29 29,411.76 12,345.68
+Unit : TPS(Transactions per Sec.)
+In Figure 2, the number of TPS incurred in each of the
+transaction as the number of records is varied is plotted. In
+this experiments, the number of TPS is not very sensitive
+to the number of records because the features of efficient
+memory and index management are used and the CPU utilization
+is uniform. The number of concurrent users, however,
+affects the the number of TPS directly as depicted in
+5
+
+Figure 3. As the number of users increases, the TPS also increases
+correspondingly because the ability of CPU is still
+enough until the number of user is up to about 10. However,
+the TPS keeps the stable plain line or is slightly degraded
+beyond the limit of CPU utilization. We can find that the
+reasonable scalability is guaranteed by ALT IBASE
+
+TM
+
+under the heavy load environment.
+0
+5000
+10000
+15000
+20000
+25000
+30000
+35000
+40000
+0 100000 200000 300000 400000 500000
+
+TPS(Transactions
+per
+Sec.)
+Number of Records
+insert
+update
+select
+delete
+Figure 2. Effects of Number of Records on
+TPS
+0
+20000
+40000
+60000
+80000
+100000
+120000
+0 10 20 30 40 50
+
+TPS(Transactions
+per
+Sec.)
+Number of Concurrent Users
+insert
+update
+select
+delete
+Figure 3. Effects of Number of Concurrent
+Users on TPS
+Finally, the TPS results measured by various experiments
+are relatively higher than the TPS pronounced by
+other commercial MMDBs. As a result, we ensure that
+
+ALT IBASE
+
+TM
+
+is appropriate to be used in applications
+which require the timeliness characteristics and high performance.
+
+
+5 Conclusion
+
+This paper describes the implementation and design issues
+of ALT IBASE
+
+TM
+
+which is a main memory database
+system. We primarily focused on the design of transaction
+management and recovery, as well as the illustration of system
+architecture. To gain the higher concurrency degree and
+resource availability, we use the multi-version concurrency
+control with multiple granularity. Multiple log files and
+fuzzy and ping-pong checkpoints are adopted to minimize
+the recovery cost and time. As the comparatively higher
+experimental results, ALT IBASE
+
+TM
+
+is ensured to guarantee
+the better performance in time-critical applications.
+Currently, ALT IBASE
+
+TM
+
+version 3.0 is pronounced and
+is in the on-going project for hybrid function of disk-based
+facilities for large database.
+
+References
+
+[1] D. Agrawal and V. Krishnaswamy. "using multiversion data
+for non-interfering execution of wirte-only transactions ".
+In Proc. of the ACM SIGMOD International Conference on
+Management of Data, 1991.
+[2] P. M. Bober and M. J. Carey. "multiversion qeury locking".
+In Proc. of the 18th Conference on Very Large Database,
+
+1992.
+[3] P. Bohannon, D. F. Lieuwen, R. Rastogi, A. Silberschatz,
+S. Seshadri, and S. Sudarshan. The architecture of the dali
+main-memory storage manager. Multimedia Tools and Applications,
+4(2), 1997.
+[4] P. Bohannon, J. Parker, R. Rastogi, S. Seshadri, A. Silberschatz,
+and S. Sudarshan. Distributed multi-level recovery in
+main-memory databases. In Proc. of the International Conference
+on Parallel and Distributed Information Systems,
+
+pages 44--55, 1996.
+[5] H. Garcia-Molina and K. Salem. "main memory database
+systems : An overview ". IEEE Transactions on Knowledge
+and Data Engineering, 4(6), 1993.
+[6] H. V. Jagadish, A. Silberschatz, and S. Sudarshan. "recovering
+main-memory lapses ". In Proc. of the 19th Conference
+on Very Large Databases, 1993.
+[7] C. Mohan. Repeating history beyond aries. In VLDB'99,
+Proceedings of 25th International Conference on Very Large
+Data Bases, September 7-10, 1999, Edinburgh, Scotland,
+UK, pages 1--17, 1999.
+[8] C. Mohan, D. Haderle, B. Lindsay, H. Pirahesh, and
+P. Schwarz. Aries: A transaction recovery method supporting
+fine-granularity locking and partial rollbacks using
+write-ahead logging. ACM Transactions on Database Systems,
+, 17(1), 1992.
+[9] K. Ramamritham and P. K. Chrysanthis. "a taxonomy of correctness
+criteria in database applications ". In VLDB Journal,
+Vol. 5, No. 1, 1996.
+[10] R. Rastogi, S. Seshadri, P. Bohannon, D. W. Leinbaugh,
+A. Silberschatz, and S. Sudarshan. Logical and physical versioning
+in main memory databases. In The VLDB Journal,
+
+pages 86--95, 1997.
+6
+

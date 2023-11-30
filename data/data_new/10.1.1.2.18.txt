@@ -1,0 +1,9952 @@
+DECOMPOSITION BASED AND BRANCH AND BOUND
+GLOBAL OPTIMIZATION APPROACHES
+FOR THE PHASE EQUILIBRIUM PROBLEM
+Conor M. McDonald and Christodoulos A. Floudas
+
+
+Department of Chemical Engineering
+Princeton University
+Princeton, N.J. 08544-5263
+Submitted 10 October 1993; revised 11 March 1994;
+To appear in Journal of Global Optimization, 1994.
+Abstract
+
+An increasingly popular approach when solving the phase and chemical equilibrium
+problem is to pose it as an optimization problem. However, difficulties are encountered
+due to the highly nonlinear nature of the models used to represent the behavior of
+the fluids, and because of the existence of multiple local solutions. This work shows
+how it is possible to guarantee ffl-global solutions for a certain important class of the
+phase and chemical equilibrium problem, namely when the liquid phase can be modeled
+using either the Non-Random Two-Liquid (NRTL) equation, or the UNIversal QUAsi
+Chemical (UNIQUAC) equation. Ideal vapor phases are easily incorporated into the
+global optimization framework. A number of interesting properties are described which
+drastically alter the structure of the respective problems. For the NRTL equation, it is
+shown that the formulation can be converted into a biconvex optimization problem. The
+GOP algorithm of Floudas and Visweswaran [8, 9] can then be used to obtain ffl-global
+
+solutions in this case. For the UNIQUAC equation, the new properties show how the
+objective function can be transformed into the difference of two convex functions (i.e.
+a D.C. programming problem is obtained), where the concave portion is separable. A
+branch and bound algorithm based on that of Falk and Soland [6] is used to guarantee
+convergence to an ffl-global solution. Examples are presented which demonstrate the
+performance of both algorithms.
+
+
+
+Author to whom all correspondence should be addressed.
+1
+
+Key words: Global optimization, phase equilibrium, biconvex and DC programming problems.
+
+1 Introduction
+
+A crucial step in the design of any separation process is the ability to predict the behavior of
+the fluids, when there may be several fluid phases and components that may or may not be
+reacting. For many separations processes, the assumption that the fluids are in equilibrium
+is made. The goal is to effectively model these processes over a potentially wide range of
+operating conditions. Such models can yield complex and nonlinear expressions with resultant
+difficulties in obtaining the solutions that actually describe the process.
+For the phase and chemical equilibrium problem there have been essentially two basic
+approaches. The first of these is equation based, and is not considered in this work. A useful
+reference in this area is the book of Smith and Missen [21]. An increasingly popular approach
+is to explicitly minimize the thermodynamic function that describes the equilibrium condition.
+In the context of this work, this function will be the Gibbs free energy, and a global minimum
+implies that the system at hand is at equilibrium. Seider et al. [20] provide a review of the
+methods used to solve this optimization problem. Ohanomah and Thompson [14, 15, 16] give a
+comparative study of the available methods. These methods have typically been second-order
+Newton type methods with resultant dependency on starting point in terms of quality of the
+final solution. Other approaches have been used. Sun and Seider [22] use a Newton-homotopy
+continuation algorithm to obtain the stationary points of the Gibbs free energy surface. Paules
+and Floudas [17] employ the Global Optimal Search algorithm of Floudas et al. [7] to find
+the equilibrium solution. Eubank et al. [5] provide an interesting alternative approach based
+on integrating the area under the Gibbs free energy curve.
+It is observed that all these algorithms share one drawback: there is no theoretical guarantee
+of convergence to the true equilibrium solution -- or even to a proper local solution in some
+cases. This represents a serious disadvantage in attempting to describe phase equilibrium
+with or without chemical reaction. Due to the complex nature of the models used to describe
+the equilibrium situation, there may be several local solutions to the problem at hand. Thus,
+the certainty of convergence to the global solution for conventional methods will be highly
+dependent on starting point.
+In this paper, the phase and chemical equilibrium problem is examined for the case where
+the liquid phase can be modeled by the NRTL and UNIQUAC equations, and the vapor
+phase is assumed to behave ideally. Both of these equations have the ability to predict liquidliquid
+immiscibility and can describe multicomponent mixtures with binary parameters only.
+2
+
+The NRTL and UNIQUAC equations are algebraically complex and lead to highly nonconvex
+expressions for the Gibbs free energy function that usually lead to multiple local solutions.
+In the following section, the requisite thermodynamic background for the phase and chemical
+equilibrium problem is provided, describing the assumptions that are made in this work.
+Then, a simplifying property for the NRTL equation is presented. It will be shown how the
+formulation for the NRTL equation can be transformed from its original nonconvex form into
+an optimization problem where a biconvex objective function is minimized subject to a bilinear
+set of constraints. This induced special structure allows the Global OPtimization (GOP)
+algorithm of Floudas and Visweswaran [8, 9] to be used to obtain global solutions to this
+problem. Next, the structure of the UNIQUAC equation is examined in detail. Two important
+properties are introduced which simplify the Gibbs energy expression, but still leave it
+in a nonconvex form. Additionally, some manipulation of terms reveal how this nonconvex
+expression can be transformed into the difference of two convex functions, where the concave
+portion of the objective function can be either nonseparable or separable. These changes occur
+purely in the objective function, so that it is not necessary to introduce new transformation
+variables as is the case for the NRTL equation. Having induced this special structure in the
+problem, an algorithm based on the branch and bound algorithm of Falk and Soland [6] is
+used to obtain the global solution of this problem. In summary, the main contribution of
+this work is to show that for ideal vapor phases and liquid phases whose behavior may be
+predicted by the NRTL or the UNIQUAC equation, attainment of an ffl-global solution can be
+guaranteed from any starting point .
+2 Problem Formulation
+
+In this section, a general outline of the phase and chemical equilibrium problem will be given.
+The focus is on systems that attain equilibrium states under conditions of constant temperature
+and pressure, where the global minimum value of the Gibbs free energy describes the
+true equilibrium state. The set of components is represented by the index set C = fig and
+the elements that constitute these components are given by E = feg. The set of phases is
+denoted by P = fkg where it is composed of vapor and liquid phases, labeled P V and P L
+
+respectively, so that P = P V [ P L . The problem may then be stated as follows:
+
+Given i components participating in up to k potential phases under isothermal and
+isobaric conditions find the mol vector n that minimizes the value of the Gibbs free
+energy while also satisfying the appropriate material balance constraints.
+3
+
+For a multicomponent, multiphase system, the criterion of equilibrium dictates that the Gibbs
+free energy function, G(n), attain its minimum:
+min G(n) =
+
+X
+
+i2C
+
+X
+
+k2P
+
+n
+
+k
+i
+
+(
+
+\DeltaG
+
+k;f
+i + RT ln
+
+
+f
+
+k
+i
+
+f
+
+k;0
+i
+
+)
+
+(1)
+where n
+
+k
+i is the number of moles of species i present in phase k,
+
+
+
+f
+
+k
+i and f
+
+k;0
+i are the fugacity
+coefficients for the mixture and the pure component at the standard state respectively. The
+standard state is the fugacity of the component in its pure state at the temperature and
+pressure of the system. \DeltaG
+
+k;f
+i represents the Gibbs free energy of formation of component i
+
+in phase state k at the system temperature.
+Difficulties in the use of Eqn. (1) arise due to the complicated expressions available for the
+expressions for fugacity. The liquid phase is modeled through the use of activity coefficients
+where the fugacity ratio is expressed as:
+
+f
+
+L
+
+i
+
+f
+
+L;0
+
+i
+
+= fl
+
+L
+
+i
+
+x
+
+L
+
+i (2)
+where x
+
+L
+
+i denotes the mole fraction of species i in the liquid phase, and fl
+
+L
+
+i is the corresponding
+activity coefficient at the system temperature and pressure.
+The fugacity of the ideal vapor phase can be expressed as follows:
+
+f
+
+V
+
+i
+
+f
+
+V;0
+
+i
+
+= Py
+
+V
+
+i (3)
+where y
+
+V
+
+i represents the vapor phase mol fraction at a total system pressure P. The standard
+state for the vapor phase is taken as an ideal gas at unit fugacity at the system temperature
+where this quantity is usually equal to 1 atm.
+Material Balances
+The objective function as described by Eqn. (1) must yield a solution that will satisfy the
+conservation of mass requirements. These can take either of two forms depending on whether
+reaction occurs in the system and introduce a set of linear equality constraints into the formulation.
+
+(a) Elemental Constraints: For simultaneous phase and chemical equilibrium where reaction
+does occur, conservation of the constituent atoms must be satisfied:
+
+X
+
+i2C
+
+X
+
+k2P
+
+a ei n
+
+k
+i = b e 8 e 2 E (4)
+4
+
+where a ei represents the number of gram-atoms of element e in component i, and b e the total
+number of gram-atoms of element e in the system.
+(b) Mass Balance Constraints: These constraints are required for those systems where no
+chemical reaction takes place, and thus conservation over the components need only hold:
+
+X
+
+k2P
+
+n
+
+k
+i = n
+
+T
+i 8 i 2 C (5)
+where n
+
+T
+i is the total number of moles of component i in the initial charge.
+For notational clarity, the material balance constraints for any system, reacting or nonreacting,
+will be written in the following general form:
+
+A \Delta n \Gamma b = 0 (6)
+where n represents the column vector of the component mol numbers, A is the appropriate
+elemental or compound abundance matrix, and b is the column vector of the total amounts
+of elements or compounds in the system.
+Feasibility Constraints: Obviously a physically realizable solution requires that
+0  n
+
+k
+i  n
+
+T
+
+8 i 2 C ; k 2 P (7)
+where n
+
+T
+
+is the total number of mols in the system.
+The complete formulation of the phase and chemical equilibrium for ideal vapor phases
+and liquid phases whose fugacities can be adequately modeled by the NRTL or UNIQUAC
+equation, is given by minimizing the expression of Eqn. (1) subject to the material balance
+constraints supplied by Eqn. (6) and the feasibility constraints of Eqn. (7). The variables
+of the formulation are the mol numbers n
+
+k
+i , noting that the mol fractions can be defined in
+terms of the mol numbers as x
+
+k
+i = n
+
+k
+i =
+
+P
+
+j n
+
+k
+j for all components and phases. There are two
+important observations in regard to the optimization formulation:
+(i) The constraint set is of small size and linear.
+(ii) The only nonlinearity appears in the objective function as n i ln
+ f i =f
+
+0
+
+i .
+If the system is ideal then any local solution will be the global one. However, the main
+difficulty is that due to the complex nature of the models used to predict fugacities, highly
+nonconvex functionalities result. This may lead to local or trivial solutions that are not true
+equilibrium solutions, and may lie far away from the correct optimal solution. The obtained
+solution will also be highly dependent on the chosen starting point.
+5
+
+3 Analysis for the NRTL Equation
+
+In this section, the Gibbs free energy expression is analyzed for the case of an ideal vapor
+phase and liquid phases modeled using the NRTL activity coefficient expression. Renon and
+Prausnitz [19] derived the following equation for the liquid-phase activity coefficient:
+ln fl i =
+
+P
+
+j2C
+
+ ji G ji x j
+
+P
+
+j2C
+
+G ji x j
+
++
+
+X
+
+j2C
+
+G ij x j
+
+P
+
+l2C
+
+G lj x l
+
+8
+?
+!
+?
+:
+
+ ij \Gamma
+
+P
+
+l2C
+
+ lj G lj x l
+
+P
+
+l2C
+
+G lj x l
+
+9
+?
+=
+?
+;
+
+8 i 2 C (8)
+where fl i is the activity coefficient at mol fraction x i ,  ij and G ij are non-symmetric binary
+interaction parameters.  ij can be negative but G ij is always positive. One important feature
+of the NRTL equation is its capability of representing liquid-liquid immiscibility for multicomponent
+systems with only binary parameters. Eqn. (8) yields exactly the same expression
+for mol numbers as for mol fractions. Substitution of Eqn. (8) into Eqn. (2) yields the correct
+liquid phase fugacity term, after rewriting the mol fractions in terms of mol numbers. Eqn. (3)
+is assumed to define the vapor phase fugacity. Again, the mol fractions are written in terms of
+the vapor mol number variables. Substitution of the resultant vapor and liquid phase fugacity
+equations into Eqn. (1) gives the Gibbs free energy function as follows:
+min
+ G(n) =
+
+X
+
+i2C
+
+X
+
+k2P
+
+n
+
+k
+i
+
+8
+?
+!
+?
+:
+
+\DeltaG
+
+k;f
+i
+
+RT
+
++ ln
+
+n
+
+k
+i
+
+P
+
+j2C
+
+n
+
+k
+j
+
+9
+?
+=
+?
+;
++
+
+X
+
+i2C
+
+X
+
+k2PL
+
+n
+
+k
+i
+
+8
+?
+!
+?
+:
+P
+
+j2C
+
+ ji G ji n
+
+k
+j
+
+P
+
+j2C
+
+G ji n
+
+k
+j
+
++
+
+X
+
+j2C
+
+G ij n
+
+k
+j
+
+P
+
+l2C
+
+G lj n
+
+k
+l
+
+8
+?
+!
+?
+:
+
+ ij \Gamma
+
+P
+
+l2C
+
+ lj G lj n
+
+k
+l
+
+P
+
+l2C
+
+G lj n
+
+k
+l
+
+9
+?
+=
+?
+;
+9
+?
+=
+?
+;
+
+(9)
+where
+
+
+G(n) = G(n)=RT (i.e. dimensionless G). Note that the pressure term associated with
+the fugacity of the vapor phase has been incorporated into the Gibbs energy of formation
+term, that is, \DeltaG
+
+V;f
+
+i = \DeltaG
+
+V;f
+
+i + RT ln P . This is done in order to collect the linear terms of
+the objective function.
+3.1 Analysis of the Gibbs free energy function:
+
+As given by Eqn. (9),
+
+
+G(n) is a complex and nonconvex expression. However, the situation
+is ameliorated by the following property:
+
+Property 3.1 For each phase k 2 P , the following relation is true:
+
+X
+
+i2C
+
+n
+
+k
+i
+
+8
+? !
+?
+:
+P
+
+j2C
+
+ ji G ji n
+
+k
+j
+
+P
+
+j2C
+
+G ji n
+
+k
+j
+
+9
+? =
+?
+;
+
+\Gamma
+
+X
+
+i2C
+
+n
+
+k
+i
+
+8
+? !
+?
+:
+X
+
+j2C
+
+G ij n
+
+k
+j
+
+P
+
+l2C
+
+G lj n
+
+k
+l
+
+P
+
+l2C
+
+ lj G lj n
+
+k
+l
+
+P
+
+l2C
+
+G lj n
+
+k
+l
+
+9
+? =
+?
+;
+
+= 0 (10)
+6
+
+Proof: See Appendix A.
+This property reduces the complexity of Eqn. (9) greatly, and it brings the crucial advantage
+of having bilinear, rather than trilinear, fractional functions in the expression for the objective
+function.
+
+Property 3.2 Let ae i be positive parameters defined 8 i. Define the real-valued function f i (n)
+
+with n ? 0 as follows:
+
+f i (n) = n i ln
+
+n i
+
+P
+
+j
+
+ae j n j
+then f i (n) is convex.
+
+Proof: See Appendix B.
+Remark: Based on Property 3.2, if C
+
+k
+
+N is defined as follows:
+C
+
+k
+
+N =
+
+X
+
+i2C
+
+n
+
+k
+i
+
+8
+?
+!
+?
+:
+
+\DeltaG
+
+k;f
+i
+
+RT
+
++ ln
+
+n
+
+k
+i
+
+P
+
+j2C
+
+n
+
+k
+j
+
+9
+?
+=
+?
+;
+
+8 k 2 P
+then the quantity
+
+P
+
+k
+
+C
+
+k
+
+N is convex, since it is a summation of individually linear and convex
+terms.
+This means that the objective function can now be written as a combination of a convex
+portion, and a nonconvex portion:
+min
+
+
+G(n) =
+
+X
+
+k2P
+
+C
+
+k
+
+N +
+
+X
+
+i2C
+
+X
+
+k2PL
+
+n
+
+k
+i
+
+8
+?
+!
+?
+:
+X
+
+j2C
+
+G ij  ij n
+
+k
+j
+
+P
+
+l2C
+
+G lj n
+
+k
+l
+
+9
+?
+=
+?
+;
+
+(11)
+The nonconvexities of Eqn. (11) now lie solely in the term to the right of the plus sign. The
+following NonConvex Formulation (NCF) is a new formulation:
+min
+
+
+G(n)
+
+s.t. A \Delta n \Gamma b = 0
+0  n  n
+
+T
+
+9
+?
+? ?
+? ?
+? ?
+? =
+?
+?
+?
+?
+?
+?
+?
+?
+;
+
+(NCF)
+where
+
+
+G(n) is defined by Eqn. (11) and is a much simpler form for the Gibbs free energy
+function than that customarily given by Eqn. (9).
+7
+
+3.2 Transformations and Partitioning
+
+The general form of the optimization problem of interest is given as follows:
+min
+
+x;y
+
+f(x; y)
+
+s.t. h(x; y) = 0
+
+g(x; y)  0
+
+x 2 X
+y 2 Y
+
+9
+?
+?
+?
+?
+?
+?
+?
+?
+?
+?
+?
+?
+?
+?
+?
+=
+?
+?
+?
+?
+?
+?
+?
+?
+?
+?
+?
+?
+?
+?
+?
+;
+
+(12)
+where X and Y are convex sets, f(x; y) is the objective function to be minimized, and h(x; y)
+
+and g(x; y) represent the vectors of equality and inequality constraints respectively. These
+functions are assumed to be continuous and piecewise differentiable on X \Theta Y . The GOP
+algorithm of Floudas and Visweswaran [8, 9] can be used to to determine an ffl-global solution
+for problems that satisfy the following conditions:
+Conditions (A):
+ffl f(x; y) and g(x; y) are convex in x for all fixed y and convex in y for all fixed x,
+
+ffl h(x; y) is affine in x for all fixed y, and affine in y for all fixed x,
+
+ffl X and Y ` V are nonempty, compact convex sets and a constraint qualification is
+satisfied, where V j f y: h(x; y) = 0; g(x; y)  0; for some x 2 Xg.
+It will now be shown how new variables are introduced so as to change the nature of the
+nonconvexities in the objective function defined by Eqn. (11). This is known as the transformation
+ phase. Having augmented the variable set in this way, it is then partitioned into
+two variable subsets, so that Conditions (A) of the GOP are satisfied. If the following new
+variables are introduced:
+\Psi
+
+k
+i =
+
+n
+
+k
+i
+
+P
+
+j2C
+
+G ji n
+
+k
+j
+
+8 i 2 C ; k 2 P L (13)
+then the transformed objective function becomes:
+min
+
+
+G(n) =
+
+X
+
+k2P
+
+C
+
+k
+
+N +
+
+X
+
+i2C
+
+X
+
+k2PL
+
+n
+
+k
+i
+
+8
+!
+:
+X
+
+j2C
+
+G ij  ij \Psi
+
+k
+j
+
+9
+=
+;
+
+(14)
+8
+
+This objective function is now subject to the transformation constraints of Eqn. (13) (which
+are rewritten by bringing the denominator over to the left hand side so that they will be
+of bilinear form, rather than fractional), in addition to the material balance constraints as
+defined by Eqn. (6). The objective is to partition the variable set into two subsets so that
+if either of these subsets is held constant, an optimization problem with simpler structure
+remains. An examination of Eqn. (14) leads to the conclusion that the obvious partition of
+variables is that in which the y variable set contains the mol vector, with the x variable set
+containing the new variables:
+
+y /
+
+n
+
+n
+
+k
+i
+
+o
+
+x /
+
+n
+
+\Psi
+
+k
+i
+
+o
+
+(15)
+Notice that if the mol number variable set is held constant, a linear objective function results.
+On the other hand, if the transformed variable set is held constant, a convex objective function
+is obtained. The equality constraints are of bilinear form and so will yield linear terms if either
+of the subsets is held constant. Thus, Conditions (A) of the GOP are satisfied. The form of
+the nonconvexities of the objective function have been changed, resulting in the introduction
+of additional bilinear equality constraints into the system.
+3.3 The Primal Problem
+
+The primal problem is defined as the subproblem that results when the y variable set is held
+fixed so that y =  y. In what follows, overbars on variables represent their values obtained
+from any given primal problem, which is defined as follows:
+min
+
+X
+
+k2P
+
+
+
+C
+
+k
+
+N +
+
+X
+
+i2C
+
+X
+
+k2PL
+
+ n
+
+k
+i
+
+8
+!
+:
+X
+
+j2C
+
+G ij  ij \Psi
+
+k
+j
+
+9
+=
+;
+s.t. \Psi
+
+k
+i \Delta
+
+8
+!
+:
+X
+
+j2C
+
+G ji  n
+
+k
+j
+
+9
+=
+;
+
+=  n
+
+k
+i 8 i 2 C ; k 2 P L
+
+9
+?
+?
+?
+?
+?
+?
+?
+?
+?
+?
+=
+?
+?
+?
+?
+?
+?
+?
+?
+?
+?
+;
+
+(P)
+n
+
+ n
+
+k
+i
+
+o
+
+represents the current value of the mol numbers (the y variable set). The primal problem
+(P) is always feasible provided that the mol vector satisfies the material balance constraints
+which are functions of the y variables alone. Hence they can be carried directly to the relaxed
+dual subproblems. This is the reason the material balance constraints are not included in (P).
+Notice that (P) is merely a function evaluation as the x variable set is completely specified
+by
+
+n
+
+ n
+
+k
+i
+
+o
+
+.
+It will be necessary to use the Karush-Kuhn-Tucker (KKT) conditions for the primal
+problem in proceeding sections. The Lagrangian as constructed from the primal problem is
+9
+
+given as:
+L(x;  y; ) =
+
+X
+
+k2P
+
+
+
+C
+
+k
+
+N +
+
+X
+
+i2C
+
+X
+
+k2PL
+
+ n
+
+k
+i
+
+8
+!
+:
+X
+
+j2C
+
+G ij  ij \Psi
+
+k
+j
+
+9
+=
+;
+
++
+
+X
+
+i2C
+
+X
+
+k2PL
+
+ \Psi
+
+k
+i
+
+8
+!
+:
+
+\Psi
+
+k
+i \Delta
+
+X
+
+j2C
+
+G ji  n
+
+k
+j \Gamma  n
+
+k
+i
+
+9
+=
+;
+
+(16)
+where  \Psi k
+i
+
+is the multiplier associated with the corresponding constraint that defines the x
+
+variable \Psi
+
+k
+i . The evaluation of the KKT conditions for the primal yields:
+r \Psi
+
+k
+i
+
+L(x;  y; ) =
+
+X
+
+j2C
+
+G ji  ji  n
+
+k
+j +  \Psi
+
+k
+i
+
+\Delta
+
+X
+
+j2C
+
+G ji  n
+
+k
+j = 0 8 i 2 C ; k 2 P L (17)
+The Lagrange multipliers from the primal are then explicitly calculated as:
+
+
+ \Psi
+
+k
+i
+
+= \Gamma
+
+P
+
+j2C
+
+G ji  ji  n
+
+k
+j
+
+P
+
+j2C
+
+G ji  n
+
+k
+j
+
+8 i 2 C ; k 2 P L (18)
+Thus, the multipliers from any primal problem are nonempty and bounded for all y 2 Y , a
+required condition to guarantee ffl-global convergence. In the special case that
+
+P
+
+j G ji n
+
+k
+j = 0,
+it is clear that n
+
+k
+i = 0 8 i 2 C, that is, the phase disappears. The corresponding primal
+constraints are then of the form \Psi
+
+k
+i \Delta 0 = 0. This implies that any value for the Lagrange
+multipliers can be chosen so that the KKT conditions will be satisfied for the primal problem
+and  \Psi
+
+k
+i
+
+= 0 8 i 2 C is one obvious choice. Thus, if for a given phase k, n
+
+k
+i = 0 8 i 2 C, then
+set  \Psi
+
+k
+i
+
+= 0 8 i 2 C; otherwise use Eqn. (18) to calculate the multipliers. This eliminates
+the problem of obtaining unbounded values for the multipliers from the primal problem. It is
+therefore seen that solving the primal problems and obtaining the corresponding multipliers
+amounts to simple function evaluations.
+3.4 The Relaxed Dual problem
+
+The primal problem establishes upper bounds on the solution. The relaxed dual subproblems
+supply lower bounds on the global solution. The details of the derivation of the Lagrangian
+for use in the relaxed dual is described in the following section.
+10
+
+3.4.1 Derivation of the Lagrangian
+
+The first step in deriving the Lagrangian is to separate and collect all the x variable terms to
+obtain:
+L(x; y;
+
+
+
+) =
+
+X
+
+i2C
+
+X
+
+k2PL
+
+\Psi
+
+k
+i
+
+8
+!
+:
+X
+
+j2C
+
+G ji  ji n
+
+k
+j +
+
+
+ \Psi k
+i
+
+\Delta
+
+X
+
+j2C
+
+G ji n
+
+k
+j
+
+9
+=
+;
+
++
+
+X
+
+k2P
+
+C
+
+k
+
+N \Gamma
+
+X
+
+i2C
+
+X
+
+k2PL
+
+n
+
+k
+i
+
+
+
+ \Psi k
+i
+
+(19)
+Eqn. (19) is simplified by enacting the following steps:
+(i) Subtract Eqns. (17) with  \Psi
+
+k
+i
+
+=
+  \Psi
+
+k
+i
+
+from the terms within the curly braces of Eqn. (19).
+(ii) Use Eqns. (18) to modify the term to the right of the minus sign in Eqn. (19).
+The following expression is then obtained:
+L(x; y;
+
+
+
+) =
+
+X
+
+i2C
+
+X
+
+k2PL
+
+\Psi
+
+k
+i
+
+8
+!
+:
+X
+
+j2C
+
+G ji
+
+h
+
+ ji +
+
+
+ \Psi
+
+k
+i
+
+i h
+
+n
+
+k
+j \Gamma  n
+
+k
+j
+
+i
+9
+=
+;
+
++
+
+X
+
+k2P
+
+C
+
+k
+
+N +
+
+X
+
+i2C
+
+X
+
+k2PL
+
+n
+
+k
+i
+
+8
+!
+:
+X
+
+j2C
+
+G ij  ij
+
+
+\Psi
+
+k
+j
+
+9
+=
+;
+
+(20)
+Note that if n
+
+k
+i =  n
+
+k
+i 8 i 2 C; k 2 P L , then the Lagrangian equals the objective function
+value supplied by the primal at  n
+
+k
+i . By evaluating the gradients of the Lagrangian given by
+Eqn. (20) with respect to the x variables, the following equations are obtained:
+g
+
+k
+i (y) = r \Psi k
+i
+
+L(x; y;
+
+
+
+) =
+
+X
+
+j2C
+
+G ji
+
+h
+
+ ji +
+
+
+ \Psi k
+i
+
+i
+
+\Delta
+
+h
+
+n
+
+k
+j \Gamma  n
+
+k
+j
+
+i
+
+8 i 2 C ; k 2 P L (21)
+These are the qualifying constraints written in terms of the x variables and describe the
+fundamental nature of the interaction of the two variable subsets. Notice that each x variable
+multiplies a summation of y variables, so that these constraints form hyperplanes that partition
+the y variable space. The next important step in the development is to obtain a much simpler
+set of partitioning hyperplanes. This is achieved by simply augmenting the set of x variables,
+so that each one of these new x variables will interact with a single y variable, rather than
+11
+
+a summation of them. This augmented set of variables, denoted f
+
+
+\Psi
+
+k
+ij g, is defined for each
+
+fi; kg 2 C \Theta P L as follows:
+
+\Psi
+
+k
+ij = \Psi
+
+k
+i 8 j 2 C (22)
+The x variables are now allowed to appear within the innermost summation of Eqn. (20) to
+yield an equivalent Lagrangian defined as follows:
+L(x; y;
+
+
+
+) =
+
+X
+
+i2C
+
+X
+
+k2PL
+
+8
+!
+:
+X
+
+j2C
+
+
+\Psi
+
+k
+ij
+
+h
+
+G ji
+
+n
+
+ ji +
+
+
+ \Psi
+
+k
+i
+
+oi
+
+\Delta
+
+h
+
+n
+
+k
+j \Gamma  n
+
+k
+j
+
+i
+9
+=
+;
+
++
+
+X
+
+k2P
+
+C
+
+k
+
+N +
+
+X
+
+i2C
+
+X
+
+k2PL
+
+n
+
+k
+i
+
+8
+!
+:
+X
+
+j2C
+
+G ij  ij
+
+
+\Psi
+
+k
+j
+
+9
+=
+;
+
+(23)
+Eqn. (23) now supplies the new form of the qualifying constraints, labeled  g
+
+k
+ij (y), obtained
+from the modified Lagrangian of Eqn. (23) as:
+ g
+
+k
+ij (y) = r  \Psi
+
+k
+ij
+
+L(x; y;
+
+
+
+) = G ji
+
+h
+
+ ji +
+
+
+ \Psi k
+i
+
+i
+
+\Delta
+
+h
+
+n
+
+k
+j \Gamma  n
+
+k
+j
+
+i
+
+8 i 2 C ; j 2 C ; k 2 P L (24)
+Thus, each qualifying constraint is now a function of a single y variable, with the important
+result that the hyperplanes are now orthogonal to each other, and partition the y variable
+space into n-rectangles (i.e. simple boxes). The number of connected variables is given as:
+
+NCV = jCj \Delta jP L j (25)
+where the braces signify the cardinalities of the appropriate sets.
+In Eqn. (24), each qualifying constraint shares the same basic form, defined as (n
+
+k
+j \Gamma  n
+
+k
+j ).
+The only difference is the expression that premultiplies this term. These are constants that
+depend on the parameters of the NRTL model and information from the primal in the form of
+the Lagrange multipliers. Eqn. (7) delineates the feasible region as an n-rectangle. The initial
+
+parent region is described by this n-rectangle, and its bounds are represented by RfL
+
+R
+
+; U
+
+R
+
+g,
+
+where L
+
+R
+
+= fL
+
+R
+n
+
+k
+i
+
+g and U
+
+R
+
+= fU
+
+R
+n
+
+k
+i
+
+g comprise the regional bounds for the variables fn
+
+k
+i g.
+
+Upon choosing an initial point fn
+
+k
+i g, this parent n-rectangle is partitioned by NCV orthogonal
+hyperplanes passing through fn
+
+k
+i g, so that 2
+
+N
+CV new n-rectangles are created. Within each
+of these new n-rectangles, the sign of (n
+
+k
+i \Gamma  n
+
+k
+i ) will be constant 8 i 2 C ; k 2 P L . The
+bounds for each of these n-rectangles are described as the box bounds, denoted BfL
+
+B
+
+; U
+
+B
+
+g,
+
+with L
+
+B
+
+= fL
+
+B
+n
+
+k
+i
+
+g and L
+
+B
+
+= fU
+
+B
+n
+
+k
+i
+
+g representing the individual box bounds for the variables
+
+fn
+
+k
+i g. The set of all possible combinations of box bounds is denoted by CB, with its 2
+
+N
+CV
+12
+
+members individually referred to as B l . The parameter s
+
+B l
+ik is used to delineate each of these
+box regions and is defined over C \Theta P L \Theta CB. It determines the partition of the y variable
+space for any given B l as follows:
+If s
+
+B l
+ik = +1 then n
+
+k
+i \Gamma  n
+
+k
+i  0
+If s
+
+B
+l
+ik = \Gamma1 then n
+
+k
+i \Gamma  n
+
+k
+i  0
+
+9
+=
+;
+
+8 i 2 C ; k 2 P L
+Figure 1 shows how s
+
+B l
+ik is used to create these regional and box bounds at the first iteration
+for the case of 2 connected variables, with C j fi 1 ; i 2 g and P L j fk 1 g. The initial point
+generates 4 subdomains denoted B 1 through B 4 .
+This implies that it is possible to construct Lagrangians that validly underestimate the
+global solution in each of these n-rectangles, within which an individual relaxed dual subproblem
+is solved. If the solution is greater than the current best upper bound obtained from the
+primal problem, it may be fathomed (i.e. discarded); otherwise, it is added to the set of candidate
+lower bounds. The infimum of all such solutions supplies the point for the next iteration,
+where the n-rectangle associated with this node will be partitioned into 2
+
+N CV
+
+n-rectangles to
+supply additional lower bounds on the final solution. In the context of Figure 1, suppose the
+infimum of the 4 lower bounds lies in B 2 . At the next iteration, B 2 is divided into 4 regions,
+and so on.
+A convenient way of describing this partitioning of the y variable space in the branch and
+bound approach is through the use of a tree structure. The starting point is represented by
+the root node, labeled R, and it generates 2
+
+NCV
+
+nodes at the first level of the tree. One of
+these leaf nodes becomes the next iteration node, in turn generating a further 2
+
+NCV
+
+additional
+nodes, and so on. Note that at any given iteration, all generated solution nodes share the
+same parent node, so that each n-rectangle is a refinement of its parent n-rectangle implying
+that the regional bounds for a given node are supplied by the box bounds of its parent node.
+This has the important implication that any given Lagrange function will be valid in any
+future n-rectangles that it spawns. In addition, retrieval of previous Lagrange functions for
+use in the current relaxed dual subproblem is easily achieved by employing a backward depthfirst
+traversal through the solution tree from the current node to the root node, extracting
+the relevant information required to construct the Lagrange function at each node along the
+path. This set of previous iterations to be included in the subproblems of some iteration K is
+denoted PL(K P ). Because a Lagrangian is not included for all previous iterations, but only
+for those whose nodes define the current node as a subdomain in the y variable space, each
+relaxed dual subproblem contains relatively few Lagrangians from previous iterations. Thus,
+each relaxed dual subproblem can be both generated and solved efficiently. The manner in
+which the x variable bounds are obtained and set on the basis of the qualifying constraints
+will now be described.
+13
+
+3.4.2 Bounds for the x variables
+
+For any given n-rectangle defined by BfL
+
+B
+
+; U
+
+B
+
+g, it is necessary to establish upper and lower
+bounds on the x variables within this box. Recall that f\Psi
+
+k
+i g are defined as linear fractionals.
+Any linear fractional is a pseudolinear function, that is, it is pseudoconvex and pseudoconcave.
+Thus, there is one local minimum and one local maximum that satisfy the KKT optimality
+conditions, and these will be unique global extrema. By examining the KKT conditions for
+the problem:
+min \Psi
+
+k
+i s:t: L
+
+B
+n
+
+k
+j
+
+ n
+
+k
+j  U
+
+B
+n
+
+k
+j
+
+8 j 2 C
+
+9
+?
+?
+=
+?
+?
+;
+
+8 i 2 C ; 8 k 2 P L (26)
+the global minimum value for each \Psi
+
+k
+i in BfL
+
+B
+
+; U
+
+B
+
+g can be evaluated and is labeled L \Psi
+
+k
+i
+
+. \Gamma\Psi
+
+k
+i
+
+is minimized subject to the same constraints to obtain the corresponding maximum, U \Psi k
+i
+
+. The
+globally valid lower and upper bounds for \Psi
+
+k
+i (and hence
+
+\Psi
+
+k
+ij ) within the n-rectangle defined
+by BfL
+
+B
+
+; U
+
+B
+
+g are given as:
+L \Psi
+
+k
+i
+
+=
+
+L
+
+B
+n
+
+k
+i
+
+L
+
+B
+n
+
+k
+i
+
++
+
+P
+
+j 6=i
+
+G ji U
+
+B
+n
+
+k
+j
+
+U \Psi
+
+k
+i
+
+=
+
+U
+
+B
+n
+
+k
+i
+
+U
+
+B
+n
+
+k
+i
+
++
+
+P
+
+j 6=i
+
+G ji L
+
+B
+n
+
+k
+j
+
+9
+?
+? ?
+? ?
+=
+?
+?
+?
+?
+?
+;
+
+8 i 2 C ; 8 k 2 P L (27)
+Having established the lower and upper bounds on the x variables it is necessary to decide
+at what bounds to set the modified x variable set,
+
+n
+
+
+\Psi
+
+k
+ij
+
+o
+
+, for some B l 2 CB. Each term
+involving (n
+
+k
+j \Gamma  n
+
+k
+j ) is underestimated individually. This quantity alone does not determine
+the bounds at which the x variables are set. The terms that premultiply (n
+
+k
+j \Gamma  n
+
+k
+j ) must also
+be considered. Once the combined sign of the two terms has been established, the sign of the
+qualifying constraints as given by Eqns. (24) is known so that the x variables can be set at
+their appropriate bounds for the current and previous iterations as follows:
+For each fi; j; kg 2 C \Theta C \Theta P L perform the following steps:
+1. Current Iteration K:
+
+If G ji
+
+h
+
+ ji +
+
+
+
+
+K
+
+\Psi
+
+k
+i
+
+i
+
+\Delta s
+
+B K
+l
+
+jk  0 then
+
+i
+
+ x
+
+k
+ij
+
+j K
+
+= L \Psi k
+i
+
+If G ji
+
+h
+
+ ji +
+
+
+
+
+K
+
+\Psi k
+i
+
+i
+
+\Delta s
+
+B
+K
+l
+
+jk ! 0 then
+
+i
+
+ x
+
+k
+ij
+
+j K
+
+= U \Psi
+
+k
+i
+
+2. Previous Iterations K P 2 PL(K P ):
+If G ji
+
+
+
+ ji +
+
+
+
+
+K P
+
+\Psi
+
+k
+i
+
+
+
+\Delta
+
+hi
+
+ n
+
+k
+i
+
+j K P
+
+\Gamma
+
+i
+
+ n
+
+k
+i
+
+j K i
+
+ 0 then
+
+i
+
+ x
+
+k
+ij
+
+j K P
+
+= L \Psi
+
+k
+i
+
+If G ji
+
+
+
+ ji +
+
+
+
+
+K P
+
+\Psi k
+i
+
+
+
+\Delta
+
+hi
+
+ n
+
+k
+i
+
+j K P
+
+\Gamma
+
+i
+
+ n
+
+k
+i
+
+j K i
+
+! 0 then
+
+i
+
+ x
+
+k
+ij
+
+j K P
+
+= U \Psi
+
+k
+i
+14
+
+For any given relaxed dual subproblem, these sets of bounds are denoted by  x
+
+B
+
+K
+l
+
+for the
+current iteration, and  x
+
+B
+
+K P
+l
+
+for previous iterations.
+3.5 Global Optimization Algorithm for the NRTL model
+
+In what follows, k S represents any node of the solution tree, with k C and k t corresponding to
+temporary nodes used in the selection of the set of previous Lagrange functions. I k S is the
+iteration number, K, at which node k S is generated, with K C denoting the current iteration
+number, and K P representing some previous iteration. S C represents the current node under
+consideration at any given iteration and is obviously a leaf node. The parent of any of these
+nodes is simply indicated by p(k). The complete algorithm for the NRTL equilibrium model
+is now given.
+STEP 0: Initialization
+Select an initial mol vector  n
+
+0
+
+and convergence tolerance ".
+
+Initialize R C fL
+
+R
+
+; U
+
+R
+
+g, P
+
+U
+
+= +1 , M
+
+L
+
+= \Gamma1, S C = R , k S = ; , I k S = ;.
+STEP 1: Primal Problem
+Evaluate (P) to give P ( n
+
+K
+
+). Store
+
+
+
+
+K
+
+,  n
+
+K
+
+.
+Solve (NCF) to give
+
+
+G
+
+
+
+and update P
+
+U
+
+= min
+
+h
+
+P
+
+U
+
+; P ( n
+
+K
+
+) ;
+
+
+
+G
+
+
+
+i
+
+.
+STEP 2: Select previous Lagrangians
+Set PL(K P ) = ; , k t = S C .
+
+(1) Set K P = I k t . Extract
+
+
+
+
+K P
+
+,  n
+
+K P
+
+. Set PL(K P ) = PL(K P ) [ K P and kC = k t .
+
+(2) Set k t = p(k C ). If k t = R , proceed to STEP 3; otherwise, return to (1).
+STEP 3: The Relaxed Dual Phase
+(1) Choose a combination of box bounds, B l from the set CB.
+
+Evaluate B C fL
+
+B
+
+; U
+
+B
+
+g and fL \Psi k
+i
+
+; U \Psi k
+i
+
+g.
+15
+
+Set  x
+
+B K
+l
+
+and  x
+
+B
+K P
+l
+
+and solve (RD) to give 
+
+
+
+B and n
+
+
+
+.
+min
+
+y2Y
+ B
+
+ B
+s.t. B  LK (x
+
+B
+K
+l
+
+;  n
+
+K
+
+; y;
+
+
+
+
+
+K
+
+)
+
+B  LK P (x
+
+B
+K
+P
+l
+
+;  n
+
+K P
+
+; y;
+
+
+
+
+
+K P
+
+) 8 K P 2 PL(K P )
+
+L
+
+B
+n
+
+k
+i
+
+ n
+
+k
+i  U
+
+B
+n
+
+k
+i
+
+8 i 2 C ; k 2 P L
+
+0 = A \Delta n \Gamma b
+
+9
+? ?
+? ?
+? ?
+? ?
+? ?
+?
+?
+?
+?
+?
+?
+?
+?
+=
+?
+?
+?
+?
+?
+?
+?
+?
+?
+?
+?
+?
+?
+?
+?
+?
+?
+?
+;
+
+(RD)
+where LK (x
+
+B K
+l ;  n
+
+K
+
+; y;
+
+
+
+
+
+K
+
+) is given by Eqn. (23).
+(i) If 
+
+
+
+B  P
+
+U
+
+\Gamma ffl, then fathom solution.
+(ii) If 
+
+
+
+B ! P
+
+U
+
+\Gamma ffl, then set k S = k S + 1, p (k S ) = S C , I k S = K, 
+
+k S
+
+= 
+
+
+
+B , n
+
+k S
+
+= n
+
+
+
+,
+
+R k S fL
+
+R
+
+; U
+
+R
+
+g = BfL
+
+B
+
+; U
+
+B
+
+g.
+
+(2) Choose another set of box bounds B l from CB and return to (1).
+If there are no remaining unchosen B l in CB, then proceed to STEP 4.
+STEP 4: Select mol vector for next iteration
+Select infimum of all 
+
+k S
+B , and set S C = k S , the associated node.
+Set  n
+
+K+1
+
+= n
+
+k S
+
+, M
+
+L
+
+= 
+
+SC
+
+B and RK+1fL
+
+R
+
+; U
+
+R
+
+g = R k S fL
+
+R
+
+; U
+
+R
+
+g
+STEP 5: Check for convergence
+Check if
+
+fi
+fi
+fi
+
+P
+
+U
+
+\GammaM
+
+L
+
+P U
+
+fi
+fi
+fi  ffl. If true, then STOP; otherwise set K = K + 1, and return to Step 1.
+It has been shown how all the conditions required to guarantee ffl-global convergence of the
+GOP algorithm (Floudas and Visweswaran [8, 9]) are satisfied.
+The main computational effort lies in solving the relaxed dual subproblems. There is a very
+simple way to reduce the number of connected variables. The material balance constraints
+appear affinely in the relaxed dual formulation. The material balance matrix represented by
+
+A has rank r so that r mol number variables can be written in terms of the others. In other
+16
+
+words r connected variables are eliminated. Thus, the number of connected variables is now
+given as:
+
+N CV = jCj \Delta jP j \Gamma r (28)
+For the phase equilibrium problem r = jCj. The derivation of the relaxed dual is exactly the
+same except that now the material balance constraints are not required to maintain feasibility.
+Another computational aid is the fact that at a given stage of the algorithm, if the current
+point matches a previous point for some (or all) i 2 C ; k 2 P L , then there is no need
+for a partitioning hyperplane in that dimension. This reduces the number of relaxed dual
+subproblems to be solved at that iteration. A significant number of relaxed dual subproblems
+are typically eliminated in this way. Note that (NCF) can also be solved locally at each
+iteration (as well as evaluating the primal) to give a valid upper bound on the global solution.
+3.6 Examples
+
+Two examples are presented which demonstrate the GOP algorithm as it applies to the NRTL
+equation. Both these problems have two postulated liquid phases, so that the the Gibbs free
+energy of formation terms can be eliminated. The function to be minimized is then given as
+
+
+G I = [G \Gamma
+
+P
+
+i \DeltaG
+
+L;f
+
+i n
+
+T
+
+i ] =RT . where G is defined by Eqn. (1).
+All the examples have a degenerate set of trivial solutions where the component mol
+fractions in each of the liquid phases are the same. If one of these points is used to initiate
+the search for a local solver, then it will be unable to move from the trivial solution, a major
+problem for local optimization algorithms. The results show that the GOP successfully obtains
+the global solution even when supplied with such a trivial solution initial point.
+It is possible to incorporate a simple local search technique into the framework of the
+global optimization algorithm. At the beginning of every iteration, MINOS5.3 is used to
+solve (NCF) as a nonconvex nonlinear programming problem, using the current mol numbers
+
+fn
+
+k
+i g as a starting point. If the resulting solution supplies a Gibbs free energy level less than
+the current best upper bound, then P
+
+U
+
+is updated to equal this new solution. This is done
+because typically a point close to the global solution is generated at a relatively early stage
+of the algorithm, but this solution is not refined until a later point in the solution procedure.
+The advantage of such a strategy is that immediate refinement of solutions (local or global)
+will occur with the attractive benefit of improved upper bounds at an earlier stage of the
+algorithm, and a greater fathoming rate. In summary, the local search is an efficient way in
+which to generate valid and improved upper bounds, independently of the global optimization
+algorithm.
+17
+
+3.6.1 Example 1: n-Butyl-acetate -- Water
+
+The application of the GOP to a simple two component, two phase example is now considered.
+This illustrative example is taken from the thesis of Lin [13] and features two components,
+
+n-butyl-acetate (1) and water (2), at a temperature of 298K and a pressure of 1 atm. There
+are two possible liquid phases and they are modeled using the NRTL equation. Both phases
+share the same standard state, so that
+
+
+G I supplies the function to be minimized. The binary
+parameters were obtained from Heidemann and Mandhane [10]:
+
+ 12 = 3:00498 ;  21 = 4:69071
+
+G 12 = 0:30794 ; G 21 = 0:15904
+The initial mixture charge is equimolar (n
+
+T
+
+i = 0:5 8 i) and no reaction occurs in the system.
+It appears to be a simple example but there are multiple stationary points and local solutions.
+In fact, there is a local minimum and a local maximum, in addition to the global solution.
+There is also a line of trivial solutions that represents physical one phase behavior, but mathematically
+yields two phase solutions, that is, the mol fractions are the same in each distinct
+phase. These solutions are given in Table 1 where the superscript I represents the first liquid
+phase. The mol numbers for the second liquid phase are obtained as n
+
+II
+
+i = n
+
+T
+
+i \Gamma n
+
+I
+
+i 8 i. The
+Gibbs free energy surface as a function of the mol numbers in liquid phase I is pictured in
+Figure 2, with the trivial solutions lying along the line defined by n
+
+I
+
+1 \Gamma n
+
+I
+
+2 = 0. Lin [13] employed
+a successive continuation method to solve the problem and trace all possible solution
+branches. In this manner, all the local and global extrema were obtained. A local solver
+will have difficulty obtaining the global solution unless the starting point lies close to it, and
+the trivial solution or one of the local optima may be found. To illustrate this point, when
+(NCF) was solved using MINOS5.3 from 100 randomly selected starting points, the global
+solution was found in only 13 cases. The strong local minimum solution was found in 5 cases,
+and the trivial solution was obtained in the remaining 82 cases. The explicit mathematical
+formulation is given as:
+min
+
+
+G I = n
+
+1
+1 ln n
+
+1
+1 + n
+
+1
+2 ln n
+
+1
+2 \Gamma [n
+
+1
+1 + n
+
+1
+2 ] ln[n
+
+1
+1 + n
+
+1
+2 ]
++ n
+
+2
+1 ln n
+
+2
+1 + n
+
+2
+2 ln n
+
+2
+2 \Gamma [n
+
+2
+1 + n
+
+2
+2 ] ln[n
+
+2
+1 + n
+
+2
+2 ]
++ G 12  12 n
+
+1
+1 \Psi
+
+1
+2 + G 21  21 n
+
+1
+2 \Psi
+
+1
+1 + G 12  12 n
+
+2
+1 \Psi
+
+2
+2 + G 21  21 n
+
+2
+2 \Psi
+
+2
+1
+
+s.t. \Psi
+
+1
+1 fn
+
+1
+1 + G 21 n
+
+1
+2 g = n
+
+1
+1
+
+\Psi
+
+1
+2 fG 12 n
+
+1
+1 + n
+
+1
+2 g = n
+
+1
+2
+
+\Psi
+
+2
+1 fn
+
+2
+1 + G 21 n
+
+2
+2 g = n
+
+2
+1
+
+\Psi
+
+2
+2 fG 12 n
+
+2
+1 + n
+
+2
+2 g = n
+
+2
+2
+18
+
+n
+
+1
+1 + n
+
+2
+1 = 0:5
+
+n
+
+1
+2 + n
+
+2
+2 = 0:5
+0  n
+
+1
+1 ; n
+
+1
+2 ; n
+
+2
+1 ; n
+
+2
+2  0:5
+By using the mass balance equality constraints to eliminate the variables of the second liquid
+phase, the number of connected variables can be reduced to NCV = 2. Thus, a maximum of
+four relaxed dual problems must be solved at each iteration. Any variables associated with the
+eliminated phase are designated with a superscript E. The x-variable set for the eliminated
+phase is then defined as:
+
+\Psi
+
+E
+
+ij =
+
+n
+
+T
+
+i \Gamma n i
+
+P
+
+l2C
+
+(n
+
+T
+l \Gamma n l )
+
+8 i ; j 2 C
+where fn i g are the variables of the non-eliminated phase and the formulation, noting that the
+superscript I has been dropped. The explicit Lagrangian was derived as Eqn. (23) and yields
+the following expression:
+
+L(n i ;  n i ;
+
+
+\Psi ij ;
+
+
+\Psi
+
+E
+
+ij ;
+
+
+
+ i ;
+
+
+
+
+
+E
+
+i ) = fn 1 ln n 1 + n 2 ln n 2 \Gamma (n 1 + n 2 ) ln (n 1 + n 2 )
++ (n
+
+T
+
+1 \Gamma n 1 ) ln (n
+
+T
+
+1 \Gamma n 1 ) + (n
+
+T
+
+2 \Gamma n 2 ) ln (n
+
+T
+
+2 \Gamma n 2 )
+
+\Gamma (n
+
+T
+
+1 \Gamma n 1 + n
+
+T
+
+2 \Gamma n 2 ) ln (n
+
+T
+
+1 \Gamma n 1 + n
+
+T
+
+2 \Gamma n 2 )
+
+\Gamma n 1
+
+
+
+ 1 \Gamma n 2
+
+
+
+ 2 \Gamma (n
+
+T
+
+1 \Gamma n 1 )
+
+
+
+
+E
+
+1 \Gamma (n
+
+T
+
+2 \Gamma n 2 )
+
+
+
+
+E
+
+2
+
+o
+
++
+
+\Psi 11
+
+
+
+ 1 [n 1 \Gamma  n 1 ] +
+
+\Psi 12 G 21
+
+h
+
+ 21 +
+
+
+ 1
+
+i
+
+[n 2 \Gamma  n 2 ]
++
+
+\Psi 21 G 12
+
+h
+
+ 12 +
+
+
+ 2
+
+i
+
+[n 1 \Gamma  n 1 ] +
+
+\Psi 22
+
+
+
+ 2 [n 2 \Gamma  n 2 ]
+
+\Gamma
+
+
+\Psi
+
+E
+
+11
+
+
+
+
+
+E
+
+1 [n 1 \Gamma  n 1 ] \Gamma
+
+
+\Psi
+
+E
+
+12 G 21
+
+h
+
+ 21 +
+
+
+
+
+E
+
+1
+
+i
+
+[n 2 \Gamma  n 2 ]
+
+\Gamma
+
+
+\Psi
+
+E
+
+21 G 12
+
+h
+
+ 12 +
+
+
+
+
+E
+
+2
+
+i
+
+[n 1 \Gamma  n 1 ] \Gamma
+
+
+\Psi
+
+E
+
+22
+
+
+
+
+
+E
+
+2 [n 2 \Gamma  n 2 ]
+Notice that the term within curly braces is convex and that the interaction between the x and
+the y variable sets is purely bilinear. The derivatives of the Lagrangian with respect to the x
+
+variables yield linear functionalities in the y variables allowing the y space to be partitioned in
+a simple manner. The Lagrangian generated in Region 1 of Iteration 1 is shown in Figure 3,
+where 0:25  n i  0:5 8 i.
+
+A local solver will not converge to the global solution from the initial point considered
+above. The progress of the upper and lower bounds is charted in Table 2. The total cpu time
+required was 1.23 sec. It should be noted that for 33% of the total iterations, only 2 relaxed
+dual problems were solved, demonstrating the fact that the maximum number of problems
+need not be solved at every iteration of the algorithm. In addition, 66% of the solutions
+obtained from the relaxed dual problems were fathomed.
+19
+
+3.6.2 Example 2: n-Propanol -- n-Butanol -- Water
+
+This system was one of two studied by Block and Hegner [4] in their modeling of three phase
+distillation towers. n-Butanol and water form the only partially miscible binary pair (i.e. it
+is a Type I system) with a relatively small domain of immiscibility. The binary parameters
+as obtained by them for use in the NRTL equation are supplied in Table 3.
+
+
+G I supplies the
+objective function to be minimized, and NCV = 3. Block and Hegner [4] conducted the liquid
+phase splitting computations independently of the vapor phase i.e. the parameters have no
+dependence on temperature. It is therefore meaningless to consider a vapor phase for this
+example. Walraven and Rompay [23] subsequently used this problem in order to test their
+phase splitting algorithm for a number of different feed charges. The explicit formulation is
+given below:
+min
+
+
+G I = n
+
+1
+1 ln n
+
+1
+1 + n
+
+1
+2 ln n
+
+1
+2 + n
+
+1
+3 ln n
+
+1
+3 \Gamma [n
+
+1
+1 + n
+
+1
+2 + n
+
+1
+3 ] ln[n
+
+1
+1 + n
+
+1
+2 + n
+
+1
+3 ]
++ n
+
+2
+1 ln n
+
+2
+1 + n
+
+2
+2 ln n
+
+2
+2 + n
+
+2
+3 ln n
+
+2
+3 \Gamma [n
+
+2
+1 + n
+
+2
+2 + n
+
+2
+3 ] ln[n
+
+2
+1 + n
+
+2
+2 + n
+
+2
+3 ]
++ n
+
+1
+1
+
+h
+
+G 12  12 \Psi
+
+1
+2 + G 13  13 \Psi
+
+1
+3
+
+i
+
++ n
+
+1
+2
+
+h
+
+G 21  21 \Psi
+
+1
+1 + G 23  23 \Psi
+
+1
+3
+
+i
+
++ n
+
+1
+3
+
+h
+
+G 31  31 \Psi
+
+1
+1 + G 32  32 \Psi
+
+1
+2
+
+i
+
++ n
+
+2
+1
+
+h
+
+G 12  12 \Psi
+
+2
+2 + G 13  13 \Psi
+
+2
+3
+
+i
+
++ n
+
+2
+2
+
+h
+
+G 21  21 \Psi
+
+2
+1 + G 23  23 \Psi
+
+2
+3
+
+i
+
++ n
+
+2
+3
+
+h
+
+G 31  31 \Psi
+
+2
+1 + G 32  32 \Psi
+
+2
+2
+
+i
+
+s.t.
+
+\Psi
+
+1
+1 fn
+
+1
+1 + G 21 n
+
+1
+2 + G 31 n
+
+1
+3 g = n
+
+1
+1 \Psi
+
+2
+1 fn
+
+2
+1 + G 21 n
+
+2
+2 + G 31 n
+
+2
+3 g = n
+
+2
+1
+
+\Psi
+
+1
+2 fG 12 n
+
+1
+1 + n
+
+1
+2 + G 32 n
+
+1
+3 g = n
+
+1
+2 \Psi
+
+2
+2 fG 12 n
+
+2
+1 + n
+
+2
+2 + G 32 n
+
+2
+3 g = n
+
+2
+2
+
+\Psi
+
+1
+3 fG 13 n
+
+1
+1 + G 23 n
+
+1
+2 + n
+
+1
+3 g = n
+
+1
+3 \Psi
+
+2
+3 fG 13 n
+
+2
+1 + G 23 n
+
+2
+2 + n
+
+2
+3 g = n
+
+2
+3
+n
+
+1
+1 + n
+
+2
+1 = n
+
+T
+
+1 0  n
+
+1
+1 ; n
+
+2
+1  n
+
+T
+
+1
+
+n
+
+1
+2 + n
+
+2
+2 = n
+
+T
+
+2 0  n
+
+1
+2 ; n
+
+2
+2  n
+
+T
+
+2
+
+n
+
+1
+3 + n
+
+2
+3 = n
+
+T
+
+3 0  n
+
+1
+3 ; n
+
+2
+3  n
+
+T
+
+3
+Two source feeds from the work of Walraven and Rompay [23] were examined, and these
+charges are given in Table 4. The first of these lies well within the immiscibility region --
+
+fn
+
+T
+
+i g = f0:04; 0:16; 0:80g -- and therefore causes little problem for a local solver. However, the
+second considered source charge of fn
+
+T
+
+i g = f0:148; 0:052; 0:800g lies close to the plait point,
+an area in which it is notoriously difficult to obtain the correct equilibrium solution. The
+trivial solution objective function value is-1.1919705, while the two phase global solution has
+an objective function value of-1.1919716, a difference of only 11 \Delta 10
+
+\Gamma7
+
+! Solving (NCF) using a
+local solver succeeded in obtaining the global solution from only 8 out of 100 random starting
+points. Nonetheless, the GOP algorithm generated the global solution for this very difficult
+problem when supplied with a trivial solution starting point. This clearly demonstrates the
+20
+
+effectiveness of the algorithm in generating global solutions for extremely challenging problems.
+The equilibrium solutions for the two sets of conditions considered here are given in Table 4.
+The difficulty of the problem when the source charge is close to the plait point is evident in
+the increased computational effort required to obtain the equilibrium solution for this case.
+4 Analysis for the UNIQUAC Equation
+
+A commonly used activity coefficient correlation is the UNIQUAC equation originally proposed
+by Abrams and Prausnitz [1], where the excess Gibbs energy is postulated to be composed of
+two contributions: a combinatorial part due to the differences in the sizes and shapes of the
+molecules, and a residual portion due to the interactions that take place between them. Thus,
+differences in molecular size are taken directly into account. To obtain improved agreement
+for systems containing water and alcohols, a modified version of the universal quasi-chemical
+equation for the correlation of liquid-phase activity coefficients was proposed by Anderson and
+Prausnitz [2, 3] and is given as:
+ln fl i = ln fl
+
+C
+i + ln fl
+
+R
+i 8 i 2 C (29)
+where ln fl
+
+C
+i = ln
+
+OE i
+
+x i
+
++
+
+z
+
+2
+
+q i ln
+
+` i
+
+OE i
+
++ l i \Gamma
+
+OE i
+
+x i
+
+X
+
+j2C
+
+l j x j (30)
+and ln fl
+
+R
+i = q
+
+0
+
+i
+
+8
+?
+!
+?
+:
+
+1 \Gamma ln
+
+0
+@
+X
+
+j2C
+
+ ji `
+
+0
+
+j
+
+1
+A \Gamma
+
+X
+
+j2C
+
+ ij `
+
+0
+
+j
+
+P
+
+l2C
+
+`
+
+0
+
+l  lj
+
+9
+?
+=
+?
+;
+
+(31)
+where fl
+
+C
+i and fl
+
+R
+i are the combinatorial and residual contributions respectively to the activity
+coefficient at mol fraction x i ,  ij are non-symmetric binary interaction parameters, q i , q
+
+0
+
+i and
+
+r i are pure component structural parameters, and z is a lattice coordination number. l i , ` i ,
+
+`
+
+0
+
+i and OE i are defined by the following relationships:
+
+l i =
+
+z
+
+2
+
+\Delta (r i \Gamma q i ) \Gamma (r i \Gamma 1) 8 i 2 C (32)
+
+` i =
+
+q i x i
+
+P
+
+j2C
+
+q j x j
+
+8 i 2 C (33)
+`
+
+0
+
+i =
+
+q
+
+0
+
+i x i
+
+P
+
+j2C
+
+q
+
+0
+
+j x j
+
+8 i 2 C (34)
+OE i =
+
+r i x i
+
+P
+
+j2C
+
+r j x j
+
+8 i 2 C (35)
+where ` i and `
+
+0
+
+i are the average area fractions for the combinatorial and residual portions of
+the activity coefficient expression, and OE i is the average segment fraction. Note that these
+21
+
+ratios can be equivalently defined for mol numbers as for mol fractions for any given phase.
+In the original formulation of Abrams and Prausnitz [1] q
+
+0
+
+i = q i .
+Eqn. (2) yields the relationship between the fugacities and the activity coefficients. If the
+following series of steps are undertaken:
+(i) the first logarithmic term in x i of Eqn. (30) is brought over to the left hand side,
+(ii) the non-logarithmic term involving OE i of Eqn. (30) is expanded out,
+(iii) the terms involving `
+
+0
+
+i in Eqn. (31) are expanded out,
+then the following expression is obtained:
+ln fl i x i =
+
+`
+
+1 \Gamma
+
+z
+
+2
+
+q i
+
+'
+
+ln OE i +
+
+z
+
+2
+
+q i ln ` i + l i \Gamma r i \Delta
+
+P
+
+j2C
+
+l j n j
+
+P
+
+j2C
+
+r j n j
+\Gammaq
+
+0
+
+i ln
+
+0
+B
+@
+P
+
+j2C
+
+q
+
+0
+
+j  ji n j
+
+P
+
+j2C
+
+q
+
+0
+
+j n j
+
+1
+C
+A + q
+
+0
+
+i \Gamma q
+
+0
+
+i
+
+X
+
+j2C
+
+q
+
+0
+
+j  ij n j
+
+P
+
+l2C
+
+q
+
+0
+
+l  lj n l
+
+(36)
+By substituting Eqn. (36) into the original objective function of Eqn. (1), it is possible to
+write the objective function for the case of multiple liquid phases in terms of the mol numbers
+in the following form:
+min
+
+
+G(n) =
+
+X
+
+i2C
+
+X
+
+k2P
+
+n
+
+k
+i
+
+8
+?
+!
+?
+:
+
+\DeltaG
+
+k;f
+i
+
+RT
+
++
+
+`
+
+1 \Gamma
+
+z
+
+2
+
+q i
+
+'
+
+ln OE
+
+k
+i +
+
+z
+
+2
+
+q i ln `
+
+k
+i + l i \Gamma r i \Delta
+
+P
+
+j2C
+
+l j n
+
+k
+j
+
+P
+
+j2C
+
+r j n
+
+k
+j
+\Gammaq
+
+0
+
+i ln
+
+0
+B
+@
+P
+
+j2C
+
+q
+
+0
+
+j  ji n
+
+k
+j
+
+P
+
+j2C
+
+q
+
+0
+
+j n
+
+k
+j
+
+1
+C
+A + q
+
+0
+
+i \Gamma q
+
+0
+
+i
+
+X
+
+j2C
+
+q
+
+0
+
+j  ij n
+
+k
+j
+
+P
+
+l2C
+
+q
+
+0
+
+l  lj n
+
+k
+l
+
+9
+?
+=
+?
+;
+
+(37)
+where `
+
+k
+i and OE
+
+k
+i are now defined for all phases k. This is a complex expression involving
+logarithmic and quadratic quotients, and is clearly nonconvex. However, by exploiting a
+number of properties associated with Eqn. (37), it is possible to obtain a more tractable form
+for the Gibbs energy. Several interesting new properties of the terms in Eqn. (37) are revealed.
+4.1 Analysis of the Gibbs free energy function:
+
+In the foregoing analysis, different ways to express the Gibbs free energy function defined
+by Eqn. (37) are presented. The final formulation will cast the minimization problem as the
+22
+
+difference of two convex functions (a D.C. programming problem), where the convex part is
+nonseparable, but the concave portion of the objective function is manipulated in such a way
+as to make it separable. In the development that follows, the indices i, j, l and m are defined
+over the set of components C.
+4.1.1 Simplification of the Gibbs free energy:
+
+Two simplifying properties are now presented.
+
+Property 4.1 The following relation is true 8 k 2 P L :
+
+X
+
+i2C
+
+n
+
+k
+i
+
+8
+?
+!
+?
+:
+
+l i \Gamma r i \Delta
+
+P
+
+j2C
+
+l j n
+
+k
+j
+
+P
+
+j2C
+
+r j n
+
+k
+j
+
+9
+?
+=
+?
+;
+
+= 0
+Proof: For each k 2 P L :
+
+X
+
+i2C
+
+n
+
+k
+i
+
+8
+?
+!
+?
+:
+
+l i \Gamma r i \Delta
+
+P
+
+j2C
+
+l j n
+
+k
+j
+
+P
+
+j2C
+
+r j n
+
+k
+j
+
+9
+?
+=
+?
+;
+
+=
+
+X
+
+i2C
+
+l i n
+
+k
+i \Gamma
+
+(
+X
+
+i2C
+
+r i n
+
+k
+i
+
+)
+
+\Delta
+
+8
+?
+!
+?
+:
+P
+
+j2C
+
+l j n
+
+k
+j
+
+P
+
+j2C
+
+r j n
+
+k
+j
+
+9
+?
+=
+?
+;
+
+=
+
+X
+
+i2C
+
+l i n
+
+k
+i \Gamma
+
+X
+
+j2C
+
+l j n
+
+k
+j = 0
+This implies that the parameter l i need not appear in the Gibbs free energy expression. 2
+Property 4.2 The following relation is true 8 k 2 P L :
+
+X
+
+i2C
+
+n
+
+k
+i
+
+8
+!
+:
+
+q
+
+0
+
+i \Gamma q
+
+0
+
+i \Delta
+
+X
+
+j2C
+
+q
+
+0
+
+j  ij n
+
+k
+j
+
+P
+
+l2C q
+
+0
+
+l  lj n
+
+k
+l
+
+9
+=
+;
+
+= 0
+Proof: For each k 2 P L :
+
+X
+
+i2C
+
+n
+
+k
+i
+
+8
+?
+!
+?
+:
+
+q
+
+0
+
+i \Gamma q
+
+0
+
+i \Delta
+
+X
+
+j2C
+
+q
+
+0
+
+j  ij n
+
+k
+j
+
+P
+
+l2C
+
+q
+
+0
+
+l  lj n
+
+k
+l
+
+9
+?
+=
+?
+;
+
+=
+
+X
+
+i2C
+
+q
+
+0
+
+i n
+
+k
+i \Gamma
+
+X
+
+j2C
+
+q
+
+0
+
+j n
+
+k
+j \Delta
+
+8
+?
+!
+?
+:
+P
+
+m2C
+
+q
+
+0
+
+m  mj n
+
+k
+m
+
+P
+
+l2C
+
+q
+
+0
+
+l  lj n
+
+k
+l
+
+9
+?
+=
+?
+;
+
+=
+
+X
+
+i2C
+
+q
+
+0
+
+i n
+
+k
+i \Gamma
+
+X
+
+i2C
+
+q
+
+0
+
+i n
+
+k
+i = 0
+where the term in braces is seen to equal unity. 2
+23
+
+Employing Properties 4.1 and 4.2 in Eqn. (37), the objective function can now be written as
+follows:
+min
+
+
+G(n) =
+
+X
+
+i2C
+
+X
+
+k2P
+
+n
+
+k
+i
+
+(
+
+\DeltaG
+
+k;f
+i
+
+RT
+
++
+
+`
+
+1 \Gamma
+
+z
+
+2
+
+q i
+
+'
+
+ln OE
+
+k
+i +
+
+z
+
+2
+
+q i ln `
+
+k
+i
++q
+
+0
+
+i ln
+
+X
+
+j2C
+
+q
+
+0
+
+j n
+
+k
+j \Gamma q
+
+0
+
+i ln
+
+X
+
+j2C
+
+q
+
+0
+
+j  ji n
+
+k
+j
+
+9
+=
+;
+
+(38)
+Some new notation will now be introduced in order to demonstrate the special structure that
+Eqn. (38) naturally possesses. The following new parameter, z
+
+R
+
+i , is introduced to aid in this
+process and is defined as:
+z
+
+R
+
+i =
+
+i
+
+z
+
+2 q i \Gamma 1
+
+j
+
+r i
+
+ 0 8 i 2 C (39)
+
+z is usually taken as 10, with q i  0:2, and therefore z
+
+R
+
+i is always positive. Using Eqn. (39)
+and expanding out OE
+
+k
+i in terms of the mol numbers, one obtains:
+
+X
+
+i2C
+
+n
+
+k
+i
+
+`
+
+1 \Gamma
+
+z
+
+2
+
+q i
+
+'
+
+ln OE
+
+k
+i = \Gamma
+
+X
+
+i2C
+
+z
+
+R
+
+i r i n
+
+k
+i ln
+
+r i n
+
+k
+i
+
+P
+
+j2C
+
+r j n
+
+k
+j
+
+8 k 2 P L
+It is now convenient to make the following definitions:
+
+A
+
+k
+
+=
+
+X
+
+i2C
+
+z
+
+R
+
+i r i n
+
+k
+i ln
+
+r i n
+
+k
+i
+
+P
+
+j2C
+
+r j n
+
+k
+j
+
+8 k 2 P L (40)
+B
+
+k
+
+=
+
+z
+
+2
+
+X
+
+i2C
+
+q i n
+
+k
+i ln
+
+q i n
+
+k
+i
+
+P
+
+j2C
+
+q j n
+
+k
+j
+
+8 k 2 P L (41)
+C
+
+k
+
+=
+
+"
+X
+
+i2C
+
+q
+
+0
+
+i n
+
+k
+i
+
+#
+
+ln
+
+"
+X
+
+i2C
+
+q
+
+0
+
+i n
+
+k
+i
+
+#
+
+8 k 2 P L (42)
+D
+
+k
+
+= \Gamma
+
+X
+
+i2C
+
+q
+
+0
+
+i n
+
+k
+i ln
+
+X
+
+j2C
+
+q
+
+0
+
+j  ji n
+
+k
+j 8 k 2 P L (43)
+Note that `
+
+k
+i has been expanded out in terms of the mol numbers 8 k 2 P L in the definition
+of B
+
+k
+
+. These definitions allow the objective function of Eqn. (38) to be equivalently written
+as follows:
+min
+
+
+G(n) =
+
+X
+
+i2C
+
+X
+
+k2PL
+
+n
+
+k
+i
+
+\DeltaG
+
+k;f
+i
+
+RT
+
++
+
+X
+
+k2PL
+
+n
+
+\GammaA
+
+k
+
++ B
+
+k
+
++ C
+
+k
+
++D
+
+k
+
+o
+
+(44)
+This objective function still yields a nonconvex optimization formulation but it is simpler than
+the objective function customarily employed.
+24
+
+4.1.2 D.C. Transformation
+
+It will now be shown how the objective function of Eqn. (44) is converted into D.C. form.
+Firstly, the following property is required.
+
+Property 4.3 Let ae i be a positive parameter defined 8 i. Define the real-valued function f(n)
+
+with n ? 0 as follows:
+
+f(n) =
+
+(
+X
+
+i
+
+ae i n i
+
+)
+
+ln
+
+(
+X
+
+i
+
+ae i n i
+
+)
+then f(n) is convex.
+
+Proof: See Appendix C. 2
+Remark: A number of observations can be made on the basis of Properties 3.2 and 4.3 in
+relation to the terms of Eqn. (44), and are listed as follows:
+(i) the term A
+
+k
+
+as defined by Eqn. (40) is convex 8 k 2 P L (apply Property 3.2). This also
+implies that \GammaA
+
+k
+
+is concave,
+(ii) the term B
+
+k
+
+as defined by Eqn. (41) is convex 8 k 2 P L (apply Property 3.2),
+(iii) The term C
+
+k
+
+as defined by Eqn. (42) is convex 8 k 2 P L (apply Property 4.3).
+
+Property 4.4 Define D
+
+k
+
++ and D
+
+k
+
+\Gamma 8 k 2 P L as follows:
+D
+
+k
+
++ =
+
+X
+
+i
+
+q
+
+0
+
+i n
+
+k
+i ln
+
+n
+
+k
+i
+
+P
+
+j
+
+q
+
+0
+
+j  ji n
+
+k
+j
+
+D
+
+k
+
+\Gamma =
+
+X
+
+i
+
+q
+
+0
+
+i n
+
+k
+i ln n
+
+k
+i
+then D
+
+k
+
++ and D
+
+k
+
+\Gamma are convex 8 k 2 P L . Further, D
+
+k
+
+as defined by Eqn. (43) can be equivalently
+expressed as the difference of these two convex functions:
+D
+
+k
+
+= D
+
+k
+
++ \Gamma D
+
+k
+
+\Gamma 8 k 2 P L (45)
+
+Proof: See Appendix D. 2
+Thus, it has been demonstrated how the majority of terms in Eqn. (44) are by themselves
+convex or concave. In one instance, it was necessary to transform a nonconvex term (D
+
+k
+
+)
+25
+
+into the summation of a convex and a concave term. It is now possible to write the objective
+function as follows:
+min
+
+
+G(n) =
+
+8
+!
+:
+X
+
+i2C
+
+X
+
+k2P
+
+n
+
+k
+i
+
+\DeltaG
+
+k;f
+i
+
+RT
+
++
+
+X
+
+k2P
+
+n
+
+B
+
+k
+
++ C
+
+k
+
++D
+
+k
+
++
+
+o
+9
+=
+;
+
+\Gamma
+
+8
+!
+:
+X
+
+k2P
+
+n
+
+A
+
+k
+
++D
+
+k
+
+\Gamma
+
+o
+9
+=
+;
+
+(46)
+The key feature to notice is that each term within braces is convex. The concave term \GammaD
+
+k
+
+\Gamma is
+separable. However the concave term \GammaA
+
+k
+
+is nonseparable. Because it is easier to construct
+the convex envelope of a separable concave function than a nonseparable one, the following
+definitions are required so that the term \GammaA
+
+k
+
+can be written in a radically different form:
+z
+
+R
+M = min
+
+i
+
+fz
+
+R
+
+i g
+
+z
+
+A
+
+= z
+
+R
+M +
+
+X
+
+i2C
+
+[z
+
+R
+
+i \Gamma z
+
+R
+M ]
+z
+
+B
+
+i =
+
+X
+
+j 6=i
+
+h
+
+z
+
+R
+
+j \Gamma z
+
+R
+M
+
+i
+
+8 i 2 C
+
+9
+?
+?
+?
+?
+?
+?
+?
+?
+?
+?
+? ?
+? =
+?
+? ?
+?
+?
+?
+?
+?
+?
+?
+?
+?
+?
+;
+
+(47)
+On the basis of these definitions, the following property is derived:
+
+Property 4.5 If A
+
+k
+
++ and A
+
+k
+
+\Gamma are defined 8 k 2 P L as follows:
+A
+
+k
+
++ = z
+
+A
+
+\Delta
+
+X
+
+i2C
+
+r i n
+
+k
+i ln
+
+X
+
+i2C
+
+r i n
+
+k
+i +
+
+X
+
+i2C
+
+z
+
+B
+
+i r i n
+
+k
+i ln
+
+n
+
+k
+i
+
+P
+
+j2C
+
+r j n
+
+k
+j
+
+\Gamma
+
+X
+
+i2C
+
+n
+
+k
+i \Delta z
+
+R
+
+i r i ln r i
+A
+
+k
+
+\Gamma =
+
+X
+
+i2C
+
+r i [z
+
+R
+
+i + z
+
+B
+
+i ] \Delta n
+
+k
+i ln n
+
+k
+i
+then A
+
+k
+
++ and A
+
+k
+
+\Gamma are convex functions. Further, \GammaA
+
+k
+
+can be expressed as the difference of
+these two convex functions:
+
+\Gamma A
+
+k
+
+= A
+
+k
+
++ \Gamma A
+
+k
+
+\Gamma (48)
+
+Proof: See Appendix E. 2
+Property 4.5 allows the nonseparable, concave term \GammaA
+
+k
+
+to be replaced by the difference of
+two convex functions, defined in Eqn. (48). The key change is that the concave part of the
+new expression is now separable as shown below:
+min
+ G(n) =
+
+8
+!
+:
+X
+
+i2C
+
+X
+
+k2P
+
+n
+
+k
+i
+
+\DeltaG
+
+k;f
+i
+
+RT
+
++
+
+X
+
+k2P
+
+n
+
+A
+
+k
+
++ + B
+
+k
+
++ C
+
+k
+
++D
+
+k
+
++
+
+o
+9
+=
+;
+
+\Gamma
+
+8
+!
+:
+X
+
+k2P
+
+n
+
+A
+
+k
+
+\Gamma +D
+
+k
+
+\Gamma
+
+o
+9
+=
+;
+
+(49)
+26
+
+The terms A
+
+k
+
+, A
+
+k
+
++ , A
+
+k
+
+\Gamma , B
+
+k
+
+, C
+
+k
+
+, D
+
+k
+
++ and D
+
+k
+
+\Gamma have been shown to be convex. Thus, the terms
+contained within the braces of Eqn. (49) are convex, i.e.
+
+
+G(n) is now given by the difference
+of two convex functions. At this point, it is convenient to collect the convex portions of the
+objective function together, defined as C
+
+k
+
+U 8 k 2 P L , to yield:
+C
+
+k
+
+U =
+
+X
+
+i2C
+
+n
+
+k
+i
+
+(
+
+\DeltaG
+
+k;f
+i
+
+RT
+
+\Gamma z
+
+R
+
+i r i ln r i
+
+)
++ z
+
+A
+
+\Delta
+
+(
+X
+
+i2C
+
+r i n
+
+k
+i
+
+)
+
+ln
+
+(
+X
+
+i2C
+
+r i n
+
+k
+i
+
+)
+
++
+
+X
+
+i2C
+
+z
+
+B
+
+i r i n
+
+k
+i ln
+
+n
+
+k
+i
+
+P
+
+j2C
+
+r j n
+
+k
+j
++
+
+z
+
+2
+
+X
+
+i2C
+
+q i n
+
+k
+i ln
+
+q i n
+
+k
+i
+
+P
+
+j2C
+
+q j n
+
+k
+j
+
++
+
+(
+X
+
+i2C
+
+q
+
+0
+
+i n
+
+k
+i
+
+)
+
+ln
+
+(
+X
+
+i2C
+
+q
+
+0
+
+i n
+
+k
+i
+
+)
+
++
+
+X
+
+i2C
+
+q
+
+0
+
+i n
+
+k
+i ln
+
+n
+
+k
+i
+
+P
+
+j2C
+
+q
+
+0
+
+j  ji n
+
+k
+j
+
+(50)
+Furthermore, if the parameter ' i is defined as follows:
+
+' i = q
+
+0
+
+i + r i [z
+
+R
+
+i + z
+
+B
+
+i ] 8 i 2 C (51)
+then (DC) is defined as:
+min
+
+
+G(n) =
+
+X
+
+k2PL
+
+C
+
+k
+
+U \Gamma
+
+X
+
+i2C
+
+X
+
+k2PL
+
+' i n
+
+k
+i ln n
+
+k
+i
+s.t. 0 = A \Delta n \Gamma b
+0  n  n
+
+T
+
+9
+?
+?
+?
+?
+?
+?
+?
+?
+?
+?
+=
+?
+?
+?
+?
+?
+?
+?
+?
+?
+?
+;
+
+(DC)
+where C
+
+k
+
+U is defined by Eqn. (50). The objective function consists of a convex, nonseparable
+portion, and a separable, concave portion, with a convex constraint set. The expression for
+ G(n) in (DC) is very different from the original Gibbs energy function defined by Eqn. (37).
+The analysis of the original function has revealed interesting properties in terms of the algebra
+
+and in terms of its convexity properties. It has been shown that this equation can be expressed
+as the sum of convex and concave parts. The specially induced structure will be used to full
+advantage in solving (DC).
+4.2 Branch and Bound Algorithm
+
+It is worthwhile to point out the salient features of the formulation for the phase and chemical
+equilibrium problem, as given by (DC):
+(i) the objective function is D.C. with a separable concave portion,
+27
+
+(ii) the feasible region is an n-rectangle,
+
+(iii) the constraint set is closed and convex (a set of linear equality constraints).
+One of the first algorithms proposed to solve problems of the above nature was that of Falk and
+Soland [6]. It is a branch and bound type algorithm, where a branching scheme successively
+refines the feasible region into smaller and smaller n-rectangles, in each of which a convex
+subproblem is solved that supplies a lower bound on the global solution of (DC). In this
+manner, a sequence of nondecreasing lower bounds is generated that converges under certain
+conditions to the global solution. The algorithm used to solve (DC) in this work is based on
+the original paper of Falk and Soland [6]. The approach of this algorithm and several others
+has been generalized and discussed in the book of Horst and Tuy [11]. The algorithm shares
+many similarities with that used for the NRTL equation, except for slight variations in the
+partitioning scheme, and significant differences in the structure of the subproblems used to
+provide lower bounds for the global solution. Thus, in what follows, the notation used will in
+as far as possible be the same as that of Section 3.
+4.2.1 Convex envelope of the Gibbs free energy
+
+In order to obtain valid lower bounds, the approach is to derive convex underestimators for
+the concave portion of the objective function in successive partitions of the feasible region.
+Suppose that at a given stage in the algorithm, the partition currently under consideration is
+an n-rectangle defined as follows:
+
+L
+
+B
+n
+
+k
+i
+
+ n
+
+k
+i  U
+
+B
+n
+
+k
+i
+
+8 i 2 C ; k 2 P L (52)
+The manner in which the partition defined by these box bounds is obtained is described in
+the next section. A lower bound is required for the objective function defined in (DC). The
+simplest such bound can be obtained by constructing the convex envelope of
+
+
+G(n). The
+concave portion of the objective function is replaced by its convex envelope, which for a
+separable concave function is simply the affine function that joins the two endpoints of the
+region under consideration. This is shown for the one variable case in Figure 4 where the
+concave function \Gamman ln n and its convex envelope, \Psi(n), are plotted between the lower and
+upper bounds L
+
+B
+
+n and U
+
+B
+
+n . Thus, the convex envelope of each concave function, labeled \Psi
+
+k
+i ,
+in the region whose bounds are given by Eqn. (52) is:
+\Psi
+
+k
+i = \GammaL
+
+B
+n
+
+k
+i
+
+ln L
+
+B
+n
+
+k
+i
+
++
+
+2
+4
+
+L
+
+B
+n
+
+k
+i
+
+ln L
+
+B
+n
+
+k
+i
+
+\Gamma U
+
+B
+n
+
+k
+i
+
+ln U
+
+B
+n
+
+k
+i
+
+U
+
+B
+n
+
+k
+i
+
+\Gamma L
+
+B
+n
+
+k
+i
+
+3
+5 \Delta
+
+h
+
+n
+
+k
+i \Gamma L
+
+B
+n
+
+k
+i
+
+i
+
+8 i 2 C; k 2 PL (53)
+Thus, the convex envelope of the concave portion of the objective function is then the summation
+of these individual affine functions. The convex envelope of the convex portion of the
+28
+
+objective function is obviously the function itself; this implies that the convex envelope of
+(DC) is a convex function and any local solution to the following problem will be a global one:
+min  =
+
+X
+
+k2P
+
+C
+
+k
+
++
+
+X
+
+i2C
+
+X
+
+k2PL
+
+' i \Psi
+
+k
+i
+s.t. L
+
+B
+n
+
+k
+i
+
+ n
+
+k
+i  U
+
+B
+n
+
+k
+i
+
+0 = A \Delta n \Gamma b
+
+9
+?
+?
+?
+?
+?
+?
+?
+?
+?
+?
+?
+=
+?
+?
+?
+?
+?
+?
+?
+?
+?
+?
+?
+;
+
+(UES)
+Formulation (UES) provides a lower bound on the global solution in the region defined by
+
+BfL
+
+B
+
+; U
+
+B
+
+g. Solving subproblems of type (UES) in successive refinements of the feasible region
+will generate a nondecreasing subsequence of lower bounds.
+4.2.2 Partitioning Scheme
+
+When the GOP was used to solve the phase and chemical equilibrium problem for the NRTL
+equation, the initial n-rectangle defined by Eqn. (7) was successively subdivided into more
+and more n-rectangles. For the case of the UNIQUAC equation, the branching scheme is
+similar but there is one major difference. For the UNIQUAC as few as 2 subproblems need
+be solved at each iteration to guarantee convergence to the ffl-global solution, whereas for the
+NRTL, upto NCV hyperplanes were used to partition the current partition into as many as
+2
+
+N
+CV regions. For consistency, the number of variables that appear in the concave portion of
+the objective function is also labeled NCV . Obviously, NCV = jCj \Delta jP L j.
+
+The same basic tree structure that was used for the NRTL equation is also employed here.
+Each n-rectangle within which a subproblem of type (UES) is solved has a node, k S , associated
+with it. An initial point is chosen labeled fn
+
+k
+i g. This parent n-rectangle is then partitioned by
+a number of hyperplanes, labeled N P , passing through the point fn
+
+k
+i g. The number of these
+hyperplanes can vary as follows:
+1  N P  NCV
+
+This means that 2
+
+N P
+
+box regions are created at each iteration. In each of these subrectangles
+Problem (UES) is solved to provide a lower bound; if this lower bound lies below the current
+best upper bound, then the solution is stored as 
+
+k S
+
+and n
+
+k S
+
+, so that each solution node k S
+
+has these quantities, as well as its box bounds, associated with it. It is important to realize
+that N P is a user specified parameter, and that it can vary from one iteration to the next. The
+trade-off is tighter lower bounds for higher values of N P and less subproblems to be solved for
+lower N P . If it is set at one, then only two subproblems are solved for that iteration.
+29
+
+The important question of how to decide the partitioning remains. One natural means is
+to measure the distance, labeled ffi
+
+k
+i , between the concave function and its convex envelope at
+the value of the current point:
+
+ffi
+
+k
+i =
+
+fi
+fi
+fi\Gamma  n
+
+k
+i ln  n
+
+k
+i \Gamma \Psi
+
+k
+i (n
+
+k
+i )
+
+fi
+fi
+fi 8 i 2 C ; k 2 P L
+where  n
+
+k
+i represents the solution value obtained as the solution of the current node, SC . Intuitively,
+one expects that the larger this distance, the greater the need for further refinement.
+Horst and Tuy [11] prove (see Chapter VII.4) that if the current n-rectangle is divided into
+two (or more) n-rectangles about the variable with the largest value of ffi
+
+k
+i , then the branch
+and bound algorithm to be defined in the next section will converge to an ffl-global solution of
+(DC). In the version of the algorithm used here, more than two n-rectangles may be created
+at each iteration, if desired. Therefore, the distances ffi
+
+k
+i are rank-ordered from highest to
+lowest. The set of parameters fH
+
+k
+i g determines if there is a partitioning hyperplane for the
+corresponding variable n
+
+k
+i . If H
+
+k
+i = 1 then a hyperplane is used to divide the region for that
+particular variable as n
+
+k
+i   n
+
+k
+i and n
+
+k
+i   n
+
+k
+i . This is shown in Figure 5 for the first iteration
+where N P = 1. Suppose that the greatest distance between the concave function and its
+convex envelope occurs for the variable n 1 , so that H 1 = 1 and H 2 = 0. This means that the
+initial feasible region is divided into two box regions, labeled B
+
+1
+1 and B
+
+1
+2 , where the superscript
+corresponds to the iteration number, and two subproblems are solved. In the general case,
+
+N P hyperplanes are used to divide the current region into 2
+
+N P
+
+n-rectangles for the largest
+
+N P distances. For the remaining variables, no dividing hyperplane is used so that H
+
+k
+i = 0
+and the box bounds for these variables are simply their regional bounds, i.e. L
+
+B
+n
+
+k
+i
+
+= L
+
+R
+n
+
+k
+i
+
+and
+
+U
+
+B
+n
+
+k
+i
+
+= U
+
+R
+n
+
+k
+i
+
+.
+Having solved a set of subproblems of type (UES) at a given iteration, the manner in which
+the value of the y variables is chosen for the next iteration is exactly the same as the GOP
+algorithm for the NRTL. Having chosen the infimum of all lower bounds, the region associated
+with this particular node is divided into 2
+
+N P
+
+new n-rectangles to obtain successively tighter
+lower bounds. In the context of Figure 5, assume that the infimum of the lower bounds occurs
+in box region 1 of Iteration 1. At Iteration 2 with N P = 1 again, suppose that the distance
+is now greatest for n 2 , so that H 2 = 1, but H 1 = 0. This implies that at Iteration 2, the
+region is divided into two box regions, B
+
+2
+1 and B
+
+2
+2 (see Figure 5), wherein (UES) is solved to
+obtain two new lower bounds on the global solution. Thus, 2
+
+N P
+
+new nodes are generated in
+the solution tree at a given iteration. Experience has shown that convergence properties are
+not significantly altered by tinkering with N P . It is worthwhile to set N P higher in earlier
+iterations to get tighter bounds, and reduce it as the algorithm proceeds to avoid adding
+excessive numbers of nodes to the solution tree.
+30
+
+4.2.3 Branch and Bound algorithm
+
+The algorithm shares many similarities with that used for the NRTL equation, and the notation
+is therefore the same as that used in Section 3. The main difference lies in how it obtains
+lower bounds on the global solution. In this case, only one underestimating function is included
+when generating lower bounds for (DC). The complete branch and bound algorithm
+for the phase and chemical equilibrium problem when the liquid phase is modeled using the
+UNIQUAC equilibrium model is now given.
+STEP 0: Initialization
+Select an initial mol vector  n
+
+0
+
+and convergence tolerance ".
+
+Initialize R C fL
+
+R
+
+; U
+
+R
+
+g, P
+
+U
+
+= +1 , M
+
+L
+
+= \Gamma1, S C = R , k S = ; , fH
+
+k
+i g = 0 , N P = 0.
+STEP 1: Primal Problem
+Solve (DC) locally to give
+
+
+G
+
+
+
+and update P
+
+U
+
+= min
+
+h
+
+P
+
+U
+
+;
+
+
+
+G
+
+
+
+i
+
+.
+STEP 2: Convex underestimation phase
+(1) Choose a combination of box bounds, B l from the set CB ( jCBj = 2
+
+N P
+
+).
+Use s
+
+B l
+
+i;k , H
+
+k
+i and RKfL
+
+R
+
+; U
+
+R
+
+g to set BKfL
+
+B
+
+; U
+
+B
+
+g.
+
+Construct \Psi
+
+k
+i based on BKfL
+
+B
+
+; U
+
+B
+
+g and solve (UES) to yield 
+
+
+
+and n
+
+
+
+.
+(i) If 
+
+
+
+ P
+
+U
+
+\Gamma ffl, then fathom solution.
+(ii) If 
+
+
+
+! P
+
+U
+
+\Gamma ffl, then k S = k S + 1, p (k S ) = S C , 
+
+k S
+
+= 
+
+
+
+, n
+
+k S
+
+= n
+
+
+
+, R k S fL
+
+R
+
+; U
+
+R
+
+g =
+
+BKfL
+
+B
+
+; U
+
+B
+
+g.
+
+(2) Choose another set of bounds B l from CB and return to (1).
+If there are no remaining unchosen B l in CB, then proceed to Step 3.
+STEP 3: Select mol vector for next iteration
+Select infimum of all 
+
+k S
+B , and set S C = k S , the associated node.
+31
+
+Set  n
+
+K+1
+
+= n
+
+k S
+
+, M
+
+L
+
+= 
+
+SC
+
+B and RK+1fL
+
+R
+
+; U
+
+R
+
+g = R k S fL
+
+R
+
+; U
+
+R
+
+g
+Choose 1  N P  NCV . Set D = fi; kg j C \Theta P L , fH
+
+k
+i g = 0.
+
+for m = 1; : : : ; N P
+
+fi
+
+
+
+; k
+
+
+
+g =
+argmax
+
+D
+
+fi
+fi
+fi\Gamma  n
+
+k
+i ln  n
+
+k
+i \Gamma \Psi
+
+k
+i (n
+
+k
+i )
+
+fi
+fi
+fi
+
+H
+
+k
+
+
+
+i
+
+ = 1
+
+D = Dnfi
+
+
+
+; k
+
+
+
+g
+
+end
+STEP 4: Check for convergence
+
+Check if
+
+fi
+fi
+fi
+
+P
+
+U \GammaM L
+
+P U
+
+fi
+fi
+fi  ffl. If true, then STOP; otherwise set K = K + 1, and return to Step 1.
+Convergence to an ffl-global solution of (DC) by the above algorithm has been proven by Horst
+and Tuy [11].
+Note that it is also possible to use the GOP algorithm for the case of the UNIQUAC
+equation. New variables, labeled \Psi
+
+k
+i , would be introduced so that \Psi
+
+k
+i = n
+
+k
+i 8 i 2 C; k 2
+
+P L . The nonconvex terms of the objective function then take the form \Gamman
+
+k
+i ln \Psi
+
+k
+i . This
+transformation will clearly satisfy Conditions (A) of the GOP. If the y variables (i.e. n
+
+k
+i )
+are held fixed, then a convex objective function results. If the x variables (i.e. \Psi
+
+k
+i ) are kept
+constant, then a convex objective function is also obtained. However, because the linear convex
+envelope derived in Section 4.2.1 represents the tightest possible convex underestimator of the
+objective function, it is clear that the bounds generated by the GOP algorithm will not be as
+tight as those generated in the branch and bound algorithm just described.
+4.3 Example 3: Toluene (1) -- Water (2)
+
+This example was studied by Lantagne et al. [12]. They used the modified version of the
+UNIQUAC equation for systems containing alcohols or water as proposed by Anderson and
+Prausnitz [3]. It is assumed that there is an equimolar charge of toluene and water (n
+
+T
+
+1 =
+
+n
+
+T
+
+2 = 0:5). There are two postulated liquid phases, so that P L j fk 1 ; k 2 g; these phases share
+the same standard state so that the Gibbs free energy of formation terms can be eliminated
+as for Example 1. The pure component structural parameters and the binary interaction data
+were obtained from Prausnitz et al. [18] and these are given as:
+
+q 1 = 2:97 q
+
+0
+
+1 = 2:97 r 1 = 3:92 l 1 = 1:83
+
+q 2 = 1:40 q
+
+0
+
+2 = 1:00 r 2 = 0:92 l 2 = \Gamma2:32
+32
+
+The parameters l i are supplied even though they are not used in the formulation. The interaction
+parameters are given as:
+
+ 12 = 0:09867 ;  21 = 0:59673
+The parameters introduced to convert the original formulation into a D.C. programming
+problem are then defined as:
+
+z
+
+R
+
+1 =
+
+5q 1 \Gamma1
+
+r 1
+
+z
+
+R
+
+2 =
+
+5q 2 \Gamma1
+
+r 2
+
+= 3:53316 = 6:52174
+
+z
+
+R
+M = min f z
+
+R
+
+1 ; z
+
+R
+
+2 g
+
+= z
+
+R
+
+1
+
+= 3:53316
+
+z
+
+A
+
+= z
+
+R
+M + (z
+
+R
+
+1 \Gamma z
+
+R
+M ) + (z
+
+R
+
+2 \Gamma z
+
+R
+M )
+= z
+
+R
+
+2
+
+= 6:52174
+
+z
+
+B
+
+1 = z
+
+R
+
+2 \Gamma z
+
+R
+M z
+
+B
+
+2 = z
+
+R
+
+1 \Gamma z
+
+R
+M
+
+= 2:98858 = 0
+
+' 1 = q
+
+0
+
+1 + r 1 \Delta (z
+
+R
+
+1 + z
+
+B
+
+1 ) = 28:53522
+
+' 2 = q
+
+0
+
+2 + r 2 \Delta (z
+
+R
+
+2 + z
+
+B
+
+2 ) = 7:0
+This allows the explicit formulation to be written as follows:
+min
+ G I = \Gamman
+
+T
+
+1 z
+
+R
+
+1 r 1 ln r 1 \Gamma n
+
+T
+
+2 z
+
+R
+
+2 r 2 ln r 2
+
++ z
+
+A
+
+h
+
+r 1 n
+
+1
+1 + r 2 n
+
+1
+2
+
+i
+
+ln
+
+h
+
+r 1 n
+
+1
+1 + r 2 n
+
+1
+2
+
+i
+
++ z
+
+B
+
+1 r 1 n
+
+1
+1 ln
+
+n
+
+1
+1
+
+r 1 n
+
+1
+1 + r 2 n
+
+1
+2
+
++ z
+
+A
+
+h
+
+r 1 n
+
+2
+1 + r 2 n
+
+2
+2
+
+i
+
+ln
+
+h
+
+r 1 n
+
+2
+1 + r 2 n
+
+2
+2
+
+i
+
++ z
+
+B
+
+1 r 1 n
+
+2
+1 ln
+
+n
+
+2
+1
+
+r 1 n
+
+2
+1 + r 2 n
+
+2
+2
+
++
+
+z
+
+2
+
+q 1 n
+
+1
+1 ln
+
+q 1 n
+
+1
+1
+
+q 1 n
+
+1
+1 + q 2 n
+
+1
+2
+
++
+
+z
+
+2
+
+q 2 n
+
+1
+2 ln
+
+q 2 n
+
+1
+2
+
+q 1 n
+
+1
+1 + q 2 n
+
+1
+2
+
++
+
+z
+
+2
+
+q 1 n
+
+2
+1 ln
+
+q 1 n
+
+2
+1
+
+q 1 n
+
+2
+1 + q 2 n
+
+2
+2
+
++
+
+z
+
+2
+
+q 2 n
+
+2
+2 ln
+
+q 2 n
+
+2
+2
+
+q 1 n
+
+2
+1 + q 2 n
+
+2
+2
+
++
+
+h
+
+q
+
+0
+
+1 n
+
+1
+1 + q
+
+0
+
+2 n
+
+1
+2
+
+i
+
+ln
+
+h
+
+q
+
+0
+
+1 n
+
+1
+1 + q
+
+0
+
+2 n
+
+1
+2
+
+i
+
++ q
+
+0
+
+1 n
+
+1
+1 ln
+
+n
+
+1
+1
+
+q
+
+0
+
+1 n
+
+1
+1 +  21 q
+
+0
+
+2 n
+
+1
+2
+
++ q
+
+0
+
+2 n
+
+1
+2 ln
+
+n
+
+1
+2
+
+ 12 q
+
+0
+
+1 n
+
+1
+1 + q
+
+0
+
+2 n
+
+1
+2
+
++
+
+h
+
+q
+
+0
+
+1 n
+
+2
+1 + q
+
+0
+
+2 n
+
+2
+2
+
+i
+
+ln
+
+h
+
+q
+
+0
+
+1 n
+
+2
+1 + q
+
+0
+
+2 n
+
+2
+2
+
+i
+
++ q
+
+0
+
+1 n
+
+2
+1 ln
+
+n
+
+2
+1
+
+q
+
+0
+
+1 n
+
+2
+1 +  21 q
+
+0
+
+2 n
+
+2
+2
+
++ q
+
+0
+
+2 n
+
+2
+2 ln
+
+n
+
+2
+2
+
+ 12 q
+
+0
+
+1 n
+
+2
+1 + q
+
+0
+
+2 n
+
+2
+2
+
+\Gamma ' 1
+
+h
+
+n
+
+1
+1 ln n
+
+1
+1 + n
+
+2
+1 ln n
+
+2
+1
+
+i
+
+\Gamma ' 2
+
+h
+
+n
+
+1
+2 ln n
+
+1
+2 + n
+
+2
+2 ln n
+
+2
+2
+
+i
+33
+
+s.t.
+
+n
+
+1
+1 + n
+
+2
+1 = 0:5
+
+n
+
+1
+2 + n
+
+2
+2 = 0:5
+0  n
+
+1
+1 ; n
+
+1
+2 ; n
+
+2
+1 ; n
+
+2
+2  0:5
+The last line of the objective function contains the nonconvex portion (which is separable and
+concave). The equality constraints can be used to eliminate the variables of the second liquid
+phase in the same manner as was done in Examples 1 and 2. This reduces the number of
+connected variables to NCV = 2. If a trivial solution starting point is used, the algorithm
+converges in 343 iterations to the global solution which is given in Table 5. If such a starting
+point is supplied to a local solver, it will fail to converge to the global solution. The total
+time taken to solve the problem was 3.3 cpu sec and 64% of the solutions were fathomed.
+Because the size of the problem is small, 2
+
+2
+
+= 4 subproblems were solved at each iteration
+(i.e. N P = NCV for all iterations), even though it is necessary to solve only two at each
+iteration
+The algorithm has been used to solve several other examples with more components and
+phases. The number of variables stays relatively small so that the tested problems stay
+of manageable size. This is because the effort of obtaining the interaction coefficients,  ij ,
+becomes prohibitive for more than four components.
+5 Conclusions
+
+It has been demonstrated how the Gibbs free energy function can be radically altered when the
+liquid phase is modeled using the NRTL or UNIQUAC equations (and an ideal vapor phase).
+Numerous simplifications and properties of the equations have been revealed that allow the
+structures of the problems to be fully exploited. The GOP algorithm was used to obtain an
+
+ffl-global solution for the NRTL equation, where a biconvex function is minimized over a set
+of bilinear equality constraints. A branch and bound algorithm based on that of Falk and
+Soland [6] was used to likewise guarantee obtaining an ffl-global solution for the UNIQUAC
+equation. Examples were presented which demonstrate the effectiveness of the algorithms in
+obtaining global solutions of a number of difficult phase equilibrium problems, for which no
+previous approaches could make the same guarantees.
+Acknowledgement : The authors gratefully acknowledge financial support from the National
+Science Foundation under Grants CBT-8857013 and CTS-9221411, as well as support from
+Amoco Chemical Co., Exxon Co., Tennessee Eastman Co., Mobil Co., and Shell Development.
+34
+
+References
+
+[1] D.S. Abrams and J.M. Prausnitz. Statistical thermodynamics of liquid mixtures: A new
+expression for the excess Gibbs energy of partly or completely miscible systems. AIChE
+J., 21(1):116, 1975.
+[2] T.F. Anderson and J.M. Prausnitz. Application of the UNIQUAC equation to calculation
+of multicomponent phase equilibria. 1. vapor-liquid equilibria. Ind. Eng. Chem. Proc. Des.
+Dev., 17:552, 1978.
+[3] T.F. Anderson and J.M. Prausnitz. Application of the UNIQUAC equation to calculation
+of multicomponent phase equilibria. 2. liquid-liquid equilibria. Ind. Eng. Chem. Proc. Des.
+Dev., 17:561, 1978.
+[4] U. Block and B. Hegner. Development and application of a simulation model for threephase
+distillation. AIChE J., 22(3):582, 1976.
+[5] P.T. Eubank, A.E. Elhassen, M.A. Barrufet, and W.B. Whiting. Area method for prediction
+of fluid-phase equilibria. I&EC Res., 31:942, 1992.
+[6] J.E. Falk and R.M. Soland. An algorithm for separable nonconvex programming problems.
+ Manag. Sci., 15(9):550, 1969.
+[7] C.A. Floudas, A. Aggarwal, and A.R. Ciric. A global optimum search for nonconvex NLP
+and MINLP problems. Comput. chem. engng., 13(10):1117, 1989.
+[8] C.A. Floudas and V. Visweswaran. A global optimization algorithm (GOP) for certain
+classes of nonconvex NLPs: I. Theory. Comput. chem. engng., 14(12):1397, 1990.
+[9] C.A. Floudas and V. Visweswaran. A primal-relaxed dual global optimization approach.
+
+Journal of Optimization Theory and Applications, 78(2):187, 1993.
+[10] R.A. Heidemann and J.M. Mandhane. Some properties of the NRTL equation in correcting
+liquid-liquid equilibrium data. Chem. Eng. Sci., 28:1213, 1973.
+[11] R. Horst and H. Tuy. Global Optimization. Springer-Verlag, 1st. edition, 1990.
+[12] G. Lantagne, B. Marcos, and B. Cayrol. Computation of complex equilibria by nonlinear
+optimization. Comput. chem. engng., 12(6):589, 1988.
+[13] W.J. Lin. Application of continuation and modeling methods to phase equilibrium, steadystate
+and dynamic process calculations. PhD thesis, University of Utah, 1988.
+35
+
+[14] M.O. Ohanomah and D.W. Thompson. Computation of multicomponent phase equilibria
+- Part I. Vapour-liquid equilibria. Comput. chem. engng., 8(3/4):147, 1984.
+[15] M.O. Ohanomah and D.W. Thompson. Computation of multicomponent phase equilibria
+- Part II. Liquid-liquid and solid-liquid equilibria. Comput. chem. engng., 8(3/4):157,
+1984.
+[16] M.O. Ohanomah and D.W. Thompson. Computation of multicomponent phase equilibria
+- Part III. Multiphase equilibria. Comput. chem. engng., 8(3/4):163, 1984.
+[17] G.E. Paules, IV and C.A. Floudas. A new optimization approach for phase and chemical
+equilibrium problems. Paper presented at the Annual AIChE Meeting, San Franciso, CA,
+November, 1989.
+[18] J.M. Prausnitz, T.F. Anderson, E.A. Grens, C.A. Eckert, R. Hsieh, and J.P. O'Connell.
+
+Computer calculations for multicomponent vapor-liquid and liquid-liquid equilibria.
+
+Prentice-Hall Inc., Englewood Cliffs, New Jersey, 1980.
+[19] H. Renon and J.M. Prausnitz. Local compositions in thermodynamic excess functions
+for liquid mixtures. AIChE J., 14(1):135, 1968.
+[20] W.D. Seider, R. Gautam, and C.W. White, III. Computation of phase and chemical
+equilibrium: A review. In Computer Applications to Chemical Engineering, page 115.
+American Chemical Society, 1980. ACS Symp. Ser., No. 124(5).
+[21] W.R. Smith and R.W. Missen. Chemical Reaction equilibrium analysis: theory and algorithms.
+Wiley & Sons, 1982.
+[22] A.C. Sun and W.D. Seider. Homotopy-continuation algorithm for global optimization.
+In Recent advances in global optimization, page 561. Princeton University Press, 1992.
+[23] F.F.Y. Walraven and P.V. VanRompay. An improved phase-splitting algorithm. Comput.
+chem. engng., 12(8):777, 1988.
+36
+
+Appendix A
+
+In what follows the mol number phase superscripts are dropped for clarity of presentation. It
+is required to prove that the following relation is true:
+
+X
+
+i2C
+
+n i
+
+8
+?
+!
+?
+:
+P
+
+j2C
+
+ ji G ji n j
+
+P
+
+j2C
+
+G ji n j
+
+9
+?
+=
+?
+;
+
+\Gamma
+
+X
+
+i2C
+
+n i
+
+8
+?
+!
+?
+:
+X
+
+j2C
+
+G ij n j
+
+P
+
+l2C
+
+G lj n l
+
+P
+
+l2C
+
+ lj G lj n l
+
+P
+
+l2C
+
+G lj n l
+
+9
+?
+=
+?
+;
+
+= 0 (A.1)
+The basis of the proof is to extract the common term
+
+P
+
+j G ji n j from the denominator of
+Eqn. (A.1). Rewriting the term to the left of the minus sign of Eqn. (A.1) yields:
+
+X
+
+i
+
+n i
+
+(P
+
+j  ji G ji n j
+
+P
+
+j G ji n j
+
+)
+
+=
+
+X
+
+i
+
+1
+
+P
+
+j
+
+G ji n j
+
+\Delta n i \Delta
+
+X
+
+j
+
+ ji G ji n j (A.2)
+The first term in the denominator of the term to the right of the minus sign of Eqn. (A.1),
+
+P
+
+l G lj n l , is extracted and summed over the index i, that is, it is changed to
+
+P
+
+m G mi nm . In
+doing so, the indices of G ij in the numerator of the term to the right of the minus sign of
+Eqn. (A.1) are swapped to give G ji and the second indices in the l summation terms change
+from j to i as follows:
+
+X
+
+i2C
+
+n i
+
+8
+?
+!
+?
+:
+X
+
+j2C
+
+G ij n j
+
+P
+
+l
+
+G lj n l
+
+P
+
+l
+
+ lj G lj n l
+
+P
+
+l
+
+G lj n l
+
+9
+?
+=
+?
+;
+=
+
+X
+
+i
+
+1
+
+P
+
+m
+
+G mi nm
+
+\Delta n i \Delta
+
+X
+
+j
+
+G ji n j \Delta
+
+P
+
+l
+
+ li G li n l
+
+P
+
+l
+
+G li n l
+=
+
+X
+
+i
+
+1
+
+P
+
+j
+
+G ji n j
+
+\Delta n i \Delta
+
+X
+
+l
+
+ li G li n l (A.3)
+noting that the indices of the terms
+
+P
+
+j G ji n j and
+
+P
+
+l G li n l run independently of each other
+and therefore cancel. Subtracting Eqn. (A.3) from Eqn. (A.2) yields the desired result:
+
+X
+
+i
+
+1
+
+P
+
+j
+
+G ji n j
+
+\Delta n i \Delta
+
+X
+
+j
+
+ ji G ji n j \Gamma
+
+X
+
+i
+
+1
+
+P
+
+j
+
+G ji n j
+
+\Delta n i \Delta
+
+X
+
+l
+
+ li G li n l
+=
+
+X
+
+i
+
+1
+
+P
+
+j
+
+G ji n j
+
+\Delta n i \Delta
+
+8
+!
+:
+X
+
+j
+
+ ji G ji n j \Gamma
+
+X
+
+l
+
+ li G li n l
+
+9
+=
+;
+
+= 0
+realizing that the indices of the terms in braces run independently of each other and are
+therefore equal to zero. The same result can be obtained for any phase k. 2
+37
+
+Appendix B
+
+It is required to establish if the following function is convex:
+
+f ' = n ' ln
+
+n '
+
+P
+
+j=1;:::;p
+
+ae j n j
+
+for any ' = 1; : : : ; p
+where p represents the number of variables of the problem. There are a number of ways to
+prove its convexity. The chosen method here is to explicitly evaluate the eigenvalues for f ' .
+For notational convenience, u =
+
+P
+
+j ae j n j in the foregoing. A necessary and sufficient condition
+for convexity requires that all the eigenvalues of the Hessian, H, be nonnegative. These are
+obtained by evaluating the roots of the characteristic equation of the matrix (H \Gamma I). The
+approach utilizes the following two properties:
+(i) The determinant of a matrix changes sign if two rows (or two columns) are exchanged,
+(ii) Adding a multiple of one row to another leaves the determinant unchanged (viz. for
+columns).
+Step 1: Evaluation of (H \Gamma I)
+As a first step, the second order derivatives of the function f ' are given as follows:
+@
+
+2
+
+f '
+
+@n i @n j
+
+=
+
+8
+?
+?
+!
+?
+?
+:
+
+(ae ' n ' \Gammau)
+
+2
+
+n ' u
+
+2 i = j = '
+
+ae j
+
+ae ' n ' \Gammau
+
+u
+
+2 i = '; j 6= i
+ae i ae j
+
+n '
+
+u
+
+2 i 6= '; j 6= '
+If  n is substituted for ae ' n ' and n for n ' , then (H \Gamma I) is given explicitly as:
+(H \Gamma I) =
+
+0
+B
+B
+B
+B
+B
+B
+B
+B
+B
+B
+@
+
+(n\Gammau)
+
+2
+
+nu
+
+2 \Gamma  ae 2
+
+ n\Gammau
+u
+
+2 ae 3
+
+ n\Gammau
+u
+
+2 \Delta \Delta \Delta
+
+ae 2
+
+ n\Gammau
+u
+
+2 ae
+
+2
+2
+
+n
+u
+
+2 \Gamma  ae 2 ae 3
+
+n
+u
+
+2 ae 2 ae 4
+
+n
+u
+
+2
+
+ae 3
+
+ n\Gammau
+u
+
+2 ae 3 ae 2
+
+n
+u
+
+2 ae
+
+2
+3
+
+n
+u
+
+2 \Gamma  ae 3 ae 4
+
+n
+u
+
+2
+
+.
+.
+.
+.
+.
+. ae 4 ae 2
+
+n
+u
+
+2 ae 4 ae 3
+
+n
+u
+
+2 ae
+
+2
+4
+
+n
+u
+
+2 \Gamma 
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+1
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+A
+The ' 'th row and column have been pivoted into the first row and column, leaving the determinant
+unchanged because of Property (i). The set of parameters fae 2 ; : : : ; ae p g are assumed to
+be equivalent to the set fae 1 ; : : : ; ae p g n ae ' . Thus, the above form can be equivalently obtained
+for any ' = 1; : : : ; p. 2
+38
+
+Step 2: Transformation of (H \Gamma I)
+By Property (ii), the following operations change the structure of (H \Gamma I) without changing
+its determinant:
+
+for i = 3; : : : ; p
+
+for i
+
+0
+
+= i; : : : ; p
+
+for j = 1; : : : ; p
+a i
+
+0
+
+;j = a i
+
+0
+
+;j \Gamma
+
+h
+
+ae i 0
+
+ae i\Gamma1
+
+i
+
+a i\Gamma1;j
+
+end
+end
+end
+
+where a ij is the i \Gamma j'th entry of the matrix (H \Gamma I). This yields the following result:
+j H \Gamma I jj
+
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+
+(n\Gammau)
+
+2
+
+nu
+
+2 \Gamma  ae 2
+
+ n\Gammau
+u
+
+2 ae 3
+
+ n\Gammau
+u
+
+2 \Delta \Delta \Delta
+
+ae 2
+
+ n\Gammau
+u
+
+2 ae
+
+2
+2
+
+n
+u
+
+2 \Gamma  ae 2 ae 3
+
+n
+u
+
+2 ae 2 ae 4
+
+n
+u
+
+2 \Delta \Delta \Delta
+
+0
+
+ae 3
+
+ae 2
+
+ \Gamma 0
+0 0
+
+ae 4
+
+ae 3
+
+ \Gamma 0
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+
+One more operation on the second row is required:
+
+for i = 2
+
+for j = 1; : : : ; p
+a i;j = a i;j \Gamma
+
+h
+
+ae 2
+
+n
+
+ n\Gammau
+
+i
+
+a 1;j
+
+end
+end
+
+The characteristic equation is then equivalently given by the following determinant:
+j H \Gamma I jj
+
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+
+(n\Gammau)
+
+2
+
+nu
+
+2 \Gamma  ae 2
+
+ n\Gammau
+u
+
+2 ae 3
+
+ n\Gammau
+u
+
+2 \Delta \Delta \Delta
+
+ae 2
+
+n
+
+ n\Gammau
+
+ \Gamma 0 0 \Delta \Delta \Delta
+
+0
+
+ae 3
+
+ae 2
+
+ \Gamma 0
+0 0
+
+ae 4
+
+ae 3
+
+ \Gamma 0
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+
+This determinant is evaluated by expanding the cofactors down the first column so that:
+
+j H \Gamma I j=
+
+"
+
+(n \Gamma u)
+
+2
+
+nu
+
+2
+
+\Gamma 
+
+#
+
+j A 11 j +
+
+
+
+ae 2
+
+n
+
+ n \Gamma u
+
+
+
+(\Gamma) j A 21 j (B.1)
+39
+
+where A ij is the appropiate minor obtained by deleting the i'th row and j'th column of
+(H \Gamma I). 2
+Step 3: Evaluation of j A 11 j and j A 21 j
+Because A 11 is lower triangular, it is clear that:
+
+j A 11 j= (\Gamma)
+
+p\Gamma1
+
+(B.2)
+
+A 21 is a (p \Gamma 1) \Theta (p \Gamma 1) square matrix. By extracting the common term in the first row, its
+determinant is given as:
+j A 21 j =
+ n \Gamma u
+u
+
+2
+
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+
+ae 2 ae 3 ae 4 \Delta \Delta \Delta
+
+ae 3
+
+ae 2
+
+ \Gamma 0 \Delta \Delta \Delta
+
+0
+
+ae 4
+
+ae 3
+
+ \Gamma 0 \Delta \Delta \Delta
+
+0 0
+
+ae 5
+
+ae 4
+
+ \Gamma
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+
+(B.3)
+=
+ n \Gamma u
+u
+
+2
+
+j A
+
+p\Gamma1
+
+j (B.4)
+where A
+
+p\Gamma1
+
+is the (p \Gamma 1) \Theta (p \Gamma 1) matrix of the form given in Eqn. (B.3). Its determinant
+can be determined inductively by expanding across the top column, noting that the minors
+will be upper triangular to yield:
+
+ae 2 j A
+
+p\Gamma1
+
+j = (\Gamma)
+
+p\Gamma2
+
+\Delta
+
+h
+
+ae
+
+2
+2 + \Delta \Delta \Delta + ae
+
+2
+
+p
+
+i
+
+(B.5)
+= (\Gamma)
+
+k\Gamma2
+
+\Delta T
+
+where T =
+
+X
+
+j=1;:::;p
+j 6='
+
+ae
+
+2
+
+j (B.6)
+in the general case. This simple relation allows the determinant of the original matrix to be
+easily calculated. 2
+Step 4: Evaluation of j H \Gamma I j
+The original determinant may now be obtained by substituting Eqns. (B.2) and (B.4) into
+Eqn. (B.1) -- noting that ae 2 j A
+
+p\Gamma1
+
+j= T \Delta (\Gamma)
+
+p\Gamma2
+
+by Eqn. (B.6) -- to yield:
+
+j H \Gamma I j = (\Gamma)
+
+p\Gamma1
+
+"
+
+(n \Gamma u)
+
+2
+
+nu
+
+2
+
+\Gamma 
+
+#
+
++
+
+
+
+n
+
+ n \Gamma u
+
+ 
+
+ n \Gamma u
+u
+
+2
+
+
+
+(\Gamma) ae 2 j A
+
+p\Gamma1
+
+j
+= (\Gamma)
+
+p\Gamma1
+
+"
+
+(n \Gamma u)
+
+2
+
+nu
+
+2
+
++
+
+nT
+u
+
+2
+
+\Gamma 
+
+#
+40
+
+The eigenvalues are calculated as
+
+fi
+fi
+fiH \Gamma I
+
+fi
+fi
+fi = 0 :
+ ' =
+(n \Gamma u)
+
+2
+
++ n
+
+2
+
+T
+
+nu
+
+2
+
+ 0
+ j = 0 8 j 6= '
+Recall that  n = ae ' n ' , u =
+
+P
+
+j=1;:::;p
+
+ae j n j , n = n ' , and T =
+
+P
+
+j=1;:::;p
+j 6='
+
+ae
+
+2
+
+j .
+As a check, notice that  ' = trace H, because
+
+P
+
+j 6='  j = 0. Thus, there is exactly one
+nonnegative eigenvalue and the rest are zero. This is precisely the necessary and sufficient
+condition for convexity. 2
+Appendix C
+
+A proof of the convexity of the following function is required:
+f(n) =
+
+8
+!
+:
+X
+
+i=1;:::;p
+
+ae i n i
+
+9
+=
+;
+
+ln
+
+8
+!
+:
+X
+
+i=1;:::;p
+
+ae i n i
+
+9
+=
+;
+
+The method used is essentially the same as that employed in Appendix B. For notational
+convenience, u =
+
+P
+
+i ae i n i in the foregoing. As a first step, the second order derivatives of the
+function f(n) are given as follows:
+
+@
+
+2
+
+f
+@n i @n j
+
+=
+
+ae i ae j
+
+u
+
+(H \Gamma I) is constructed as for Appendix B, and the following operations will leave this matrix
+unchanged:
+
+for i = 2; : : : ; p
+
+for i
+
+0
+
+= i; : : : ; p
+
+for j = 1; : : : ; p
+a i
+
+0
+
+;j = a i
+
+0
+
+;j \Gamma
+
+h
+
+ae i 0
+
+ae i\Gamma1
+
+i
+
+a i\Gamma1;j
+
+end
+end
+end
+41
+
+where a ij is the i \Gamma j'th entry of the matrix (H \Gamma I). This yields the following result:
+j H \Gamma I jj
+
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+
+ae
+
+2
+1
+
+u
+
+\Gamma 
+
+ae 1 ae 2
+
+u
+ae 1 ae 3
+
+u
+
+\Delta \Delta \Delta
+
+ae 2
+
+ae 1
+
+ \Gamma 0 0 \Delta \Delta \Delta
+
+0
+
+ae 3
+
+ae 2
+
+ \Gamma 0
+0 0
+
+ae 4
+
+ae 3
+
+ \Gamma 0
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+
+This determinant is evaluated by expanding the cofactors down the first column so that:
+
+j H \Gamma I j=
+
+"
+
+ae
+
+2
+1
+
+u
+
+\Gamma 
+
+#
+
+j A 11 j +
+
+"
+
+ae 2
+
+ae 1
+
+#
+
+(\Gamma) j A 21 j (C.1)
+where A 11 is given by Eqn. (B.2) and A 21 is defined as:
+
+A 21 =
+
+ae 1
+
+u
+
+j A
+
+p\Gamma1
+
+j (C.2)
+with A
+
+p\Gamma1
+
+defined by Eqn. (B.5). This means that the determinant can be calculated as:
+j H \Gamma I j = (\Gamma)
+
+p\Gamma1
+
+"
+
+ae
+
+2
+
+u
+
+\Gamma 
+
+#
+
++
+
+
+
+1
+
+u
+
+
+
+(\Gamma)
+
+p\Gamma1
+
+h
+
+ae
+
+2
+2 + \Delta \Delta \Delta + ae
+
+2
+
+p
+
+i
+= (\Gamma)
+
+p\Gamma1
+
+
+
+T
+
+u
+
+\Gamma 
+
+
+but with T now defined as:
+
+T =
+
+X
+
+i=1;:::;p
+
+ae
+
+2
+
+i
+The eigenvalues are calculated as
+
+fi
+fi
+fiH \Gamma I
+
+fi
+fi
+fi = 0 :
+ 1 =
+
+T
+
+u
+
+ 0
+ j = 0 8 j = 2; : : : ; p
+
+As a check, notice that  1 = trace H, because
+
+P
+
+j 6=1  j = 0. Thus, there is exactly one
+nonnegative eigenvalue and the rest are zero. This is precisely the necessary and sufficient
+condition for convexity. 2
+Appendix D
+
+Add and subtract the term
+
+P
+
+i q
+
+0
+
+i n
+
+k
+i ln n
+
+k
+i to the original term D
+
+k
+
+of Eqn. (44):
+
+D
+
+k
+
+j
+
+X
+
+i2C
+
+q
+
+0
+
+i n
+
+k
+i ln n
+
+k
+i \Gamma
+
+X
+
+i2C
+
+q
+
+0
+
+i n
+
+k
+i ln
+
+X
+
+j2C
+
+q
+
+0
+
+j  ji n
+
+k
+j \Gamma
+
+X
+
+i2C
+
+q
+
+0
+
+i n
+
+k
+i ln n
+
+k
+i
+42
+
+=
+
+X
+
+i2C
+
+q
+
+0
+
+i n
+
+k
+i ln
+
+n
+
+k
+i
+
+P
+
+j2C
+
+q
+
+0
+
+j  ji n
+
+k
+j
+
+\Gamma
+
+X
+
+i2C
+
+q
+
+0
+
+i n
+
+k
+i ln n
+
+k
+i
+=
+
+2
+6
+4
+X
+
+i2C
+
+q
+
+0
+
+i
+
+n
+
+k
+i ln
+
+n
+
+k
+i
+
+P
+
+j2C
+
+q
+
+0
+
+j  ji n
+
+k
+j
+
+3
+7
+5 \Gamma
+
+"
+X
+
+i2C
+
+q
+
+0
+
+i
+
+n
+
+k
+i ln n
+
+k
+i
+
+#
+The first term in square brackets is the term defined as D
+
+k
+
++ , while the second term is D
+
+k
+
+\Gamma .
+Therefore Eqn. (45) is seen to be valid. It remains to prove that the terms D
+
+k
+
++ and D
+
+k
+
+\Gamma are
+convex. Setting and q
+
+0
+
+j  ji = ae 8 j, each individual i'th term of the nonlinear part of D
+
+k
+
++ is seen
+to be convex. The sum of linear and convex functions is itself a convex function. Hence D
+
+k
+
++
+
+is convex. D
+
+k
+
+\Gamma is a summation of separable terms of the form n ln n, which are clearly convex
+terms because q
+
+0
+
+i ? 0 8 i, i.e. D
+
+k
+
+\Gamma is convex. 2
+Appendix E
+
+The original term A
+
+k
+
+of Eqn. (44) is defined as:
+
+\GammaA
+
+k
+
+j \Gamma
+
+X
+
+i2C
+
+z
+
+R
+
+i r i n
+
+k
+i ln
+
+r i n
+
+k
+i
+
+P
+
+j2C
+
+r j n
+
+k
+j
+
+= \Gamma
+
+X
+
+i2C
+
+z
+
+R
+
+i r i n
+
+k
+i ln r i n
+
+k
+i +
+
+X
+
+i2C
+
+z
+
+R
+
+i r i n
+
+k
+i ln
+
+X
+
+j2C
+
+r j n
+
+k
+j
+A term is now added and subtracted from each i'th term as follows:
+
+\GammaA
+
+k
+
+= \Gamma
+
+X
+
+i2C
+
+z
+
+R
+
+i r i n
+
+k
+i ln r i n
+
+k
+i
++
+
+X
+
+i2C
+
+8
+!
+:
+
+z
+
+R
+
+i
+
+r i n
+
+k
+i ln
+
+X
+
+j2C
+
+r j n
+
+k
+j
++ (z
+
+R
+
+i \Gamma z
+
+R
+M )
+
+X
+
+j 6=i
+
+r j n
+
+k
+j ln
+
+0
+@
+X
+
+l2C
+
+r l n
+
+k
+l
+
+1
+A + (z
+
+R
+
+i \Gamma z
+
+R
+M )
+
+X
+
+j 6=i
+
+r j n
+
+k
+j ln n
+
+k
+j
+\Gamma (z
+
+R
+
+i \Gamma z
+
+R
+M )
+
+X
+
+j 6=i
+
+r j n
+
+k
+j ln
+
+0
+@
+X
+
+l2C
+
+r l n
+
+k
+l
+
+1
+A \Gamma (z
+
+R
+
+i \Gamma z
+
+R
+M )
+
+X
+
+j 6=i
+
+r j n
+
+k
+j ln n
+
+k
+j
+
+9
+=
+;
+
+This expression can be equivalently written as follows:
+\GammaA
+
+k
+
+= \Gamma
+
+X
+
+i2C
+
+z
+
+R
+
+i r i n
+
+k
+i ln r i n
+
+k
+i +
+
+"
+
+z
+
+R
+M +
+
+X
+
+i2C
+
+(z
+
+R
+
+i \Gamma z
+
+R
+M )
+
+#
+0
+@
+X
+
+j2C
+
+r j n
+
+k
+j
+
+1
+A ln
+
+0
+@
+X
+
+j2C
+
+r j n
+
+k
+j
+
+1
+A
++
+
+X
+
+i2C
+
+2
+4
+X
+
+j 6=i
+
+i
+
+z
+
+R
+
+j \Gamma z
+
+R
+M
+
+j
+3
+5 r i n
+
+k
+i ln
+
+n
+
+k
+i
+
+P
+
+j2C
+
+r j n
+
+k
+j
+
+\Gamma
+
+X
+
+i2C
+
+2
+4
+X
+
+j 6=i
+
+i
+
+z
+
+R
+
+j \Gamma z
+
+R
+M
+
+j
+3
+5 r i n
+
+k
+i ln n
+
+k
+i
+43
+
+Recalling the definitions of z
+
+R
+M , z
+
+A
+
+and z
+
+B
+
+i as given by Eqns. (47), the following relation is
+obtained:
+\GammaA
+
+k
+
+=
+
+8
+?
+!
+?
+:
+
+\Gamma
+
+X
+
+i2C
+
+n
+
+k
+i z
+
+R
+
+i r i ln r i + z
+
+A
+
+0
+@
+X
+
+j2C
+
+r j n
+
+k
+j
+
+1
+A ln
+
+0
+@
+X
+
+j2C
+
+r j n
+
+k
+j
+
+1
+A +
+
+X
+
+i2C
+
+z
+
+B
+
+i r i n
+
+k
+i ln
+
+n
+
+k
+i
+
+P
+
+j2C
+
+r j n
+
+k
+j
+
+9
+?
+=
+?
+;
+
+\Gamma
+
+(
+X
+
+i2C
+
+n
+
+k
+i ln n
+
+k
+i r i [z
+
+R
+
+i + z
+
+B
+
+i ]
+
+)
+The first term within curly braces corresponds to the definition of A
+
+k
+
++ . Its first term is linear.
+The next is convex by Property 4.3, while the third term is convex by Property 3.2. Thus the
+first term within curly braces is convex. The second term within curly braces is seen to be
+the definition of A
+
+k
+
+\Gamma . It is clearly separable and convex. These two terms correspond to the
+definitions of A
+
+k
+
++ and A
+
+k
+
+\Gamma as given in Property 4.5 so that:
+
+\Gamma A
+
+k
+
+= A
+
+k
+
++ \Gamma A
+
+k
+
+\Gamma (E.1)
+where A
+
+k
+
++ and A
+
+k
+
+\Gamma have been shown to be convex.
+44
+
+Solution for n-Butyl-Acetate (1) -- Water (2)
+
+T = 298K, P = 1:0 atm
+Feed Liquid I Liquid II
+
+
+G
+
+
+
+I
+
+Components (mols) (mols) (mols) (---)
+
+C 6 H 12 O 2 (1) 0:50 0:00071 0:49929 \Gamma0.02020
+
+H 2 O (2) 0:50 0:15588 0:34412 (Global minimum)
+
+C 6 H 12 O 2 (1) 0:50 0:00213 0:49787 \Gamma0.01961
+
+H 2 O (2) 0:50 0:46547 0:03453 (Local minimum)
+
+C 6 H 12 O 2 (1) 0:50 0:00173 0:49827 \Gamma0.01730
+
+H 2 O (2) 0:50 0:37544 0:12456 (Local maximum)
+Table 1: Solutions for Example 1
+Iteration M
+
+L
+
+P ( n
+
+K
+
+)
+1 \Gamma0.42615 \Gamma0.01758
+
+2 \Gamma0.23027 \Gamma0.01758
+
+3 \Gamma0.22209 0.00507
+4 \Gamma0.11446 \Gamma0.01754
+
+48 \Gamma0.02408 \Gamma0.01980
+
+74 \Gamma0.02166 \Gamma0.01988
+
+87 \Gamma0.02059 \Gamma0.02002
+
+91 \Gamma0.02042 \Gamma0.02018
+
+106 \Gamma0.02021 \Gamma0.02020
+Table 2: Progress of bounds for Example 1
+45
+
+n-Propanol (1) -- n-Butanol (2) -- Water (3):  ij and ff ij dimensionless
+Components ij i j  ij  ji ff ij = ff ji
+
+C 3 H 8 O -- C 4 H 10 O 1 2 \Gamma0:61259 0:71640 0:30
+
+C 3 H 8 O -- H 2 O 1 3 \Gamma0:07149 2:7425 0:30
+
+C 4 H 10 O -- H 2 O 2 3 0:90047 3:51307 0:48
+Table 3: Binary data for Example 2
+Solutions for n-Propanol (1) -- n-Butanol (2) -- Water (3) at T , P = 1 atm
+Feed Liquid I Liquid II
+
+
+G
+
+
+
+II cpu N I N F
+
+Component (mols) (mols) (mols) (---) (sec) (---) (%)
+
+C 3 H 8 O (1) 0:040 0:0049 0:0351 \Gamma1.24112 5.2 268 65
+
+C 4 H 10 O (2) 0:160 0:0095 0:1505
+
+H 2 O (3) 0:800 0:4153 0:3847
+
+C 3 H 8 O (1) 0:148 0:1280 0:0200 \Gamma1.1919716 17.31 932 26
+
+C 4 H 10 O (2) 0:052 0:0456 0:0064
+
+H 2 O (3) 0:800 0:6549 0:1451
+Table 4: Global solutions for Example 2
+G
+
+
+
+n
+
+I
+
+1 n
+
+I
+
+2
+
+Global Minimum \Gamma0.01976 0.00045 0.47733
+
+Local Minimum 0.30919 0.25 0.25
+Table 5: Solutions for Example 3
+46
+
+Iteration Lower bound Upper bound
+1 \Gamma3.77305 0.30923
+2 \Gamma3.65550 0.18812
+3 \Gamma1.28319 0.18812
+4 \Gamma1.13669 0.05711
+12 \Gamma0.40768 0.00389
+22 \Gamma0.15547 \Gamma0.00787
+
+36 \Gamma0.06343 \Gamma0.00760
+
+42 \Gamma0.04459 \Gamma0.00657
+
+49 \Gamma0.03744 \Gamma0.00547
+
+52 \Gamma0.03553 \Gamma0.01968
+
+122 \Gamma0.02088 \Gamma0.01975
+
+190 \Gamma0.02004 \Gamma0.01976
+
+343 \Gamma0.01978 \Gamma0.01976
+Table 6: Progress of bounds for Example 3
+47
+
+n 2
+n
+
+1
+
+n
+
+T
+2
+Initial Point
+n
+
+T
+1
+
+n
+i
+
+1
+
+n 2
+B
+B B
+
+S
+= { +1,+1 } S
+
+B
+
+1
+B
+S
+
+B
+
+2
+3 4
+= { -1,-1 }
+= { +1,-1 }
+4
+3
+
+S
+
+B
+
+= { -1,+1 }
+
+2
+B
+
+1
+
+i
+i
+i
+Figure 1: Example for two connected variables
+48
+
+0
+0.2
+0.4
+n(1)
+0
+0.2
+0.4
+n(2)
+-0.02
+-0.01
+0
+0.01
+0.02
+G(n)
+0
+0.2
+0.4
+n(1)
+0
+0.2
+0.4
+n(2)
+-0.02
+-0.01
+0
+0.01
+0.02
+G(n)
+*
+*
+*
+
+Global Min
+Local Min
+Local Max
+Figure 2: Gibbs energy surface for Example 1
+Figure 3: Gibbs surface and Lagrangian for Region 1 of Iteration 1 of Example 1
+-n ln n
+U L
+
+y
+n n
+
+(n)
+n
+-n ln n
+Figure 4: Concave function and its convex envelope
+49
+
+1
+
+n 2
+B
+
+2
+
+1
+
+B
+
+2
+
+2
+
+S
+
+B
+
+2
+
+2
+
+= { +1 }
+
+1
+S
+
+B
+
+2
+
+= { -1 }
+
+2
+
+2
+
+B 2
+
+1
+
+B
+
+1
+
+1
+
+H
+
+1
+
+= {1}
+S
+
+B
+1
+
+1
+
+1
+
+= { +1 } S
+
+B 2
+
+1
+
+= { -1 }
+
+1
+n
+
+= {0}
+
+n 2
+n 1
+
+n
+
+T
+2
+n
+
+T
+1
+
+Initial Point
+
+H
+
+2
+
+H
+
+2
+H
+= {0}
+= {1}
+1
+
+Figure 5: Box regions of UNIQUAC example
+50
+

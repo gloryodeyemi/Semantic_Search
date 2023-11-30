@@ -1,0 +1,577 @@
+﻿Collaborative Decision-making Processes for
+Maintaining Biodiversity: Two Australian Case
+Studies
+C. Pettit a , D. Pullar b
+a School of Mathematical and Geospatial Science, RMIT University, Melbourne, Australia
+(Chris.pettit@rmit.edu.au)
+b School of Geography, Planning and Architecture, University of Queensland, Australia
+Abstract: There have been many models developed by scientists to assist decision-makers in making
+socio-economic and environmental decisions. It is now recognised that there is a shift in the dominant
+paradigm to making decisions with stakeholders, rather than making decisions for stakeholders. Our
+paper investigates two case studies where group model building has been undertaken for maintaining
+biodiversity in Australia. The first case study focuses on preservation and management of green spaces
+and biodiversity in metropolitan Melbourne under the umbrella of the Melbourne 2030 planning
+strategy. A geographical information system is used to collate a number of spatial datasets
+encompassing a range of cultural and natural assets data layers including: existing open spaces,
+waterways, threatened fauna and flora, ecological vegetation covers, registered cultural heritage sites,
+and existing land parcel zoning. Group model building is incorporated into the study through eliciting
+weightings and ratings of importance for each datasets from urban planners to formulate different
+urban green system scenarios. The second case study focuses on modelling ecoregions from spatial
+datasets for the state of Queensland. The modelling combines collaborative expert knowledge and a
+vast amount of environmental data to build biogeographical classifications of regions. An information
+elicitation process is used to capture expert knowledge of ecoregions as geographical descriptions, and
+to transform this into prior probability distributions that characterise regions in terms of environmental
+variables. This prior information is combined with measured data on the environmental variables
+within a Bayesian modelling technique to produce the final classified regions. We describe how linked
+views between descriptive information, mapping and statistical plots are used to decide upon
+representative regions that satisfy a number of criteria for biodiversity and conservation. This paper
+discusses the advantages and problems encountered when undertaking group model building. Future
+research will extend the group model building approach to include interested individuals and
+community groups.
+Keywords: GIS; environmental planning; group model building.
+1. INTRODUCTION
+Traditionally, physical planners and
+environmental modellers in isolation have
+undertaken land use planning. However, this
+resulted in outcomes not acceptable to
+stakeholders and the wider community. Today
+the dominant paradigm has moved towards
+planning with the community rather than for
+the community, as advocated by Forester
+[1999]. This paper examines two Australian
+case studies, which focus on land use planning
+and biodiversity issues: i) in urban areas, and
+ii) in a regional context.
+The first case study analysis deploys both
+geographical information system (GIS) and
+planning support system (PSS) technologies in
+developing green system scenarios. The What
+if? PSS tool has been used to elicit decision
+factors and their weightings of importance
+from environmental planners within the City of
+Darebin in order to run and re-run urban green
+space scenario simulations.
+The second case study involved running
+workshops with a scientific panel to develop
+an ecoregional classification for the state of
+Queensland. Visual spatial exploration tools
+were developed to enable data communication
+and model exploration. The study aimed to
+elicit map-based information from experts
+(mainly ecologists and biologists) on prior
+probabilities for the distribution of
+environmental variables that characterized
+bioregions within a Bayesian modelling
+framework [Pullar et al., 2004].
+This paper discusses the methodology used to
+formulate the different scaled scenarios,
+examines the results of urban biodiversity
+scenarios (case study I) and ecoregional
+classifications (case study II), and offers
+directions of how approaches will be refined
+through the incorporation of further feedback
+from planners, experts, and the ultimately the
+community.
+2. METHODOLOGY
+Miller et al. [1998] have developed a
+collaborative approach for analysing green
+systems in the urban context, which integrates
+suitability analysis with GIS technology for
+identifying suitable sites for greenway
+development in the town of Prescott Valley,
+Arizona, USA. However, there is a paucity of
+research examining urban green spaces
+systems in Australia. Our paper incorporates a
+case study of work in progress, which focuses
+on the development of a collaborative land
+suitability approach for developing green
+systems scenarios for the City of Darebin,
+Melbourne.
+2.1 Scenario Modelling
+Spatial modelling is based upon the
+formulation and evaluation of future scenarios.
+In the context of decision support systems a
+scenario can be defined as:
+“A description of the current situation, of a
+possible or desirable future state as well as of
+the series of events that lead from the current
+state of affairs to this future state.” [Veenklaas
+and van den Berg, 1994, p99].
+PSS are a specialised form of spatial decision
+support systems (SDSS) focusing on planning
+(predominantly land use) related decisions.
+PSS have been described as geo-information
+tools used to assist in public and private
+planning processes (or parts thereof) across a
+range of spatial scales and within a specific
+planning context [Stillwell, 2003]. In
+December 2003, the 4 th Place Matters -
+workshop was held in San Francisco, USA.
+(www.placematters.us). This workshop
+focused principally on the application of four
+collaborative PSS tools including:
+1. What if?
+2. CommunityViz
+3. Index
+4. Place3S
+The workshop enabled participants to explore
+the application of these PSSs in a charette
+environment, (a charette is defined as a
+collaborative hands-on learning experience), to
+see how planners and community facilitators to
+formulate different collaborative visions could
+use them. Direct involvement by the
+community in the early stages of plan
+formulation through the interaction of
+advanced spatial planning tools is an approach
+which is now being widely applied in urban
+planning [Synder, 2001].
+In formulating the green system scenarios for
+the City of Darebin case study the What if?
+PSS developed by Klosterman [1999] was
+used. What if? is a collaborative GIS based
+PSS used to derive land suitability maps,
+calculate future land use demand, and
+formulate possible scenarios. In this research
+only the suitability module of What if? was
+used to formulate urban green system
+scenarios.
+2.2 Approaches to Group Decision
+Modelling
+There are many techniques for group decision
+modelling, which integrate multiple criteria
+decision-making and GIS based techniques
+[Malczewski 1999; Jankowski and Nyerges
+2001]. Some of these include the passive use
+of technology where PSS operators observe
+and model the results of scenarios created by
+participants using non-technical media such as
+paper maps and land use stickers. The passive
+scenario modelling approach was
+demonstrated at the PlaceMatters workshop
+2003, where Place3S PSS software, was used
+in a charette to formulate and evaluate
+potential development scenarios for a fictitious
+study area – Edge City, as illustrated in Figure
+1.
+Figure 1. Place3S passive group decision
+modelling
+Other approaches to group decision modelling
+may be undertaken using more active
+techniques, which allow the participants to
+directly interact with PSS software. Such can
+be the case with the What if? PSS, where
+participants enter their weightings of
+importance directly into the software and
+visualise the scenario results immediately after
+the geocomputational processing is completed.
+The later, active technology approach is
+utilised in both the case studies presented in
+this paper.
+Generally, the factor weighting and ratings
+employed in active group decision models
+need to be determined by informed decisionmakers
+and stakeholders. These individuals
+and groups may include environment planners
+and managers from local and state
+governments, community groups, and the
+public using formal approaches such as
+interview, public consultation, and discussions.
+For example, in Pettit's [2003] land use
+planning scenarios for Hervey Bay, the local
+council planners were consulted to determine
+the appropriate weighting and ratings. This
+approach was applied in developing
+preliminary urban green systems scenarios for
+the City of Darebin. Similarly, when dealing
+with scientific based decisions there is a need
+for the input of knowledge by experts in
+influencing the outcome of a classification. In
+the ecoregion case study expert knowledge
+from a panel is used to select model
+parameters, adjust parameter distributions, and
+assist in separating structural characteristics of
+observed data from unstructured random
+effects. This is explained in detail for the
+ecoregional analysis in the next section.
+3. A CASE STUDY APPROACH
+3.1 Urban Biodiversity in the City of
+Darebin
+Green systems such as parks and waterways
+are an important component of the urban
+environment. Preserving and enhancing green
+systems is critical not only for sustaining and
+improving the quality of life of urban residents
+but also for conserving biodiversity. In the
+Metropolitan v 2030 Strategy, the importance
+of sustainable green systems is expressed in
+the vision for the city in 2030 in the form of
+green wedges [DOI, 2002].
+The city of Darebin is one of 31 Council
+comprising metropolitan Melbourne
+Geographically. Darebin is located between
+Melbourne’s central business district (CBD)
+and the City of Whittlesea growth area. The
+City has diverse open space networks that are
+facing pressure from urban development.
+Certain areas with environmental and cultural
+significance in the City of Darebin need to be
+protected including: native grasslands,
+waterways (such as Merri and Darebin
+Creeks), and significant remnant vegetation
+(such as river red gums at Mount Cooper).
+Darebin has nearly 0.6 square metres of open
+space per person, a level comparable to many
+other inner Melbourne municipalities.
+Before the urban green system scenarios were
+formulated for the City of Darebin a
+geodatabase was created. Datasets comprising
+this database includes:
+1. Green systems data – open spaces,
+waterways and water areas;
+2. Biodiversity data – flora, ecological
+vegetation classes, threatened fauna;
+3. Cultural heritage data – registered
+heritage sites; and
+4. Planning scheme and land parcel
+(cadastral) data.
+A number of buffering and union GIS
+operations were performed on these data
+layers. For example, to accommodate the
+analysis of suitability of land use by protecting
+the natural and cultural heritage, green
+systems, biodiversity, and cultural heritage
+areas were buffered into 5 zones (0-25, 25-50,
+50-75, 75-100, >100 metres) to classify the
+conservation importance of these areas in
+sustainable land use. The resultant datasets
+were used to construct the geodatabase for
+importing into What if?.
+A number of urban green systems scenarios
+were developed to consider the principal of
+sustainable built environment, and to analyse
+and determine the supply of land (both
+quantity and location) suitable for protecting
+and enhancing the existing green system and
+biodiversity. Land suitability analysis was
+undertaken using a weighted linear
+combination (WLC), multiple criteria analysis
+(MCA) model, based on the sieve mapping
+overlay technique [McHarg, 1969]. The MCA
+model is a simple mathematical procedure
+which multiplies each decision factor’s rating
+by the overall weighting of importance
+assigned by the user and then performs an
+additive operation, combining all suitability
+factors, to derive a final potential cost surface,
+also known as a suitability map. By using this
+simple MCA technique the underlying
+mathematical model is easily understood by
+most planners, decision-makers and ultimately
+the community.
+The decision factors have been formulated
+from a number of spatial datasets listed above
+using standardised factor values related to
+buffer distances and weightings determined by
+priorities in accordance to the existing Darebin
+Council planning policies. In summary, the
+land suitability analysis module in What if?
+enabled multiple decision factors to be
+synthesised in order to determine the relative
+suitability of different locations for a particular
+land use (‘open space’ in this study). Table 1
+contains the weightings and rating assigned by
+the City of Darebin environmental planners
+used to formulate one of the sustainable urban
+green system scenarios.
+Category
+Considered suitability factors and ratings
+Open Water
+Land
+Factors Fauna Flora space features Heritage EVC Use
+Factor weight 3 3 3 3 - - 2
+0-25 5 5 3 5 - - Park 5
+Buffers
+(m)
+25-50 5 4 3 4 - - bus 2
+50-75 5 3 2 3 - - ind 2
+75-100 5 2 2 2 - - infra 3
+Outside 1 1 1 1 - - res 2
+Table 1. Urban Green System Scenario
+weightings and ratings.
+These weightings and ratings, combined with
+permissible land use conversion values, were
+used to formulate the urban green space
+scenario illustrated in Figure 2. This particular
+scenario is based on a policy of preserving
+open space, primarily for biodiversity
+purposes, rather than cultural amenity.
+Figure 2. Biodiversity Green System Scenario
+for the City of Darebin.
+3.2 Modelling Ecoregions in Queensland
+Ecoregions define recognisable areas that
+embody broad environmental and landscape
+structures. Queensland, like most states in
+Australia, has developed a hierarchical
+classification of ecoregions for conservation
+planning, natural resource management and
+funding allocation. Because of their
+significance in decision-making and legislation
+it is essential that ecoregions be defined in an
+objective and scientifically defensible manner.
+This lead to a project between the state
+Environmental Protection Agency and the
+University of Queensland to develop a
+ecosystem classification that combined expert
+(qualitative) knowledge from ecologists and
+(quantitative) data analysis of environmental
+data. The resulting classification is described
+in Pullar et al. [2004]. The main feature of this
+classification is that qualitative forms of
+knowledge are interpreted as quantitative data
+in a rigorous statistical model. Forms of
+knowledge include rules of thumb, expert
+advice, scientific publications, or reports. The
+Bayesian modelling approach supports the
+inclusion of this knowledge as informative
+priors, which is balanced with hard data in the
+model result. The procedure of transforming
+knowledge into probability statements for
+informative priors in modelling is called
+information elicitation. In this case study,
+information elicitation is carried out through a
+focused workshop that brings together
+scientists to define ecoregions. The experts
+often express their knowledge geographically
+by describing regions that, in their opinion,
+characterise a unique pattern of biotic and
+landscape qualities. For instance, coastal
+lowland regions with Melaleuca open forest.
+Through information elicitation we obtain
+geographical descriptions for ecoregions, and
+analyse these locations with measurable
+environmental data, such as climatic, terrain,
+and soil data. The experts can interactively
+explore and adjust environmental data
+distributions and their confidence in these to
+conform to their opinions of ecoregions. This
+is transformed into probability distributions
+and an overall weight is given for this prior
+information. The Bayesian modelling
+computes definitions for ecoregions producing
+outputs as classified maps, uncertainty maps
+and charts showing the posterior probability
+distributions.
+A GIS application has been written for
+elicitation of ecoregion classifications. The
+three main components of the system are: i) an
+exploratory interface for users to select areas
+that define ecoregions by querying locations
+and attributes (biotic and landscape categorical
+variables), ii) data visualisation tool that allows
+users to adjust the abiotic variables used to
+characterise these ecoregions, and iii) a
+Markov Chain Monte Carlo (MCMC)
+simulation algorithms that uses a Gibbs
+sampling technique [Gilks et al., 1996] to
+classify ecoregions as density mixture
+distributions. Figure 3 shows an example of an
+interface for the data visualisation tool. Experts
+can adjust class breaks of data distribution for
+several variables to define a model-based
+cluster corresponding to an ecoregion.
+Figure 3. Data visualisation of environmental
+(abiotic) variables from geographical selection.
+4. ADVANTAGES & WEAKNESSES
+The land suitability analysis approach to urban
+green systems scenario modelling has many
+advantages. It is objective and effective;
+decision factors can be clearly defined and
+adjusted according to the objectives. It is
+transparent as it enables planners, decisionmakers
+and ultimately community members to
+formulate scenarios by allowing participants to
+select effective decision factors, assign various
+weightings of importance to different decision
+factors, and examine the results by spatial
+demonstration (suitability maps and reports).
+Weightings and ratings can easily be adjusted
+to re-run scenarios based on different policy
+emphasise.
+This type of modelling approach can help to
+optimise the allocation of additional land to
+enhance existing green systems in built-up
+areas such as in the City of Darebin. However,
+one of the weaknesses of the model is the
+constraint imposed by jurisdictional
+boundaries. This means that the formulation of
+an integrated urban green system is restricted,
+which negatively impacts on the effectiveness
+of biodiversity corridors, a critical issue in
+urban environmental management. For
+example, Darebin and Merri Creeks flow
+through three councils – Darebin, Moreland
+and Banyule. For biodiversity protection of
+such riparian habitats cross-jurisdictional land
+use management practices need to be put in
+place.
+Another weakness in the urban green systems
+scenario modelling approach is it considers the
+future land use suitability only from the
+perspective of biodiversity conservation and
+green systems enhancement. However, in
+reality many other complex issues need to be
+considered including social and economic
+dimensions pertaining to surrounding land uses
+and values.
+The advantages and weaknesses in the
+ecoregional classification approach are
+discussed in Pullar et al. [2004]. In this case
+the output of expert collaboration is to produce
+a regionalisation that is used as a framework
+for environmental decision-making.
+Differences of opinion can arise because
+certain types of species are seen as endemic to
+an area, or experts believe an ecological
+community needs to be identified within a
+region to remain intact. If there are conflicts in
+opinion these can be broken down by
+geographical descriptions to pinpoint where
+the differences lie. It is generally agreed that
+this does provide a better way for informing
+the decision-making process, and the resulting
+classifications are considered more defensible
+from an ecological and legal standpoint.
+5. FUTURE WORK
+In this study, the factor weightings and ratings
+are only considered from environmental
+planners from the City of Darebin. However,
+there is a need to involve stakeholders, and
+community groups in the selection of model
+inputs, factor weightings and ratings. This will
+be explored in future studies.
+Further work is required in improving the
+usability of collaborative PSS systems such as
+What if?. For example work is currently being
+undertaken to improve the weighting and
+rating capability of the suitability module
+through the incorporation of slider bars to
+enable users to set decision factor trade-offs, as
+illustrated in Figure 4.
+Figure 4. Future enhancements to What if? -
+slider bar decision factor settings.
+6. CONCLUSIONS
+One of the current research foci of scenario
+modelling has been the integration of maps
+with multiple criteria decision models.
+Progress in this area has been slow due to a
+limited role played by maps as decision
+support tools [Jankowski et al., 2001]. This
+research examines the application of two
+modelling approaches, which endeavour to
+integrate mapping with multiple criteria
+decision-making techniques.
+The urban green systems scenario modelling
+for the City of Darebin is an example of how
+GIS and PSS technology can be used to
+collaboratively preserve and enhance
+biodiversity in urban areas. Using a
+collaborative scenario modelling approach,
+decisions on sustainable land use can be made
+by potentially incorporating the opinions of
+different experts, decision-makers, and
+ultimately the wider community.
+It is anticipated that a refined scenario
+modelling approach will eventually be widely
+used by planners, decision-makers and the
+community to assist in achieving the
+Melbourne 2030 vision. Such a modelling
+approach could help local councils comprising
+metropolitan Melbourne to implement an
+integrated green systems strategy for
+preserving and enhancing urban biodiversity
+and conservation.
+The ecoregion classification demonstrates a
+different approach to modelling. The aim is to
+produce an ecoregion classification based upon
+environmental data. However, much of the
+knowledge about ecoregions cannot be readily
+expressed quantitatively. The case study
+demonstrates that expert knowledge can be
+expressed as geographical descriptions, which
+are transformed into probability measures used
+in a rigorous statistical model. The use of a
+Bayesian modelling approach highlights the
+possibility of combining qualitative and
+quantitative information to produce model
+results that include uncertainty values.
+7. REFERENCES
+DOI., Melbourne 2030: Planning for
+Sustainable Growth. Melbourne,
+Victorian Department of Infrastructure,
+202pp.,Melbourne, 2002.
+Forester, J., The deliberative practitioner:
+encouraging participatory planning
+processes, MIT Press, 321pp.,
+Cambridge, Mass, 1999.
+Gilks, W. R., S., D.J. Richardson and D. J.
+Spiegelhalter, Markov Chain Monte
+Carlo in Practice, Chapman & Hall,
+512pp., London, 1996.
+Jankowski, P., N. Andrienko and G.
+Andrienko, Map-centred exploratory
+approach to multiple criteria spatial
+decision-making, International Journal
+of Geographical Information Science
+15(2), 101-127, 2001.
+Jankowski, P. and T. Nyerges, Geographical
+Information Systems for Group
+Decision Making, Taylor & Francis,
+240pp., London, 2001.
+Klosterman, R. E., The What if? Collaborative
+planning support system, Environment
+and Planning B: Planning and Design,
+26, 393-408, 1999.
+Malczewski, J., GIS and Multicriteria
+Decision Analysis, John Wiley & Sons,
+392pp., Brisbane, 1999.
+McHarg, I. L., Design with Nature, Doubleday
+Natural History Press, 208pp., New
+York, 1969.
+Miller, W., W. M. G. Collins, F. R. Steiner and
+E. Cook, An approach for greenway
+suitability analysis, Landscape and
+Urban Planning, 42, 91-105, 1998.
+Pettit, C., Formulating a Sustainable
+Development Land Use Strategy for
+Hervey Bay 2021, paper presented at
+the 8th International Conference on
+Computers in Urban Planning and
+Urban Management, CUPUM, Sendai,
+Japan, May 27-29, 2003.
+Pullar, D., S. Low Choy and W. Rochester,
+Ecoregion Classification using a
+Bayesian Approach and Centre-focused
+Clusters, paper presented at the 2nd
+International Environmental Modelling
+and Software Society Conference,
+IEMSS University of Osnabruck,
+Germany, June14-17, 2004.
+Stillwell, J., Planning Support Systems in
+Practice, paper presented at the 8th
+Conference on Computers in Urban
+Planning and Urban Management,
+CUPUM, Sendai, Japan, May 27-29,
+2003.
+Synder, K., Tools for Community Design and
+Decision-making, in Planning Support
+Systems in Practice, S. Geertman and J.
+Stillwell (eds.), Springer, 99-120,
+Berlin, 2001.
+Veenklaas, F. R. and L. M. van den Berg,
+Scenario building: art, craft or just a
+fashionable whim?, paper presented at
+the Symposium Scenario Studies for the
+Rural Environment, Kluwer Academic
+Publishing, Wageningen, Netherlands,
+September 12-15, 1994.
