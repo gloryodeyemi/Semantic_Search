@@ -25,21 +25,22 @@ with index.searcher() as searcher:
     user_query = input("Enter your search query: ")
     parsed_query = query_parser.parse(user_query)
 
-    # Perform the search
-    results = searcher.search(parsed_query, limit=5)
-    print(results)
-
     # Transform the query into a TF-IDF vector using the same vectorizer
     query_vector = vectorizer.transform([user_query])
-    print(query_vector)
 
-    if len(results) == 0:
-        print("No documents found matching the query.")
-    else:
-        for hit in results:
-            print(hit)
-            similarity_score = cosine_similarity(query_vector, tfidf_matrix[hit.rank])[0][0]
-            print(f"Similarity Score: {similarity_score}")
+    # Calculate cosine similarity between the query vector and documents in the TF-IDF matrix
+    similarity_scores = cosine_similarity(query_vector, tfidf_matrix).flatten()
+
+    # Get the indices of top 5 similar papers
+    top_similar_indices = similarity_scores.argsort()[-5:][::-1]
+
+    # Inside the loop where documents are retrieved based on similarity scores
+    for idx in top_similar_indices:
+        similarity_score = similarity_scores[idx]
+        idx_str = str(idx)
+        # Retrieve the document by its path field
+        hit = searcher.document(path=idx_str)
+        if hit:
             original_paper_path = hit['path']
 
             file_name = os.path.basename(original_paper_path)
@@ -47,3 +48,5 @@ with index.searcher() as searcher:
 
             shutil.copyfile(original_paper_path, destination_path)
             print(f"Paper copied to: {destination_path}")
+        else:
+            print("No similar papers.")

@@ -1,5 +1,4 @@
-A Sequential Sampling Algorithm for a
-General Class of Utility Criteria
+A Sequential Sampling Algorithm for a General Class of Utility Criteria
 Tobias Scheffer and Stefan Wrobel
 
 University of Magdeburg, FIN/IWS
