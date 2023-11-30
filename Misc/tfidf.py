@@ -101,8 +101,6 @@ def semantic_search(query, papers_content, tfidf_matrix, vectorizer):
 query = "Consistent hierarchies of nonlinear abstractions"
 top_5_similar_papers = semantic_search(query, papers_content, tfidf_matrix, vectorizer)
 
-# ... (previous code remains unchanged until this point)
-
 # Step 5: Generating txt files for Top 5 Papers
 output_directory = 'results'
 
