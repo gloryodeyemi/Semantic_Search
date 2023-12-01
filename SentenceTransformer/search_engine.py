@@ -4,13 +4,11 @@ from sklearn.metrics.pairwise import cosine_similarity
 from SentenceTransformer.preprocess import load_data
 
 # Load the JSON file containing paper data
-# file_path = '/Users/new/Downloads/UWindsor/COMP_8380/Semantic_Search/data/arxiv-data.json'
 file_path = 'data/arxiv-data.json'
 papers_data = load_data(file_path, 100)
 
 # load precomputed embeddings for the subset
 paper_embeddings = np.load('SentenceTransformer/embeddings/roberta_embeddings.npy')
-# paper_embeddings = np.load('embeddings/paper_embeddings.npy')
 
 # use an SBERT-based model for sentence embeddings
 model = SentenceTransformer('stsb-roberta-base')
@@ -43,10 +41,3 @@ def semantic_search(query, top_k=5, batch_size=8):
     ]
 
     return search_results
-
-
-# if __name__ == '__main__':
-#     # example usage
-#     query = "Enter query here"
-#     results = semantic_search(query)
-#     print(results)

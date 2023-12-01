@@ -132,6 +132,7 @@ venv.bak/
 .spyderproject
 .spyproject
 .DS_Store
+.idea
 
 # Rope project settings
 .ropeproject
