@@ -1,0 +1,103 @@
+<!-- <!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <title>Semantic Search Engine</title>-->
+<!--    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">-->
+<!--</head>-->
+<!--<body>-->
+<!--    <h1>Enter your query:</h1>-->
+<!--    <form method="post" action="/">-->
+<!--        <input type="text" name="query">-->
+<!--        <input type="submit" value="Search">-->
+<!--    </form>-->
+
+<!--    {% if results %}-->
+<!--        <h2>Search Results:</h2>-->
+<!--        <ul>-->
+<!--            {% for paper in results %}-->
+<!--                <li>-->
+<!--                    <h3>{{ paper['paper_info']['title'] }}</h3>-->
+<!--                    <p><strong>Authors:</strong> {{ paper['paper_info']['authors'] }}</p>-->
+<!--                    <p><strong>Abstract:</strong> {{ paper['paper_info']['abstract'] }}</p>-->
+<!--                    <p><strong>DOI:</strong> <a href="{{ paper['paper_info']['doi'] }}">{{ paper['paper_info']['doi'] }}</a></p>-->
+<!--                    <p><strong>Similarity Score:</strong> {{ paper['similarity_score'] }}</p>-->
+<!--                    <p><strong>Download:</strong> <a href="https://arxiv.org/pdf/{{ paper['paper_info']['id'] }}">Download Paper</a></p>-->
+<!--                </li>-->
+<!--            {% endfor %}-->
+<!--        </ul>-->
+<!--    {% else %}-->
+<!--        {% if request.method == 'POST' %}-->
+<!--            <p>No results found for your query.</p>-->
+<!--        {% endif %}-->
+<!--    {% endif %}-->
+<!--</body>-->
+<!--</html>-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Semantic Search Engine</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Enter your query:</h1>
+        <form method="post" action="/">
+            <input type="text" name="query">
+            <input class="button-class" type="submit" value="Search">
+        </form>
+    </div>
+
+    <div class="container">
+        {% if query %}
+            <h2>Query:</h2>
+            <p>{{ query }}</p>
+        {% else %}
+            <p>Please enter a search query.</p>
+        {% endif %}
+    </div>
+
+    <div class="container">
+        {% if results %}
+            <h2>Search Results:</h2>
+            <ul>
+                {% for paper in results %}
+                    <li>
+                        <h3>{{ paper['paper_info']['title'] }}</h3>
+                        <div class="dropdown">
+                            <span class="dropdown-arrow">▼</span>
+                            <div class="hidden-info">
+                                <p><strong>Authors:</strong> {{ paper['paper_info']['authors'] }}</p>
+                                <p><strong>Abstract:</strong> {{ paper['paper_info']['abstract'] }}</p>
+                                <p><strong>DOI:</strong> <a href="{{ paper['paper_info']['doi'] }}">{{ paper['paper_info']['doi'] }}</a></p>
+                                <p><strong>Similarity Score:</strong> {{ paper['similarity_score'] }}</p>
+                                <p><strong>Download:</strong> <a href="https://arxiv.org/pdf/{{ paper['paper_info']['id'] }}" target="_blank">Download Paper</a></p>
+                            </div>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            {% if request.method == 'POST' %}
+                <p>No results found for your query.</p>
+            {% endif %}
+        {% endif %}
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const dropdowns = document.querySelectorAll('.dropdown');
+            dropdowns.forEach((dropdown) => {
+                dropdown.addEventListener('click', (event) => {
+                    const hiddenInfo = event.currentTarget.querySelector('.hidden-info');
+                    if (hiddenInfo) {
+                        hiddenInfo.classList.toggle('show-info');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
