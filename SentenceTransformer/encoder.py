@@ -5,7 +5,7 @@ import os
 
 # load the JSON file containing paper data
 file_path = '../data/arxiv-data.json'
-papers_data = load_data(file_path, 100)
+papers_data = load_data(file_path, 10000)
 
 # use an SBERT-based model for sentence embeddings
 model = SentenceTransformer('stsb-roberta-base')

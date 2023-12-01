@@ -5,7 +5,7 @@ from SentenceTransformer.preprocess import load_data
 
 # Load the JSON file containing paper data
 file_path = 'data/arxiv-data.json'
-papers_data = load_data(file_path, 100)
+papers_data = load_data(file_path, 10000)
 
 # load precomputed embeddings for the subset
 paper_embeddings = np.load('SentenceTransformer/embeddings/roberta_embeddings.npy')
