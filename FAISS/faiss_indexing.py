@@ -27,37 +27,17 @@ def build_faiss_index(embedding_list, index_file_path, data):
     dimension = embeddings.shape[1]
     index = faiss.IndexFlatIP(dimension)  # IndexFlatIP for inner product (for cosine similarity)
 
-    # Step 3: Pass the index to IndexIDMap
+    # pass the index to IndexIDMap
     index = faiss.IndexIDMap(index)
     faiss.normalize_L2(embeddings)
 
-    # Step 4: Add vectors and their IDs
+    # add vectors and their IDs
     index.add_with_ids(embeddings, data.index_id.values)
 
     # write index to a file
     faiss.write_index(index, index_file_path)
 
     print(f"FAISS index is built and saved to {index_file_path}")
-
-# def build_faiss_index(embedding_list, index_file_path, data):
-#     embeddings = np.array(embedding_list).astype("float32")
-#     embeddings = np.squeeze(embeddings, axis=1)
-#
-#     # set up an index
-#     dimension = embeddings.shape[1]
-#     index = faiss.IndexFlatL2(dimension)  # IndexFlatIP for inner product (for cosine similarity)
-#
-#     # Step 3: Pass the index to IndexIDMap
-#     index = faiss.IndexIDMap(index)
-#     # faiss.normalize_L2(embeddings)
-#
-#     # Step 4: Add vectors and their IDs
-#     index.add_with_ids(embeddings, data.index_id.values)
-#
-#     # write index to a file
-#     faiss.write_index(index, index_file_path)
-#
-#     print(f"FAISS index is built and saved to {index_file_path}")
 
 
 def main(model_name, data):
@@ -80,13 +60,6 @@ def main(model_name, data):
     for _, item in dataset.iterrows():
         try:
             text_to_embed = f"{item.title} {item.abstract}"
-            # if model_name == "bert-base-uncased":
-            #     embedding = get_embedding2(text_to_embed, model, tokenizer)
-            #     # print(embedding.shape)
-            # elif model_name == "gpt2":
-            #     embedding = get_embedding2(text_to_embed, model, tokenizer)
-            #     # embedding = np.mean(embedding, axis=1, keepdims=True)
-            #     # embedding = embedding.squeeze(1)
             embedding = get_embedding2(text_to_embed, model, tokenizer)
             embeddings_list.append(embedding)
         except TypeError:

@@ -15,13 +15,6 @@ def load_index(index_p):
     return index
 
 
-# def get_query_embedding(query, model, tokenizer):
-#     # Generate embeddings for the query
-#     inputs = tokenizer(query, return_tensors="pt", padding=True, truncation=True)
-#     with torch.no_grad():
-#         outputs = model(**inputs)
-#     return outputs.pooler_output.numpy()
-
 def get_embedding1(text, model, tokenizer):
     # Generate embeddings for the query
     inputs = tokenizer(text, return_tensors="pt", padding=True, truncation=True)
@@ -44,14 +37,6 @@ def get_embedding2(text, model, tokenizer):
 
 # function to perform semantic search
 def semantic_search(query, model_name, model, tokenizer, faiss_index, faiss_dataset, top_k=5):
-    # get embedding for the query
-    # if model_name == "bert-base-uncased":
-    #     query_embedding = get_embedding2(query, model, tokenizer)
-    # elif model_name == "gpt2":
-    #     query_embedding = get_embedding2(query, model, tokenizer)
-    #     print(query_embedding.shape)
-    #     # query_embedding = np.mean(query_embedding, axis=1, keepdims=True)
-    #     # query_embedding = query_embedding.squeeze(1)
     query_embedding = get_embedding2(query, model, tokenizer)
     query_embedding = query_embedding.astype("float32")
     faiss.normalize_L2(query_embedding)

@@ -10,7 +10,7 @@
         <h1>Enter your query:</h1>
         <form method="post" action="/" id="search-form">
             <input type="text" name="query" id="query-text">
-            <!-- Dropdown for selecting the model -->
+            <!-- dropdown for selecting the model -->
             <select name="model">
                 <option value="bert-base-uncased">BERT Base Uncased</option>
                 <option value="gpt2">GPT-2</option>
@@ -19,7 +19,6 @@
             <input id='voice-search-btn' class="button-class" type="button" value="Voice Search" name="voice-search">
         </form>
     </div>
-<!--    onclick="startVoiceSearch()"-->
 
     {% if show_alphabets %}
         <div class="container">
