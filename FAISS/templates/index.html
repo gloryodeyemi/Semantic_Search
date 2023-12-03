@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Semantic Search Engine</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Enter your query:</h1>
+        <form method="post" action="/" id="search-form">
+            <input type="text" name="query" id="query-text">
+            <!-- Dropdown for selecting the model -->
+            <select name="model">
+                <option value="bert-base-uncased">BERT Base Uncased</option>
+                <option value="gpt2">GPT-2</option>
+            </select>
+            <input class="button-class" type="submit" value="Search" name="text-search">
+            <input id='voice-search-btn' class="button-class" type="button" value="Voice Search" name="voice-search">
+        </form>
+    </div>
+<!--    onclick="startVoiceSearch()"-->
+
+    {% if show_alphabets %}
+        <div class="container">
+            <h2>All Academic Papers</h2>
+            {% for letter in alphabets %}
+                <a href="{{ url_for('papers_by_alphabet', letter=letter) }}">{{ letter }}</a>{% if not loop.last %} | {% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if papers_by_alphabet %}
+        <div class="container">
+            <h2>All Papers starting with {{ letter }}</h2>
+            <ul>
+                {% for paper in paper_results %}
+                    <li>
+                        <h3>{{ paper['title'] }}</h3>
+                        <div class="dropdown">
+                            <span class="dropdown-arrow">▼</span>
+                            <div class="hidden-info">
+                                <p><strong>Authors:</strong> {{ paper['authors'] }}</p>
+                                <p><strong>Abstract:</strong> {{ paper['abstract'] }}</p>
+                                <p><strong>DOI:</strong> <a href="{{ paper['doi'] }}">{{ paper['doi'] }}</a></p>
+                                <p><strong>Download:</strong> <a href="https://arxiv.org/pdf/{{ paper['id'] }}" target="_blank">Download Paper</a></p>
+                            </div>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    {% if query %}
+        <div class="container">
+            <h2>Query:</h2>
+            <p>{{ query }}</p>
+        </div>
+    {% endif %}
+
+    <div class="container">
+        {% if results %}
+            <h2>{{ model }} search results:</h2>
+            <ul>
+                {% for paper in results %}
+                    <li>
+                        <h3>{{ paper['title'] }}</h3>
+                        <div class="dropdown">
+                            <span class="dropdown-arrow">▼</span>
+                            <div class="hidden-info">
+                                <p><strong>Authors:</strong> {{ paper['authors'] }}</p>
+                                <p><strong>Abstract:</strong> {{ paper['abstract'] }}</p>
+                                <p><strong>DOI:</strong> <a href="{{ paper['doi'] }}">{{ paper['doi'] }}</a></p>
+                                <p><strong>Score/Distance:</strong> {{ paper['score'] }}</p>
+                                <p><strong>Download:</strong> <a href="https://arxiv.org/pdf/{{ paper['id'] }}" target="_blank">Download Paper</a></p>
+                            </div>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            {% if request.method == 'POST' %}
+                <p>No results found for your query.</p>
+            {% endif %}
+        {% endif %}
+    </div>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

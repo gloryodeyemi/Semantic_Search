@@ -1,0 +1,36 @@
+detailed python code to create a semantic search engine with BERT language model and FAISS FOR K-nearest neighbor search using a dataset that is a json file that has the following format:
+
+id: ArXiv ID (can be used to access the paper, see below)
+submitter: Who submitted the paper
+authors: Authors of the paper
+title: Title of the paper
+comments: Additional info, such as number of pages and figures
+journal-ref: Information about the journal the paper was published in
+doi: [https://www.doi.org](Digital Object Identifier)
+abstract: The abstract of the paper
+categories: Categories / tags in the ArXiv system
+versions: A version history
+
+The code should follow the steps below:
+Step 1: Load and finetune the BERT model using the dataset and save the fine-tuned model.
+Step 2: Use the saved model to encode and generate embeddings for the data.
+Step 3: Use the FAISS library to create index to store the embeddings and data.
+Step 4: Use the FAISS library as a semantic search tool for the k-nearest neighbor search.
+
+The code should include a web app where a user can enter their query in the search bar and the top 5 nearest papers are returned with the following info: title, authors, abstract, doi, and a link to download the paper where the link is https://arxiv.org/pdf/{id} where id is the paper id.
+Also, break the functionalities into separate Python files for easy readability. For example, the process of fine-tuning the model and generating embeddings and using FAISS for the indexing should be separate from the process of search and retrieval.
+
+- data/
+  - papers.json  # Your dataset file
+- models/
+  - bert_finetuned_model.pth  # Fine-tuned BERT model checkpoint
+- app/
+  - templates/
+    - index.html  # HTML template for the web interface
+  - static/
+    - style.css  # CSS file for styling
+  - server.py  # Flask server to handle web requests
+- bert_finetune.py  # Fine-tuning BERT on the dataset
+- generate_embeddings.py  # Generating embeddings using the fine-tuned BERT model
+- faiss_indexing.py  # Indexing the embeddings using FAISS
+- semantic_search.py  # Performing semantic search using the indexed data

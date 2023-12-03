@@ -1,0 +1,3 @@
+Model,Training_time,Embedding_time,Search_time
+bert-base-uncased,141.133,4.481,0.001
+gpt2,213.463,5.767,0.001

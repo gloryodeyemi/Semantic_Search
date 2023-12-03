@@ -131,3 +131,39 @@ a:hover {
     border-width: 0 4px 5px 4px;
     border-color: transparent transparent #333 transparent;
 }
+
+/* Dropdown styles */
+select[name="model"] {
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    margin-right: 10px;
+    width: 150px; /* Adjust the width as needed */
+}
+
+/* Style the arrow */
+select[name="model"]::after {
+    content: '\25BE'; /* Unicode character for downward arrow */
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: #999;
+}
+
+/* Remove default arrow */
+select[name="model"]::-ms-expand {
+    display: none;
+}
+
+/* Style the dropdown options */
+select[name="model"] option {
+    background-color: #fff;
+    color: #333;
+}
+
+/* Hover effect for options */
+select[name="model"] option:hover {
+    background-color: #f0f0f0;
+}
