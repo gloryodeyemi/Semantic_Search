@@ -3,20 +3,31 @@ import faiss
 import numpy as np
 import pandas as pd
 import torch
-from transformers import BertModel, BertTokenizer, GPT2Model, GPT2Tokenizer
+from transformers import AutoTokenizer, AutoModel
+import matplotlib.pyplot as plt
 from preprocess import Preprocess
 
 data_preprocessing = Preprocess('../data/arxiv-data.json')
+# load the dataset
+dataset = pd.read_csv('../data/df-data.csv')
 
 
-def get_embedding2(text, model, tokenizer):
+def get_embedding3(text, model, tokenizer):
     inputs = tokenizer(text, return_tensors="pt", padding=True, truncation=True)
+    # generate embeddings
     with torch.no_grad():
         outputs = model(**inputs)
+        last_hidden_states = outputs.last_hidden_state
 
-    # text_embeddings = outputs.last_hidden_state.numpy()
-    text_embeddings = outputs.last_hidden_state[:, 0].numpy()
+    # extract the embeddings
+    text_embeddings = last_hidden_states.mean(dim=1)  # mean pooling across the sequence dimension
     return text_embeddings
+
+
+def load_model_and_tokenizer(model_name, tokenizer_name):
+    model = AutoModel.from_pretrained(model_name)
+    tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
+    return model, tokenizer
 
 
 def build_faiss_index(embedding_list, index_file_path, data):
@@ -40,15 +51,48 @@ def build_faiss_index(embedding_list, index_file_path, data):
     print(f"FAISS index is built and saved to {index_file_path}")
 
 
-def main(model_name, data):
+def plot_embedding_time():
+    # load the CSV file into a DataFrame
+    time_data = pd.read_csv('results/training_time.csv')
+
+    # extract necessary data
+    models = time_data['Model']
+    embedding_times = time_data['Embedding_time']
+
+    # plotting the line chart
+    plt.figure(figsize=(10, 6))
+
+    for model, time_ in zip(models, embedding_times):
+        plt.plot([0, 1], [0, time_], marker='o', linestyle='-', label=f"{model} = {time_:.2f}s")
+
+    plt.title('Embedding Time for Different Models')
+    plt.xlabel('Progress')
+    plt.ylabel('Embedding Time')
+    plt.xticks([0, 1], ['0', 'Embedding Time'])
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+
+    # save the chart as a PNG image
+    plt.savefig('results/embedding_times_chart.png')
+
+    # show the plot
+    plt.show()
+
+
+def main(model_name):
+    # load the model and tokenizer
     if model_name == "bert-base-uncased":
-        # load the fine-tuned model and tokenizer
-        model = BertModel.from_pretrained('models/bert-base-uncased_finetuned.pth')
-        tokenizer = BertTokenizer.from_pretrained('models/bert-base-uncased_tokenizer')
+        model, tokenizer = load_model_and_tokenizer(model_name='models/bert-base-uncased_finetuned.pth',
+                                                    tokenizer_name='models/bert-base-uncased_tokenizer')
+    elif model_name == "sbert":
+        model_ckpt = "sentence-transformers/multi-qa-mpnet-base-dot-v1"
+        model, tokenizer = load_model_and_tokenizer(model_name=model_ckpt, tokenizer_name=model_ckpt)
     elif model_name == "gpt2":
-        # load the fine-tuned model and tokenizer
-        model = GPT2Model.from_pretrained('models/gpt2_finetuned.pth')
-        tokenizer = GPT2Tokenizer.from_pretrained('models/gpt2_tokenizer')
+        model, tokenizer = load_model_and_tokenizer(model_name='models/gpt2_finetuned.pth',
+                                                    tokenizer_name='models/gpt2_tokenizer')
+        tokenizer.add_special_tokens({'pad_token': '[CLS]'})
+        tokenizer.pad_token = '[CLS]'
     else:
         return
 
@@ -60,7 +104,7 @@ def main(model_name, data):
     for _, item in dataset.iterrows():
         try:
             text_to_embed = f"{item.title} {item.abstract}"
-            embedding = get_embedding2(text_to_embed, model, tokenizer)
+            embedding = get_embedding3(text_to_embed, model, tokenizer)
             embeddings_list.append(embedding)
         except TypeError:
             print(f"TypeError: Item causing the issue: {item}")
@@ -75,11 +119,14 @@ def main(model_name, data):
     build_faiss_index(embeddings_list, index_path, dataset)
 
 
-# load the dataset
-dataset = pd.read_csv('../data/df-data.csv')
-
 # build index for bert model
-main("bert-base-uncased", dataset)
+main("bert-base-uncased")
+
+# build index for sbert model
+main("sbert")
 
 # build index for gpt2 model
-main("gpt2", dataset)
+main("gpt2")
+
+# plot graph
+plot_embedding_time()

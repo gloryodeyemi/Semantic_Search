@@ -2,26 +2,8 @@ import string
 import feature_logic
 from flask import Flask, render_template, request
 from semantic_search import main
-import speech_recognition as sr
 
 app = Flask(__name__)
-
-
-# Function to perform voice recognition and return the recognized text
-def recognize_speech():
-    recognizer = sr.Recognizer()
-    mic = sr.Microphone()
-    with mic as source:
-        recognizer.adjust_for_ambient_noise(source)
-        print("Say something...")
-        audio = recognizer.listen(source)
-    try:
-        query = recognizer.recognize_google(audio)
-        print(f"Recognized: {query}")
-        return query
-    except sr.UnknownValueError:
-        print("Could not understand audio.")
-        return None
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -30,11 +12,8 @@ def index():
     model = None
     results = []
     if request.method == 'POST':
-        if 'text-search' in request.form:  # check for text-based search
-            query = request.form['query']
-            model = request.form['model']
-        elif 'voice-search' in request.form:  # check for voice-based search
-            query = recognize_speech()
+        query = request.form['query']
+        model = request.form['model']
         if query:
             # perform semantic search
             results = main(query, model)

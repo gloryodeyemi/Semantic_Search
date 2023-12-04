@@ -1,3 +1,4 @@
 Model,Training_time,Embedding_time,Search_time
-bert-base-uncased,141.133,4.481,0.001
-gpt2,213.463,5.767,0.001
+bert-base-uncased,14236.336,749.368,0.009
+gpt2,23219.292,1082.805,0.004
+sbert,0.0,756.225,0.004

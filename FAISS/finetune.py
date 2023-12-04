@@ -98,8 +98,8 @@ def main(model_type, data):
         # GPT-2 model and tokenizer
         name = 'gpt2'
         tokenizer = GPT2Tokenizer.from_pretrained(name)
-        tokenizer.pad_token = tokenizer.eos_token
-        # tokenizer.add_special_tokens({'pad_token': '[PAD]'})
+        tokenizer.add_special_tokens({'pad_token': '[CLS]'})
+        tokenizer.pad_token = '[CLS]'
         lang_model = GPT2Model.from_pretrained(name)
     else:
         return
@@ -109,7 +109,7 @@ def main(model_type, data):
 
 
 # load the dataset
-train_data = data_preprocessing.convert_to_dataframe(50)
+train_data = data_preprocessing.convert_to_dataframe(10000)
 train_data.to_csv('../data/df-data.csv', index=False)
 
 # fine-tune bert model
