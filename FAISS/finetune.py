@@ -16,7 +16,7 @@ def tokenize_data(model_n, data_, model_tokenizer, max_length=512):
     for _, item in data_.iterrows():
         try:
             text = f"{item.title} {item.abstract}"
-            # Tokenize the text
+            # tokenize the text
             encoded_text = model_tokenizer.encode_plus(
                 text,
                 add_special_tokens=True,
@@ -24,7 +24,7 @@ def tokenize_data(model_n, data_, model_tokenizer, max_length=512):
                 padding='max_length',
                 truncation=True,
                 return_attention_mask=True,
-                return_tensors='pt'  # Returns PyTorch tensors
+                return_tensors='pt'
             )
 
             input_ids_list.append(encoded_text['input_ids'])
@@ -53,7 +53,7 @@ def finetune_and_save_model(model_name, model, model_tokenizer, preprocessed_dat
     # training loop
     for epoch in range(num_epochs):
         print(f"Epoch: {epoch}")
-        # convert processed data to BERT format
+        # convert processed data to model format
         input_ids, attention_mask = tokenize_data(model_name, preprocessed_data, model_tokenizer)
         dataset = TensorDataset(input_ids, attention_mask)
         dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
