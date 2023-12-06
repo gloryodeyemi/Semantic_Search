@@ -1,33 +1,10 @@
+import os
 import time
 import faiss
 import numpy as np
 import pandas as pd
-import torch
-from transformers import AutoTokenizer, AutoModel
 import matplotlib.pyplot as plt
-from preprocess import Preprocess
-
-data_preprocessing = Preprocess('../data/arxiv-data.json')
-# load the dataset
-dataset = pd.read_csv('../data/df-data.csv')
-
-
-def get_embedding3(text, model, tokenizer):
-    inputs = tokenizer(text, return_tensors="pt", padding=True, truncation=True)
-    # generate embeddings
-    with torch.no_grad():
-        outputs = model(**inputs)
-        last_hidden_states = outputs.last_hidden_state
-
-    # extract the embeddings
-    text_embeddings = last_hidden_states.mean(dim=1)  # mean pooling across the sequence dimension
-    return text_embeddings
-
-
-def load_model_and_tokenizer(model_name, tokenizer_name):
-    model = AutoModel.from_pretrained(model_name)
-    tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
-    return model, tokenizer
+from utils import helper, preprocess
 
 
 def build_faiss_index(embedding_list, index_file_path, data):
@@ -80,31 +57,19 @@ def plot_embedding_time():
     plt.show()
 
 
-def main(model_name):
+def main(model_name, data):
     # load the model and tokenizer
-    if model_name == "bert-base-uncased":
-        model, tokenizer = load_model_and_tokenizer(model_name='models/bert-base-uncased_finetuned.pth',
-                                                    tokenizer_name='models/bert-base-uncased_tokenizer')
-    elif model_name == "sbert":
-        model_ckpt = "sentence-transformers/multi-qa-mpnet-base-dot-v1"
-        model, tokenizer = load_model_and_tokenizer(model_name=model_ckpt, tokenizer_name=model_ckpt)
-    elif model_name == "gpt2":
-        model, tokenizer = load_model_and_tokenizer(model_name='models/gpt2_finetuned.pth',
-                                                    tokenizer_name='models/gpt2_tokenizer')
-        tokenizer.add_special_tokens({'pad_token': '[CLS]'})
-        tokenizer.pad_token = '[CLS]'
-    else:
-        return
+    model, tokenizer = helper.load_and_return(model_name=model_name)
 
     # get the embeddings
     embeddings_list = []
     print(f"Generating {model_name} embeddings...")
     init_time = time.time()
 
-    for _, item in dataset.iterrows():
+    for _, item in data.iterrows():
         try:
             text_to_embed = f"{item.title} {item.abstract}"
-            embedding = get_embedding3(text_to_embed, model, tokenizer)
+            embedding = helper.get_embeddings(text_to_embed, model, tokenizer)
             embeddings_list.append(embedding)
         except TypeError:
             print(f"TypeError: Item causing the issue: {item}")
@@ -112,21 +77,25 @@ def main(model_name):
     # get and save the embedding time
     embedding_time = round(time.time() - init_time, 3)
     print(f"Embeddings generated.\nTime taken: {embedding_time}s")
-    data_preprocessing.model_train_time(model_name, embedding_time=embedding_time, time_to_update="embedding")
+    preprocess.model_train_time(model_name, embedding_time=embedding_time, time_to_update="embedding")
 
     # create the index
-    index_path = f"faiss_index/{model_name}_faiss.index"
-    build_faiss_index(embeddings_list, index_path, dataset)
+    directory = "faiss_index"
+    if not os.path.exists(directory):
+        os.makedirs(directory)
 
+    index_path = os.path.join(directory, f"{model_name}_faiss.index")
+    build_faiss_index(embeddings_list, index_path, data)
+
+
+# load the dataset
+dataset = preprocess.convert_to_dataframe()
 
 # build index for bert model
-main("bert-base-uncased")
+main("bert-base-uncased", dataset)
 
 # build index for sbert model
-main("sbert")
-
-# build index for gpt2 model
-main("gpt2")
+main("sbert", dataset)
 
 # plot graph
 plot_embedding_time()

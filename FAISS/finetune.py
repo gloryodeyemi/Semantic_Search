@@ -1,12 +1,9 @@
+import os
 import time
-
-from preprocess import Preprocess
+from utils import helper, preprocess
 import torch
-from transformers import BertTokenizer, BertModel, AdamW, GPT2Tokenizer, GPT2Model
+from transformers import AdamW
 from torch.utils.data import DataLoader, TensorDataset
-import numpy as np
-
-data_preprocessing = Preprocess('../data/arxiv-data.json')
 
 
 def tokenize_data(model_n, data_, model_tokenizer, max_length=512):
@@ -72,8 +69,12 @@ def finetune_and_save_model(model_name, model, model_tokenizer, preprocessed_dat
         scheduler.step()
 
     # save the fine-tuned model and tokenizer
-    output_model_path = f'models/{model_name}_finetuned.pth'
-    output_tokenizer_path = f'models/{model_name}_tokenizer'
+    directory = "models"
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+    output_model_path = os.path.join(directory, f"{model_name}_finetuned.pth")
+    output_tokenizer_path = os.path.join(directory, f"{model_name}_tokenizer")
 
     model.save_pretrained(output_model_path)
     model_tokenizer.save_pretrained(output_tokenizer_path)
@@ -81,38 +82,19 @@ def finetune_and_save_model(model_name, model, model_tokenizer, preprocessed_dat
     # get and save the training time
     training_time = round(time.time() - init_time, 3)
     print(f"Fine-tuning done and model saved.\nTime taken: {training_time}s")
-    data_preprocessing.model_train_time(model_name, training_time=training_time, time_to_update="training")
+    preprocess.model_train_time(model_name, training_time=training_time, time_to_update="training")
 
 
 def main(model_type, data):
-    name = None
-    tokenizer = None
-    lang_model = None
-
-    if model_type == 'bert':
-        # define BERT model and tokenizer
-        name = 'bert-base-uncased'
-        tokenizer = BertTokenizer.from_pretrained(name)
-        lang_model = BertModel.from_pretrained(name)
-    elif model_type == 'gpt2':
-        # GPT-2 model and tokenizer
-        name = 'gpt2'
-        tokenizer = GPT2Tokenizer.from_pretrained(name)
-        tokenizer.add_special_tokens({'pad_token': '[CLS]'})
-        tokenizer.pad_token = '[CLS]'
-        lang_model = GPT2Model.from_pretrained(name)
-    else:
-        return
-
+    lang_model, tokenizer = helper.load_and_return(model_type)
     # finetune the BERT model
-    finetune_and_save_model(model_name=name, model=lang_model, model_tokenizer=tokenizer, preprocessed_data=data)
+    finetune_and_save_model(model_name=model_type, model=lang_model, model_tokenizer=tokenizer, preprocessed_data=data)
 
 
 # load the dataset
-train_data = data_preprocessing.convert_to_dataframe(10000)
-train_data.to_csv('../data/df-data.csv', index=False)
+train_data = preprocess.convert_to_dataframe()
 
 # fine-tune bert model
-main("bert", train_data)
+main("bert-base-uncased", train_data)
 # fine-tune gpt2 model
 main("gpt2", train_data)

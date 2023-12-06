@@ -1,8 +1,6 @@
 import time
 import faiss
-from preprocess import Preprocess
-import torch
-from transformers import AutoTokenizer, AutoModel
+from utils import helper, preprocess
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -11,7 +9,7 @@ import matplotlib
 # use a non-GUI backend for Matplotlib
 matplotlib.use('Agg')
 
-data_preprocessing = Preprocess('../data/arxiv-data.json')
+DATASET = pd.read_csv('data/df-data.csv', dtype={'id': str})
 
 
 def load_index(index_p):
@@ -20,44 +18,23 @@ def load_index(index_p):
     return index
 
 
-def load_model_and_tokenizer(model_name, tokenizer_name):
-    model = AutoModel.from_pretrained(model_name)
-    tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
-    return model, tokenizer
-
-
-def get_embedding3(text, model, tokenizer):
-    inputs = tokenizer(text, return_tensors="pt", padding=True, truncation=True)
-    # generate embeddings
-    with torch.no_grad():
-        outputs = model(**inputs)
-        last_hidden_states = outputs.last_hidden_state
-
-    # extract the embeddings
-    text_embeddings = last_hidden_states.mean(dim=1)  # mean pooling across the sequence dimension
-    return text_embeddings
-
-
 # function to perform semantic search
-def semantic_search(query, model_name, model, tokenizer, faiss_index, faiss_dataset, top_k=10):
-    query_embedding = get_embedding3(query, model, tokenizer)
+def semantic_search(query, model_name, model, tokenizer, faiss_index, top_k=10):
+    query_embedding = helper.get_embeddings(query, model, tokenizer)
     query_embedding = np.array(query_embedding).astype("float32")
-    # faiss.normalize_L2(query_embedding)
-
-    query_embedding = query_embedding / np.linalg.norm(query_embedding)
+    faiss.normalize_L2(query_embedding)
 
     print(f"Searching FAISS index for {model_name} model...")
     init_time = time.time()
 
     # search in FAISS index
     distance, index = faiss_index.search(query_embedding, top_k)
-    # print(f"Distances: {distance}\nIndices: {index}")
 
     # get data information for the top-k similar results
     similar_results = []
     for i, idx in enumerate(index[0]):
-        if idx < len(faiss_dataset):
-            result_info = faiss_dataset.iloc[idx]
+        if idx < len(DATASET):
+            result_info = DATASET.iloc[idx]
             score = f"{distance[0][i]:.4f}"
             result_info['score'] = score
             similar_results.append(result_info.to_dict())
@@ -67,7 +44,7 @@ def semantic_search(query, model_name, model, tokenizer, faiss_index, faiss_data
     # get and save the embedding time
     search_time = round(time.time() - init_time, 3)
     print(f"Searching done.\nTime taken: {search_time}s")
-    data_preprocessing.model_train_time(model_name, search_time=search_time, time_to_update="search")
+    preprocess.model_train_time(model_name, search_time=search_time, time_to_update="search")
 
     return similar_results
 
@@ -97,36 +74,16 @@ def plot_search_time():
     # save the chart as a PNG image
     plt.savefig('results/search_times_chart.png')
 
-    # show the plot
-    # plt.show()
-
 
 def main(user_query, model_n):
-    model = None
-    tokenizer = None
-
     # load the FAISS index and dataset
     index_path = f"faiss_index/{model_n}_faiss.index"
-    dataset = pd.read_csv('../data/df-data.csv', dtype={'id': str})
 
     # load the model and tokenizer
-    if model_n == "bert-base-uncased":
-        model, tokenizer = load_model_and_tokenizer(model_name='models/bert-base-uncased_finetuned.pth',
-                                                    tokenizer_name='models/bert-base-uncased_tokenizer')
-    elif model_n == "sbert":
-        model_ckpt = "sentence-transformers/multi-qa-mpnet-base-dot-v1"
-        model, tokenizer = load_model_and_tokenizer(model_name=model_ckpt, tokenizer_name=model_ckpt)
-    elif model_n == "gpt2":
-        model, tokenizer = load_model_and_tokenizer(model_name='models/gpt2_finetuned.pth',
-                                                    tokenizer_name='models/gpt2_tokenizer')
-        tokenizer.add_special_tokens({'pad_token': '[CLS]'})
-        tokenizer.pad_token = '[CLS]'
-    else:
-        return
+    model, tokenizer = helper.load_and_return(model_name=model_n)
 
     # perform semantic search
-    result = semantic_search(user_query, model_n, model, tokenizer,
-                             load_index(index_path), dataset)
+    result = semantic_search(user_query, model_n, model, tokenizer, load_index(index_path))
 
     plot_search_time()
     return result

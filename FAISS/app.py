@@ -1,5 +1,5 @@
 import string
-import feature_logic
+from utils import feature_logic
 from flask import Flask, render_template, request
 from semantic_search import main
 
