@@ -4,7 +4,7 @@ A semantic search engine using Facebook AI Similarity Search (FAISS) and languag
 **Keywords:** Semantic Search, Indexing, Vectors, Embedding.
 
 ## The Data
-A subset of the [ArXiv dataset](https://www.kaggle.com/datasets/Cornell-University/arxiv/) was used for this project.
+A subset of the [ArXiv dataset](https://www.kaggle.com/datasets/Cornell-University/arxiv/) (10,000 articles) was used for this project.
 
 ## Requirements
 You can find the modules and libraries used in this project in the [requirement.txt](https://github.com/gloryodeyemi/Semantic_Search/blob/main/FAISS/requirements.txt) file. You can also run the code below.
