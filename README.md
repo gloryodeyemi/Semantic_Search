@@ -1,7 +1,7 @@
 # Semantic Search Engine
 A semantic search engine using Facebook AI Similarity Search (FAISS) and language models (BERT and SBERT).
 
-**Keywords:** Semantic Search, Indexing, Vectors, Embedding.
+**Keywords:** Semantic Search, Indexing, Vectors, Embedding, Information Retrieval.
 
 ## The Data
 A subset of the [ArXiv dataset](https://www.kaggle.com/datasets/Cornell-University/arxiv/) (10,000 articles) was used for this project.
