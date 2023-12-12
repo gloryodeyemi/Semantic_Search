@@ -84,7 +84,7 @@ def combine_and_process_data(data_path1, data_path2):
         'Category': categories
     })
 
-    # Extract labels from categories (optional)
+    # extract labels from categories
     labels = [category.split(':')[0] for category in categories]
     data['Label'] = labels
 
@@ -124,44 +124,44 @@ def evaluate(data, labels, model_name, task):
     print(f"Evaluation done and saved.")
 
 
-# # Movie Review Task
-# mr_data, mr_labels = read_and_process_data(f'{DATA_PATH}/MR/rt-polarity.neg', f'{DATA_PATH}/MR/rt-polarity.pos')
-# evaluate(mr_data, mr_labels, 'bert-base-uncased', 'MR')
-# evaluate(mr_data, mr_labels, 'sbert', 'MR')
-# print("*"*50)
+# Movie Review Task
+mr_data, mr_labels = read_and_process_data(f'{DATA_PATH}/MR/rt-polarity.neg', f'{DATA_PATH}/MR/rt-polarity.pos')
+evaluate(mr_data, mr_labels, 'bert-base-uncased', 'MR')
+evaluate(mr_data, mr_labels, 'sbert', 'MR')
+print("*"*50)
 
 # Customer Review Task
-# cr_data, cr_labels = read_and_process_data(f'{DATA_PATH}/CR/custrev.neg', f'{DATA_PATH}/CR/custrev.pos')
-# evaluate(cr_data, cr_labels, 'bert-base-uncased', 'CR')
-# evaluate(cr_data, cr_labels, 'sbert', 'CR')
-# print("*"*50)
+cr_data, cr_labels = read_and_process_data(f'{DATA_PATH}/CR/custrev.neg', f'{DATA_PATH}/CR/custrev.pos')
+evaluate(cr_data, cr_labels, 'bert-base-uncased', 'CR')
+evaluate(cr_data, cr_labels, 'sbert', 'CR')
+print("*"*50)
 
 # SUBJ Task
-# subj_data, subj_labels = read_and_process_data(f'{DATA_PATH}/SUBJ/subj.objective', f'{DATA_PATH}/SUBJ/subj.subjective')
-# evaluate(subj_data, subj_labels, 'bert-base-uncased', 'SUBJ')
-# evaluate(subj_data, subj_labels, 'sbert', 'SUBJ')
-# print("*"*50)
+subj_data, subj_labels = read_and_process_data(f'{DATA_PATH}/SUBJ/subj.objective', f'{DATA_PATH}/SUBJ/subj.subjective')
+evaluate(subj_data, subj_labels, 'bert-base-uncased', 'SUBJ')
+evaluate(subj_data, subj_labels, 'sbert', 'SUBJ')
+print("*"*50)
 
 # MPQA Task
-# mpqa_data, mpqa_labels = read_and_process_data(f'{DATA_PATH}/MPQA/mpqa.neg', f'{DATA_PATH}/MPQA/mpqa.pos')
-# evaluate(mpqa_data, mpqa_labels, 'bert-base-uncased', 'MPQA')
-# evaluate(mpqa_data, mpqa_labels, 'sbert', 'MPQA')
-# print("*"*50)
+mpqa_data, mpqa_labels = read_and_process_data(f'{DATA_PATH}/MPQA/mpqa.neg', f'{DATA_PATH}/MPQA/mpqa.pos')
+evaluate(mpqa_data, mpqa_labels, 'bert-base-uncased', 'MPQA')
+evaluate(mpqa_data, mpqa_labels, 'sbert', 'MPQA')
+print("*"*50)
 
 # SST Task
-# sst_data, sst_labels = merge_and_process_data(f'{DATA_PATH}/SST/binary/sentiment-train',
-#                                               f'{DATA_PATH}/SST/binary/sentiment-test',
-#                                               f'{DATA_PATH}/SST/binary/sentiment-dev')
-# evaluate(sst_data, sst_labels, 'bert-base-uncased', 'SST')
-# evaluate(sst_data, sst_labels, 'sbert', 'SST')
-# print("*"*50)
+sst_data, sst_labels = merge_and_process_data(f'{DATA_PATH}/SST/binary/sentiment-train',
+                                              f'{DATA_PATH}/SST/binary/sentiment-test',
+                                              f'{DATA_PATH}/SST/binary/sentiment-dev')
+evaluate(sst_data, sst_labels, 'bert-base-uncased', 'SST')
+evaluate(sst_data, sst_labels, 'sbert', 'SST')
+print("*"*50)
 
 # TREC Task
-# trec_data = combine_and_process_data(f'{DATA_PATH}/TREC/.!20834!train_5500.label',
-#                                               f'{DATA_PATH}/TREC/TREC_10.label-e')
-# evaluate(trec_data['Text'], trec_data['Label'], 'bert-base-uncased', 'TREC')
-# evaluate(trec_data['Text'], trec_data['Label'], 'sbert', 'TREC')
-# print("*"*50)
+trec_data = combine_and_process_data(f'{DATA_PATH}/TREC/.!20834!train_5500.label',
+                                              f'{DATA_PATH}/TREC/TREC_10.label-e')
+evaluate(trec_data['Text'], trec_data['Label'], 'bert-base-uncased', 'TREC')
+evaluate(trec_data['Text'], trec_data['Label'], 'sbert', 'TREC')
+print("*"*50)
 
 # MRPC Task
 mrpc_data, mrpc_labels = load_and_process_data(f'{DATA_PATH}/MRPC/msr_paraphrase_train.txt',
