@@ -73,13 +73,13 @@ def evaluate(data, model_name, task):
 
 
 # evaluate using SICK
-# dataset = merge_and_load_data(f'{DATA_PATH}/SICK/SICK_train.txt',
-#                               f'{DATA_PATH}/SICK/SICK_trial.txt',
-#                               f'{DATA_PATH}/SICK/SICK_test_annotated.txt')
-# print(f"Dataset shape: {dataset.shape}")
-# evaluate(dataset, 'bert-base-uncased', 'SICK')
-# evaluate(dataset, 'sbert', 'SICK')
-# print("*"*50)
+dataset = merge_and_load_data(f'{DATA_PATH}/SICK/SICK_train.txt',
+                              f'{DATA_PATH}/SICK/SICK_trial.txt',
+                              f'{DATA_PATH}/SICK/SICK_test_annotated.txt')
+print(f"Dataset shape: {dataset.shape}")
+evaluate(dataset, 'bert-base-uncased', 'SICK')
+evaluate(dataset, 'sbert', 'SICK')
+print("*"*50)
 
 # evaluate using STSBenchmark
 dataset = merge_and_load_data(f'{DATA_PATH}/STS/STSBenchmark/sts-train.csv',
