@@ -58,8 +58,8 @@ def plot_similarity():
 # plot graph for transfer tasks
 dataset = pd.read_csv('../results/embedding_evaluation_results.csv')
 metrics = ['Accuracy', 'Macro_F1', 'Weighted_F1']
-for metric in metrics:
-    plot_transfer(dataset, metric)
+for metric_ in metrics:
+    plot_transfer(dataset, metric_)
 
 # plot graph for similarity tasks
 plot_similarity()
