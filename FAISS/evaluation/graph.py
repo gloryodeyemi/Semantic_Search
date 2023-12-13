@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 
 def plot_transfer(data, metric):
-    # group data by Model and Task for Accuracy scores
+    # group data by Model and Task for metric scores
     metric_grouped = data.groupby(['Task', 'Model'])[f'{metric}'].mean().unstack()
     ax = metric_grouped.plot(kind='bar', figsize=(12, 8))
     ax.set_ylabel(f'{metric}')
