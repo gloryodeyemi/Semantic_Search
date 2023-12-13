@@ -1,0 +1,5 @@
+Model,Task,Spearman,Pearson
+BERT,SICK,0.59,0.61
+SBERT,SICK,0.74,0.8
+BERT,STSBenchmark,0.51,0.51
+SBERT,STSBenchmark,0.73,0.72
