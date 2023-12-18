@@ -13,7 +13,9 @@ pip install -r requirements.txt
 ```
 
 ## Structure
-* **[Data](https://github.com/gloryodeyemi/Semantic_Search/tree/main/FAISS/data):** contains the data file used for this project.
+* **[data](https://github.com/gloryodeyemi/Semantic_Search/tree/main/FAISS/data):** contains the data file used for this project.
+  
+* **[evaluation](https://github.com/gloryodeyemi/Semantic_Search/tree/main/FAISS/evaluation):** contains code for evaluating the models using SentEval downstream transfer and similarity tasks.
 
 * **[utils](https://github.com/gloryodeyemi/Semantic_Search/tree/main/FAISS/utils):** contains helper functions used for the project.
   
