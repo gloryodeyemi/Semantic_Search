@@ -55,6 +55,18 @@ python faiss_indexing.py
 python app.py
 ```
 
+To run the evaluation Python files, git clone the SentEval toolkit in the project's root directory first to get them, and follow the README instructions to download the datasets.
+
+1. Return to the project's root directory
+```
+cd..
+```
+2. Git clone SentEval toolkit
+```
+https://github.com/facebookresearch/SentEval.git
+```
+3. Download datasets.
+
 ## Contact
 Glory Odeyemi is undergoing her Master's program in Computer Science, Artificial Intelligence specialization at the [University of Windsor](https://www.uwindsor.ca/), Windsor, ON, Canada. You can connect with her on [LinkedIn](https://www.linkedin.com/in/glory-odeyemi-a3a680169/).
 
