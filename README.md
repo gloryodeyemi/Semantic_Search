@@ -75,3 +75,4 @@ Glory Odeyemi is undergoing her Master's program in Computer Science, Artificial
 2. [FAISS](https://faiss.ai/index.html)
 3. [BERT](https://huggingface.co/bert-base-uncased)
 4. [SBERT](https://huggingface.co/sentence-transformers/multi-qa-mpnet-base-dot-v1)
+5. [SentEval](https://github.com/facebookresearch/SentEval)
