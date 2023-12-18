@@ -63,7 +63,7 @@ cd..
 ```
 2. Git clone SentEval toolkit
 ```
-https://github.com/facebookresearch/SentEval.git
+git clone https://github.com/facebookresearch/SentEval.git
 ```
 3. Download datasets.
 
